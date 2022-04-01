@@ -1,0 +1,41 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.10'
+}
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+javafx {
+    version = "11.0.2"
+    modules = [ 'javafx.controls' ]
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url "https://maven.imagej.net/content/repositories/public/"
+    }
+    maven {
+        url "https://maven.repository.redhat.com/ga/"
+    }
+
+}
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+    implementation 'com.github.graphstream:gs-core:2.0-alpha'
+    implementation 'com.github.graphstream:gs-ui-javafx:2.0-alpha'
+    implementation 'org.apache.lucene:lucene-core:3.6.2.redhat-8'
+    implementation 'org.apache.lucene:lucene-analyzers-common:4.0.0'
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    implementation 'org.apache.commons:commons-lang3:3.11'
+
+
+
+}
+
+test {
+    useJUnitPlatform()
+}
+

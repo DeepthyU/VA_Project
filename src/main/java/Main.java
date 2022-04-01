@@ -1,15 +1,7 @@
-import javafx.scene.canvas.GraphicsContext;
-import org.graphstream.graph.*;
-import org.graphstream.graph.implementations.*;
-import org.graphstream.ui.fx_viewer.FxDefaultView;
-import org.graphstream.ui.graphicGraph.GraphicGraph;
-import org.graphstream.ui.javafx.FxGraphRenderer;
-import org.graphstream.ui.view.GraphRenderer;
-import org.graphstream.ui.view.LayerRenderer;
-import org.graphstream.ui.view.View;
-import org.graphstream.ui.view.Viewer;
+import org.graphstream.graph.Graph;
+import org.graphstream.graph.Node;
+import org.graphstream.graph.implementations.SingleGraph;
 
-import java.awt.*;
 import java.util.Iterator;
 
 public class Main {
@@ -24,8 +16,7 @@ public class Main {
         graph.setAutoCreate(true);
         graph.setStrict(false);
         System.setProperty("org.graphstream.ui", "javafx");
-        Viewer viewer = graph.display(true);
-        FxDefaultView view = (FxDefaultView) viewer.getDefaultView();
+        graph.display(true);
 
         graph.addEdge("AB", "A", "B");
         graph.addEdge("AC", "A", "C");

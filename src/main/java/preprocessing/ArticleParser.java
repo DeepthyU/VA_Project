@@ -16,16 +16,11 @@ public class ArticleParser {
     List<String> STD_FORMAT_PUBLISHERS = new ArrayList<>(
             Arrays.asList("The Orb", "The Light of Truth", "The Tulip", "Worldwise", "Central Bulletin", "Athena Speaks",
                     "The Guide","News Desk", "The Truth", "The World", "The General Post", "Who What News","Daily Pegasus",
-                    "International News", "The Wrap", "All News Today", "The Explainer", "All News Today"));
-
-    List<String> STD_FORMAT_PUBLISHERS_1 = new ArrayList<>(
-            Arrays.asList("The World"));
+                    "International News", "The Wrap", "All News Today", "The Explainer", "All News Today", "The World"));
 
     List<String> TYPE2_FORMAT_PUBLISHERS = new ArrayList<>(
             Arrays.asList("Everyday News", "World Journal", "The Continent","International Times",
-                    "Tethys News","World Journal","World Source"));
-    List<String> TYPE2_FORMAT_PUBLISHERS_1 = new ArrayList<>(
-            Arrays.asList("Tethys News", "News Online Today"));
+                    "Tethys News","World Journal","World Source", "Tethys News", "News Online Today"));
     List<String> NO_TITLE_FORMAT_PUBLISHERS = new ArrayList<>(
             Arrays.asList("Homeland Illumination", "Centrum Sentinel"));
 
@@ -39,28 +34,22 @@ public class ArticleParser {
             return null;
         }
         if (STD_FORMAT_PUBLISHERS.contains(publication)) {
-            return parseStdArticle(lines, publication, 2);
-        }
-        if (STD_FORMAT_PUBLISHERS_1.contains(publication)) {
-            return parseStdArticle(lines, publication, 1);
-        }
-        if (TYPE2_FORMAT_PUBLISHERS_1.contains(publication)) {
-            return parseType2Article(lines, publication, 1);
+            return parseStdArticle(lines, publication);
         }
         if (TYPE2_FORMAT_PUBLISHERS.contains(publication)) {
-            return parseType2Article(lines, publication, 2);
+            return parseType2Article(lines, publication);
         }
         if ("Modern Rubicon".equalsIgnoreCase(publication)||"The Abila Post".equalsIgnoreCase(publication)) {
             int dateIdx = 2;
             int contentIdx = 3;
             // date format 20 January 2014
-            Timestamp date = Utils.format_date(lines[dateIdx], 1);
+            Timestamp date = Utils.format_date(lines[dateIdx]);
             String author = "";
             if (null == date) {
                 author = lines[dateIdx];
                 dateIdx += 1;
                 contentIdx += 1;
-                date = Utils.format_date(lines[dateIdx], 2);
+                date = Utils.format_date(lines[dateIdx]);
             }
             if (contentIdx >= lines.length)
             {
@@ -80,11 +69,11 @@ public class ArticleParser {
         if ("Kronos Star".equalsIgnoreCase(publication)) {
             String title = lines[1];
             if (title.startsWith("Breaking: ")) {
-                return parseStdArticle(lines, publication, 1);
+                return parseStdArticle(lines, publication);
             } else {
                 //breaking news
                 title = title.substring(10);
-                Article article = parseType2Article(lines, publication, 1);
+                Article article = parseType2Article(lines, publication);
                 article.setTitle(title);
                 Pattern pattern = Pattern.compile("^(Update, )[0-9]{1,2}(:)[0-9]{1,2}[\\s](PM|AM){1}[\\:]");
                 Matcher content_matcher = pattern.matcher(lines[3]);
@@ -94,7 +83,7 @@ public class ArticleParser {
             }
         }
         if (NO_TITLE_FORMAT_PUBLISHERS.contains(publication)) {
-            Article article = parseNoTitleArticle(lines, publication, 1);
+            Article article = parseNoTitleArticle(lines, publication);
             Pattern pattern = Pattern.compile("^[0-9]+[\\-]");
             Matcher content_matcher = pattern.matcher(lines[3]);
             String content = remove_pattern(3, content_matcher, lines);
@@ -105,18 +94,18 @@ public class ArticleParser {
         return null;
     }
 
-    Article parseStdArticle(String[] lines, String publication, int date_format) {
+    Article parseStdArticle(String[] lines, String publication) {
         int titleIdx = 1;
         int dateIdx = 2;
         int contentIdx = 3;
         //date format yyyy / mm / dd
-        Timestamp date = Utils.format_date(lines[dateIdx], date_format);
+        Timestamp date = Utils.format_date(lines[dateIdx]);
         String author = "";
         if (null == date) {
             author = lines[dateIdx];
             dateIdx += 1;
             contentIdx += 1;
-            date = Utils.format_date(lines[dateIdx], date_format);
+            date = Utils.format_date(lines[dateIdx]);
         }
         if (contentIdx >= lines.length)
         {
@@ -147,17 +136,17 @@ public class ArticleParser {
     }
 
 
-    Article parseNoTitleArticle(String[] lines, String publication, int date_format) {
+    Article parseNoTitleArticle(String[] lines, String publication) {
         int dateIdx = 2;
         int contentIdx = 3;
         //date format 20 January 2014
-        Timestamp date = Utils.format_date(lines[dateIdx], date_format);
+        Timestamp date = Utils.format_date(lines[dateIdx]);
         String author = "";
         if (null == date) {
             author = lines[dateIdx];
             dateIdx += 1;
             contentIdx += 1;
-            date = Utils.format_date(lines[dateIdx], date_format);
+            date = Utils.format_date(lines[dateIdx]);
         }
         if (contentIdx >= lines.length)
         {
@@ -171,19 +160,20 @@ public class ArticleParser {
         return new Article(publication, "", author, date, place, content, has_image);
     }
 
-    Article parseType2Article(String[] lines, String publication, int date_format) {
+    Article parseType2Article(String[] lines, String publication) {
         int titleIdx = 1;
         int dateIdx = 2;
         int contentIdx = 3;
         //date format yyyy / mm / dd
-        Timestamp date = Utils.format_date(lines[dateIdx], date_format);
+        Timestamp date = Utils.format_date(lines[dateIdx]);
         String author = "";
         if (null == date) {
             author = lines[dateIdx];
             dateIdx += 1;
             contentIdx += 1;
-            date = Utils.format_date(lines[dateIdx], date_format);
+            date = Utils.format_date(lines[dateIdx]);
         }
+
         if (contentIdx >= lines.length)
         {
             System.out.println("Error in length::"+Arrays.toString(lines));
@@ -194,6 +184,17 @@ public class ArticleParser {
         String title = results[0];
         String place = results[1];
         String content = results[2];
+        if (null == date) {
+            date = Utils.format_date(lines[titleIdx]);
+            if (null != date) {
+                title = null;
+                author = null;
+            }
+            else{
+                System.out.println("CANNOT FIND DATE::"+Arrays.toString(lines));
+                return null;
+            }
+        }
         boolean has_image = (content.contains("<<deleted image"));  //add to all
         return new Article(publication, title, author, date, place, content, has_image);
     }
@@ -213,14 +214,20 @@ public class ArticleParser {
             }
         } else {
             content = Arrays.toString(Arrays.copyOfRange(lines, contentIdx, lines.length));
-            matcher = pattern.matcher(lines[contentIdx]);
-            matchFound = matcher.find();
+            int idx = contentIdx;
+            while (idx != lines.length && !matchFound) {
+                matcher = pattern.matcher(lines[idx]);
+                matchFound = matcher.find();
+                idx++;
+            }
             if (matchFound) {
                 place = matcher.group(0);
-                title = matcher.group(1);
+                content = matcher.group(1);
+                if (idx > lines.length)
+                    content = content.concat(Arrays.toString(Arrays.copyOfRange(lines, idx+1, lines.length)));
             }
         }
-        if (StringUtils.isNotBlank(place)) {
+        if (StringUtils.isBlank(place)) {
             String search_str = lines[1].concat(Arrays.toString(Arrays.copyOfRange(lines, contentIdx, lines.length)));
             if (search_str.toLowerCase().contains("kronos")) {
                 place = "kronos";

@@ -1,9 +1,11 @@
 package preprocessing;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
-public class Article{
+public class Article {
 
     private String fileName;
     private String publication;
@@ -12,16 +14,23 @@ public class Article{
     private String place;
     private String content;
     private String[] stems;
-    private String[] keyword_count_arr;
+    private List<String> keywordsList = new ArrayList<String>();
     private String author;
     private boolean hasDeletedImg;
     private String time;
-
+    private int xCoordinate;
     private int yCoordinate;
+    private List<Edge> edges = new ArrayList<>();
 
+    public List<Edge> getEdges() {
+        return edges;
+    }
 
-    public Article(String publication, String title, String author, Timestamp date, String place, String content, boolean hasDeletedImg)
-    {
+    public void setEdges(List<Edge> edges) {
+        this.edges = edges;
+    }
+
+    public Article(String publication, String title, String author, Timestamp date, String place, String content, boolean hasDeletedImg) {
         this.publication = publication;
         this.title = title;
         this.author = author;
@@ -87,16 +96,16 @@ public class Article{
         this.stems = stems;
     }
 
-    public String[] getKeyword_count_arr() {
-        return keyword_count_arr;
-    }
-
-    public void setKeyword_count_arr(String[] keyword_count_arr) {
-        this.keyword_count_arr = keyword_count_arr;
-    }
-
     public String getAuthor() {
         return author;
+    }
+
+    public int getxCoordinate() {
+        return xCoordinate;
+    }
+
+    public void setxCoordinate(int xCoordinate) {
+        this.xCoordinate = xCoordinate;
     }
 
     public void setAuthor(String author) {
@@ -120,13 +129,20 @@ public class Article{
     }
 
 
-
     public int getyCoordinate() {
         return yCoordinate;
     }
 
     public void setyCoordinate(int yCoordinate) {
         this.yCoordinate = yCoordinate;
+    }
+
+    public List<String> getKeywordsList() {
+        return keywordsList;
+    }
+
+    public void setKeywordsList(List<String> keywordsList) {
+        this.keywordsList = keywordsList;
     }
 
     @Override
@@ -139,12 +155,12 @@ public class Article{
                 ", place='" + place + '\'' +
                 ", content='" + content + '\'' +
                 ", stems=" + Arrays.toString(stems) +
-                ", keyword_count_arr=" + Arrays.toString(keyword_count_arr) +
+                ", keywordsList=" + keywordsList +
                 ", author='" + author + '\'' +
                 ", hasDeletedImg=" + hasDeletedImg +
                 ", time='" + time + '\'' +
+                ", xCoordinate=" + xCoordinate +
                 ", yCoordinate=" + yCoordinate +
                 '}';
     }
-
 }
