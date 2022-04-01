@@ -2,11 +2,13 @@ package preprocessing;
 
 import keywordsearch.KeywordFinder;
 import org.apache.commons.collections4.CollectionUtils;
+import sentimentAnalysis.SentimentAnalysis;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -42,6 +44,7 @@ public class Preprocessor {
         setXCoordinate(articleList);
         setYCoordinate(articleList);
         findEdges(articleList);
+        //SentimentAnalysis.setSentiments(articleList, Arrays.asList(keywordsArr));
         return articleList;
     }
 
