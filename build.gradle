@@ -6,10 +6,10 @@ plugins {
 group 'org.example'
 version '1.0-SNAPSHOT'
 
-javafx {
-    version = "11.0.2"
-    modules = [ 'javafx.controls' ]
-}
+//javafx {
+//    version = "11.0.2"
+//    modules = [ 'javafx.controls' ]
+//}
 
 repositories {
     mavenCentral()
@@ -25,11 +25,29 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
     implementation 'com.github.graphstream:gs-core:2.0-alpha'
+    implementation 'com.github.graphstream:gs-algo:2.0-alpha'
     implementation 'com.github.graphstream:gs-ui-javafx:2.0-alpha'
+    implementation 'com.github.graphstream:gs-ui-swing:2.0-alpha'
     implementation 'org.apache.lucene:lucene-core:3.6.2.redhat-8'
     implementation 'org.apache.lucene:lucene-analyzers-common:4.0.0'
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     implementation 'org.apache.commons:commons-lang3:3.11'
+    // https://mvnrepository.com/artifact/org.python/jython
+    implementation group: 'org.python', name: 'jython', version: '2.7.0'
+    // https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-collections4
+    implementation 'org.apache.commons:commons-collections4:4.4'
+    // https://mvnrepository.com/artifact/com.kennycason/kumo
+    implementation 'com.kennycason:kumo:1.5'
+    // https://mvnrepository.com/artifact/edu.stanford.nlp/stanford-corenlp
+    implementation 'edu.stanford.nlp:stanford-corenlp:4.4.0'
+    implementation group: 'edu.stanford.nlp', name: 'stanford-corenlp', version: '4.4.0', classifier: 'models'
+    implementation 'org.slf4j:slf4j-api:2.0.0-alpha7'
+
+
+
+
 
 
 

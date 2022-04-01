@@ -22,6 +22,16 @@ public class Article {
     private int yCoordinate;
     private List<Edge> edges = new ArrayList<>();
 
+    public int getSentimentScore() {
+        return sentimentScore;
+    }
+
+    public void setSentimentScore(int sentimentScore) {
+        this.sentimentScore = sentimentScore;
+    }
+
+    private int sentimentScore;
+
     public List<Edge> getEdges() {
         return edges;
     }
