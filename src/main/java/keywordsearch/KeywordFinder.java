@@ -12,7 +12,7 @@ public class KeywordFinder {
     public static String[] keywordsArr;
 
     public KeywordFinder(List<Article> articleList, String history){
-        keywordsArr = getKeywords(articleList, history);
+        keywordsArr = getKeywords(articleList, 0, Long.MAX_VALUE, history);
     }
 
     public String[] getKeywordsArr()

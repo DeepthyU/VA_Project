@@ -12,17 +12,11 @@ import java.util.List;
 
 public class SentimentAnalysis {
 
-    public static void main(String[] args) throws FileNotFoundException {
-        SentimentAnalysis sa = new SentimentAnalysis();
-        sa.setSentiments(null);
-    }
 
     //TODO: write article output list to json file
     //TODO: update to take articleList as arguement
-    public void setSentiments(List<String> keywords) {
+    public static void setSentiments(List<Article> articleList, List<String> keywords) {
         StanfordCoreNLP stanfordCoreNLP = Pipeline.getPipeline();
-        Preprocessor preprocessor = new Preprocessor();
-        List<Article> articleList = preprocessor.getArticleList();
         for (Article article : articleList) {
             if (isArticleHasKeyword(article, keywords)) {
                 String content = article.getTitle() + article.getContent();
@@ -54,7 +48,7 @@ public class SentimentAnalysis {
         }
     }
 
-    private boolean isArticleHasKeyword(Article article, List<String> keywords) {
+    private static boolean isArticleHasKeyword(Article article, List<String> keywords) {
         if (null == keywords) {
             return true;
         }

@@ -5,12 +5,12 @@ import java.util.List;
 
 public class ArticleFilter {
 
-    ArticleField field;
-    List<String> selectedValues = new ArrayList<>();
-    List<String> unselectedValues = new ArrayList<>();
-    long startDate;
-    long endDate;
-    boolean keepEmptyValue;
+    private ArticleField field;
+    private List<String> selectedValues = new ArrayList<>();
+    private List<String> unselectedValues = new ArrayList<>();
+    private long startDate;
+    private long endDate;
+    private boolean keepEmptyValue;
 
     public boolean isKeepEmptyValue() {
         return keepEmptyValue;

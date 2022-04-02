@@ -2,6 +2,7 @@ package preprocessing;
 
 import keywordsearch.KeywordFinder;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import sentimentAnalysis.SentimentAnalysis;
 
 import java.io.File;
@@ -21,12 +22,10 @@ public class Preprocessor {
     private String[] keywordsArr;
 
     public Preprocessor() {
-        // if (doInit) {
+        // check file. if file exists, read from file
         articleList = makeArticleList();
         KeywordFinder keywordFinder = new KeywordFinder(articleList, HISTORY);
         keywordsArr = keywordFinder.getKeywordsArr();
-        //  doInit = false;
-        //}
     }
 
     public List<Article> getArticleList() {
@@ -44,11 +43,13 @@ public class Preprocessor {
         setXCoordinate(articleList);
         setYCoordinate(articleList);
         findEdges(articleList);
-        //SentimentAnalysis.setSentiments(articleList, Arrays.asList(keywordsArr));
+        SentimentAnalysis.setSentiments(articleList, null);
         return articleList;
     }
-
-    private void findEdges(List<Article> articleList) {
+    public void findEdges(List<Article> articleList) {
+        findEdges(articleList, null);
+    }
+    public void findEdges(List<Article> articleList, List<String> keywordList) {
         for (Article article : articleList) {
             for (Article article1 : articleList) {
                 if (article.getFileName().compareTo(article1.getFileName()) >= 0) {
@@ -56,11 +57,16 @@ public class Preprocessor {
                 }
                 List<String> common = (List<String>) CollectionUtils.intersection(article.getKeywordsList(), article1.getKeywordsList());
                 if (null != common) {
-                    Edge edge = new Edge();
-                    edge.setNode1(article.getFileName());
-                    edge.setNode2(article1.getFileName());
-                    edge.setWeight(common.size());
-                    article.getEdges().add(edge);
+                    if (null != keywordList) {
+                        common = (List<String>) CollectionUtils.intersection(common, keywordList);
+                    }
+                    if (null != common) {
+                        Edge edge = new Edge();
+                        edge.setNode1(article.getFileName());
+                        edge.setNode2(article1.getFileName());
+                        edge.setWeight(common.size());
+                        article.getEdges().add(edge);
+                    }
                 }
             }
         }
@@ -74,10 +80,8 @@ public class Preprocessor {
             String content = article.getContent();
             int count = 0;
             for (String keyword : keywords) {
-                if (null != title && title.contains(keyword)) {
-                    article.getKeywordsList().add(keyword);
-                    count++;
-                } else if (null != content && content.contains(keyword)) {
+                if ((StringUtils.isNotBlank(title) && title.contains(keyword)) ||
+                        (StringUtils.isNotBlank(content) && content.contains(keyword))) {
                     article.getKeywordsList().add(keyword);
                     count++;
                 }
@@ -120,4 +124,10 @@ public class Preprocessor {
         }
     }
 
+    public static void main(String[] args) {
+        Preprocessor preprocessor = new Preprocessor();
+        Utils.writeArticleListToFile("article_list.json", preprocessor.getArticleList());
+        List<Article> readArticles = Utils.readArticleList("article_list.json");
+        System.out.println(readArticles);
+    }
 }

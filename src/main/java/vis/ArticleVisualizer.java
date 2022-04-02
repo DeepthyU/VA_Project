@@ -12,6 +12,7 @@ import preprocessing.Preprocessor;
 import java.util.*;
 
 public class ArticleVisualizer {
+    private static final Preprocessor PREPROCESSOR = new Preprocessor();
     private List<ArticleFilter> filters;
     protected static String styleSheet =
             "node {	fill-color: black; } node.marked { fill-color: red;}" +
@@ -19,7 +20,7 @@ public class ArticleVisualizer {
                     "node.tethys { fill-color: green;}";
 
     protected static Graph graph = initGraph(styleSheet);
-    protected static List<Article> ARTICLE_LIST = getArticles();
+    protected static List<Article> ARTICLE_LIST = PREPROCESSOR.getArticleList();
 
     public static void main(String args[]) {
         ArticleVisualizer av = new ArticleVisualizer();
@@ -28,7 +29,7 @@ public class ArticleVisualizer {
     }
 
     public List<ArticleFilter> getFilters() {
-        if (null == filters){
+        if (null == filters) {
             filters = new ArrayList<>();
         }
         return filters;
@@ -83,11 +84,15 @@ public class ArticleVisualizer {
     public Graph prepareGraph(boolean showEdges) {
         Graph graph = initGraph(styleSheet);
         List<ArticleFilter> filters = getFilters();
+        boolean needEdgeUpdate = false;
         System.out.println("article list size is " + ARTICLE_LIST.size());
+        List<Article> currList = new ArrayList<>();
         for (Article article : ARTICLE_LIST) {
             if (isRemoveItem(filters, article)) {
+                needEdgeUpdate = true;
                 continue;
             }
+            currList.add(article);
             Node node = graph.addNode(article.getFileName());
             node.setAttribute("xy", article.getxCoordinate(), article.getyCoordinate() * 200);
             node.setAttribute("title", article.getTitle());
@@ -104,7 +109,11 @@ public class ArticleVisualizer {
 //            }
         }
         if (showEdges) {
-            for (Article article : ARTICLE_LIST) {
+            if (needEdgeUpdate) {
+                resetEdges(currList);
+                updateEdges(currList, filters);
+            }
+            for (Article article : currList) {
                 for (Edge edge : article.getEdges()) {
                     graph.addEdge(String.valueOf(edge.hashCode()), edge.getNode1(), edge.getNode2());
                 }
@@ -112,6 +121,28 @@ public class ArticleVisualizer {
         }
         return graph;
 
+    }
+
+    //TODO: zoom https://stackoverflow.com/questions/44675827/how-to-zoom-into-a-graphstream-view
+    private void updateEdges(List<Article> currList, List<ArticleFilter> filters) {
+        ArticleFilter keywordFilter = null;
+        List<String> keywords = null;
+        for (ArticleFilter filter : filters) {
+            if (filter.getField().equals(ArticleField.KEYWORD)) {
+                keywordFilter = filter;
+                break;
+            }
+        }
+        if (null != keywordFilter) {
+            keywords = keywordFilter.getSelectedValues();
+        }
+        PREPROCESSOR.findEdges(currList, keywords);
+    }
+
+    private void resetEdges(List<Article> currList) {
+        for (Article article : currList) {
+            article.setEdges(new ArrayList<Edge>());
+        }
     }
 
 
@@ -164,11 +195,6 @@ public class ArticleVisualizer {
                 filter.getUnselectedValues().contains(fieldValue));
     }
 
-    public static List<Article> getArticles() {
-        Preprocessor preprocessor = new Preprocessor();
-        List<Article> articleList = preprocessor.getArticleList();
-        return articleList;
-    }
 
     public static Graph initGraph(String styleSheet) {
         Graph graph = new SingleGraph("single graph");

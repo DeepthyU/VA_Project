@@ -1,8 +1,10 @@
 package preprocessing;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.io.*;
+import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -10,7 +12,9 @@ import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -109,5 +113,37 @@ public class Utils {
     public static void main(String[] args) {
         Timestamp output = format_date("2007/03/22");
         System.out.println(output);
+    }
+
+    public static int writeArticleListToFile(String fileName, List<Article> articleList) {
+        try {
+            BufferedWriter bWriter = new BufferedWriter(new FileWriter(fileName));
+            Gson gson = new Gson();
+            Type type = new TypeToken<List<Article>>() {}.getType();
+            String jsonStr = gson.toJson(articleList, type);
+            bWriter.append(jsonStr);
+            bWriter.newLine();
+            bWriter.close();
+        } catch (IOException e) {
+            return -1;
+        }
+        return 0;
+    }
+
+    public static List<Article> readArticleList(String fileName) {
+        List<Article> articleList = new ArrayList<>();
+        try {
+            BufferedReader buffReader = new BufferedReader(new FileReader(fileName));
+            String line;
+            Gson gson = new Gson();
+            Type type = new TypeToken<List<Article>>() {}.getType();
+            while ((line = buffReader.readLine()) != null) {
+                articleList.addAll(gson.fromJson(line, type));
+            }
+            buffReader.close();
+        } catch (IOException e) {
+            System.out.println("ERROR: File read failed in readArticleList()");
+        }
+        return articleList;
     }
 }
