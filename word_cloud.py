@@ -26,7 +26,7 @@ local_stopwords.update(STOPWORDS)
 local_stopwords.update(all_stopwords)
 
 # Generate word cloud
-wordcloud = WordCloud(normalize_plurals=True, include_numbers=False, collocation_threshold=30, width = 3000, height = 2000, random_state=1, background_color='black', colormap='Set2', collocations=False, stopwords = local_stopwords).generate(text)
+wordcloud = WordCloud(normalize_plurals=True, include_numbers=False, collocation_threshold=30, width = 3000, height = 2000, random_state=1, background_color='black', colormap='Set2', collocations=False, min_word_length = 3, stopwords = local_stopwords).generate(text)
     
 #wordcloud = WordCloud(width = 3000, height = 2000, random_state=1, background_color='black', colormap='Set2', collocations=False, stopwords = STOPWORDS).generate(text)
 # Plot

@@ -23,22 +23,28 @@ public class Preprocessor {
 
     public Preprocessor() {
         // check file. if file exists, read from file
-        articleList = makeArticleList();
-        KeywordFinder keywordFinder = new KeywordFinder(articleList, HISTORY);
-        keywordsArr = keywordFinder.getKeywordsArr();
+        articleList = makeArticleList(1000);
+    }
+
+    public Preprocessor(int count) {
+        // check file. if file exists, read from file
+        articleList = makeArticleList(count);
     }
 
     public List<Article> getArticleList() {
         return articleList;
+    }
+    public void setKeywordsArr(String[] keywordsArr) {
+        this.keywordsArr = keywordsArr;
     }
 
     public String[] getKeywordsArr() {
         return keywordsArr;
     }
 
-    private List<Article> makeArticleList() {
+    private List<Article> makeArticleList(int count) {
         File file = new File(ARTICLES_PATH);
-        List<Article> articleList = readFiles(file);
+        List<Article> articleList = readFiles(file, count);
         //get coordinates
         setXCoordinate(articleList);
         setYCoordinate(articleList);
@@ -75,6 +81,7 @@ public class Preprocessor {
     private void setYCoordinate(List<Article> articleList) {
         KeywordFinder kf = new KeywordFinder(articleList, HISTORY);
         String[] keywords = kf.getKeywordsArr();
+        setKeywordsArr(keywords);
         for (Article article : articleList) {
             String title = article.getTitle();
             String content = article.getContent();
@@ -90,9 +97,14 @@ public class Preprocessor {
         }
     }
 
-    private List<Article> readFiles(File folder) {
+    private List<Article> readFiles(File folder, int count) {
         List<Article> articleList = new ArrayList<>();
+        int counter = 0;
         for (final File fileEntry : folder.listFiles()) {
+            if (count== counter){
+                break;
+            }
+            counter++;
             String text = Utils.readFile(fileEntry.getPath(), StandardCharsets.UTF_8);
             ArticleParser parser = new ArticleParser();
             Article article = parser.parseArticle(text);
@@ -125,9 +137,9 @@ public class Preprocessor {
     }
 
     public static void main(String[] args) {
-        Preprocessor preprocessor = new Preprocessor();
+        Preprocessor preprocessor = new Preprocessor(1000);
         Utils.writeArticleListToFile("article_list.json", preprocessor.getArticleList());
         List<Article> readArticles = Utils.readArticleList("article_list.json");
-        System.out.println(readArticles);
+        System.out.println(readArticles.get(0).getTitle());
     }
 }
