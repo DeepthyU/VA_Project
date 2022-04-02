@@ -14,7 +14,8 @@ import java.util.Comparator;
 import java.util.List;
 
 public class Preprocessor {
-    private static boolean doInit = true;
+    public static final String ARTICLE_LIST_FILE_PATH = "article_list.json";
+    public static final String ARTICLE_LIST_FILE_PATH2 = "article_list1.json";
     private static final String ARTICLES_PATH = "./src/main/data/gastech_data/data/articles/";
     private static final String HISTORIC_DOCS_PATH = "./src/main/data/gastech_data/data/HistoricalDocuments/txt versions";
     private List<Article> articleList;
@@ -23,17 +24,21 @@ public class Preprocessor {
 
     public Preprocessor() {
         // check file. if file exists, read from file
-        articleList = makeArticleList(1000);
+        articleList = Utils.readArticleList(ARTICLE_LIST_FILE_PATH);
+        if (CollectionUtils.isEmpty(articleList)) {
+            articleList = makeArticleList(1000, false);
+        }
     }
 
-    public Preprocessor(int count) {
+    public Preprocessor(int count, boolean write) {
         // check file. if file exists, read from file
-        articleList = makeArticleList(count);
+        articleList = makeArticleList(count, write);
     }
 
     public List<Article> getArticleList() {
         return articleList;
     }
+
     public void setKeywordsArr(String[] keywordsArr) {
         this.keywordsArr = keywordsArr;
     }
@@ -42,19 +47,21 @@ public class Preprocessor {
         return keywordsArr;
     }
 
-    private List<Article> makeArticleList(int count) {
+    private List<Article> makeArticleList(int count, boolean write) {
         File file = new File(ARTICLES_PATH);
         List<Article> articleList = readFiles(file, count);
         //get coordinates
         setXCoordinate(articleList);
-        setYCoordinate(articleList);
+        setYCoordinate(articleList, write);
         findEdges(articleList);
-        SentimentAnalysis.setSentiments(articleList, null);
         return articleList;
     }
+
+
     public void findEdges(List<Article> articleList) {
         findEdges(articleList, null);
     }
+
     public void findEdges(List<Article> articleList, List<String> keywordList) {
         for (Article article : articleList) {
             for (Article article1 : articleList) {
@@ -78,7 +85,7 @@ public class Preprocessor {
         }
     }
 
-    private void setYCoordinate(List<Article> articleList) {
+    private void setYCoordinate(List<Article> articleList, boolean write) {
         KeywordFinder kf = new KeywordFinder(articleList, HISTORY);
         String[] keywords = kf.getKeywordsArr();
         setKeywordsArr(keywords);
@@ -94,6 +101,10 @@ public class Preprocessor {
                 }
             }
             article.setyCoordinate(count);
+            if (write) {
+                SentimentAnalysis.setSentiments(article);
+                Utils.writeArticleToFile(ARTICLE_LIST_FILE_PATH2, article);
+            }
         }
     }
 
@@ -101,7 +112,7 @@ public class Preprocessor {
         List<Article> articleList = new ArrayList<>();
         int counter = 0;
         for (final File fileEntry : folder.listFiles()) {
-            if (count== counter){
+            if (count == counter) {
                 break;
             }
             counter++;
@@ -137,9 +148,6 @@ public class Preprocessor {
     }
 
     public static void main(String[] args) {
-        Preprocessor preprocessor = new Preprocessor(1000);
-        Utils.writeArticleListToFile("article_list.json", preprocessor.getArticleList());
-        List<Article> readArticles = Utils.readArticleList("article_list.json");
-        System.out.println(readArticles.get(0).getTitle());
+        System.out.println(Utils.readArticleList("article_list.json"));
     }
 }

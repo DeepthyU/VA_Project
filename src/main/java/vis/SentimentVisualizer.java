@@ -3,28 +3,31 @@ package vis;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.ui.view.Viewer;
-import org.graphstream.ui.view.ViewerPipe;
 import preprocessing.Article;
 import preprocessing.Edge;
 import vis.article.ArticleFilter;
 import vis.article.MainVisualizer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-public class ArticleVisualizer extends MainVisualizer {
+public class SentimentVisualizer extends MainVisualizer {
 
     protected static String styleSheet =
-            "node {	fill-color: black; } node.marked { fill-color: red;}" +
-                    "node.kronos { fill-color: blue;}" +
-                    "node.tethys { fill-color: green;}";
-
+            "node {	size: 5px, 5px; fill-color: black; } " +
+                    "node.marked { fill-color: red;}" +
+                    "node.positive { fill-color: blue;}" +
+                    "node.negative { fill-color: green;}" +
+                    "edge {\n" +
+                    "\tshape: line;\n" +
+                    "\tarrow-size: 3px, 2px;\n" +
+                    "}" +
+                    "edge.marked {\n" +
+                    "\tshape: line;\n" +
+                    "\tfill-color: red;\n" +
+                    "\tarrow-size: 3px, 2px;\n" +
+                    "}";
     protected static Graph graph = initGraph(styleSheet);
-
-    public static void main(String args[]) {
-        ArticleVisualizer av = new ArticleVisualizer();
-        List<ArticleFilter> filters = av.getFilters();
-        av.makeGraph(filters, true);
-    }
 
     public void makeGraph(List<ArticleFilter> filters, boolean showEdges) {
         System.out.println("article list size is " + PREPROCESSOR.getArticleList().size());
@@ -37,21 +40,17 @@ public class ArticleVisualizer extends MainVisualizer {
             }
             currList.add(article);
             Node node = graph.addNode(article.getFileName());
-            node.setAttribute("xy", article.getxCoordinate(), article.getyCoordinate() * 200);
+            node.setAttribute("xy", article.getxCoordinate() , article.getSentimentScore() * 100);
             node.setAttribute("title", article.getTitle());
-            node.setAttribute("place", article.getPlace());
-            node.setAttribute("author", article.getAuthor());
+            node.setAttribute("sentiment", article.getSentimentScore());
             node.setAttribute("publication", article.getPublication());
-            if (article.getPlace().toLowerCase(Locale.ROOT).contains("kronos")) {
-                node.setAttribute("ui.class", "kronos");
-            } else if (article.getPlace().toLowerCase(Locale.ROOT).contains("tethys")) {
-                node.setAttribute("ui.class", "tethys");
+            if (article.getSentimentScore() < 0) {
+                node.setAttribute("ui.class", "negative");
+            } else if (article.getSentimentScore() > 0) {
+                node.setAttribute("ui.class", "positive");
             }
-//            else {
-//                System.out.println("Unknown place:" + article);
-//            }
         }
-        System.out.println("Remaining articles after filtering:" + currList.size());
+        System.out.println("Remaining articles after filtering:"+currList.size());
         if (showEdges) {
             if (needEdgeUpdate) {
                 resetEdges(currList);
@@ -64,24 +63,27 @@ public class ArticleVisualizer extends MainVisualizer {
             }
         }
 
-
         Viewer viewer = graph.display();
         viewer.disableAutoLayout();
-        //View view = viewer.getDefaultView();
-        //view.setMouseManager(new MouseOverMouseManager());
-        viewer.enableXYZfeedback(true);
-        ViewerPipe fromView = viewer.newViewerPipe(); // An object allowing thread-safe communication with the viewer
-        fromView.addAttributeSink(graph); // Listen at the changes in the graphic graph.
-        //fromView.addViewerListener();
-        Node start = graph.getNode(currList.get(0).getFileName());
-        Iterator<? extends Node> k = start.getBreadthFirstIterator();
-
-        while (k.hasNext()) {
-            Node next = k.next();
-            next.setAttribute("ui.class", "marked");
-            sleep();
-        }
-        System.out.println("DONE");
+//        Node start = graph.getNode("100.txt");
+//        Iterator<? extends Node> k = start.getBreadthFirstIterator();
+//        Node previous = null;
+//        while (k.hasNext()) {
+//
+//            Node next = k.next();
+//            if (null != previous) {
+//                org.graphstream.graph.Edge edge = previous.getEdgeBetween(next.getId());
+//                if (null == edge) {
+//                    System.out.println("Edge missing for :" + previous.getId() + " , " + next.getId());
+//                } else {
+//                    edge.setAttribute("ui.class", "marked");
+//                }
+//            }
+//            next.setAttribute("ui.class", "marked");
+//            previous = next;
+//            sleep();
+//        }
+    System.out.println("DONE");
     }
 
     public Graph prepareGraph(boolean showEdges) {
@@ -97,19 +99,15 @@ public class ArticleVisualizer extends MainVisualizer {
             }
             currList.add(article);
             Node node = graph.addNode(article.getFileName());
-            node.setAttribute("xy", article.getxCoordinate(), article.getyCoordinate() * 200);
+            node.setAttribute("xy", article.getxCoordinate(), article.getSentimentScore() * 200);
             node.setAttribute("title", article.getTitle());
-            node.setAttribute("place", article.getPlace());
-            node.setAttribute("author", article.getAuthor());
+            node.setAttribute("sentiment", article.getSentimentScore());
             node.setAttribute("publication", article.getPublication());
-            if (article.getPlace().toLowerCase(Locale.ROOT).contains("kronos")) {
-                node.setAttribute("ui.class", "kronos");
-            } else if (article.getPlace().toLowerCase(Locale.ROOT).contains("tethys")) {
-                node.setAttribute("ui.class", "tethys");
+            if (article.getSentimentScore() < 0) {
+                node.setAttribute("ui.class", "negative");
+            } else if (article.getSentimentScore() > 0) {
+                node.setAttribute("ui.class", "positive");
             }
-//            else {
-//                System.out.println("Unknown place:" + article);
-//            }
         }
         if (showEdges) {
             if (needEdgeUpdate) {
@@ -123,10 +121,14 @@ public class ArticleVisualizer extends MainVisualizer {
             }
         }
         return graph;
-
     }
 
-    //TODO: zoom https://stackoverflow.com/questions/44675827/how-to-zoom-into-a-graphstream-view
 
+    //TODO: zoom https://stackoverflow.com/questions/44675827/how-to-zoom-into-a-graphstream-view
+    public static void main(String args[]) {
+        SentimentVisualizer sv = new SentimentVisualizer();
+        List<ArticleFilter> filters = sv.getFilters();
+        sv.makeGraph(filters, true);
+    }
 
 }

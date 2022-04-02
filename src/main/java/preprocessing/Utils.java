@@ -1,6 +1,7 @@
 package preprocessing;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.*;
@@ -130,11 +131,45 @@ public class Utils {
         return 0;
     }
 
-    public static List<Article> readArticleList(String fileName) {
+    public static int writeArticleToFile(String fileName, Article article) {
+        try {
+            BufferedWriter bWriter = new BufferedWriter(new FileWriter(fileName, true));
+            Gson gson = new Gson();
+            Type type = new TypeToken<Article>() {}.getType();
+            String jsonStr = gson.toJson(article, type);
+            bWriter.append(jsonStr);
+            bWriter.newLine();
+            bWriter.close();
+        } catch (IOException e) {
+            return -1;
+        }
+        return 0;
+    }
+
+    public static List<Article> readArticles(String fileName) {
         List<Article> articleList = new ArrayList<>();
+        String line = null;
         try {
             BufferedReader buffReader = new BufferedReader(new FileReader(fileName));
-            String line;
+            Gson gson = new Gson();
+            while ((line = buffReader.readLine()) != null) {
+                Article article = gson.fromJson(line, Article.class);
+                articleList.add(article);
+            }
+            buffReader.close();
+        } catch (IOException e) {
+            System.out.println("ERROR: File read failed in readArticleList()");
+        } catch (JsonSyntaxException e){
+            System.out.println("ERROR: Article deserialise read failed in readArticles() for line :");
+        }
+        return articleList;
+    }
+
+    public static List<Article> readArticleList(String fileName) {
+        List<Article> articleList = new ArrayList<>();
+        String line = null;
+        try {
+            BufferedReader buffReader = new BufferedReader(new FileReader(fileName));
             Gson gson = new Gson();
             Type type = new TypeToken<List<Article>>() {}.getType();
             while ((line = buffReader.readLine()) != null) {
@@ -143,6 +178,8 @@ public class Utils {
             buffReader.close();
         } catch (IOException e) {
             System.out.println("ERROR: File read failed in readArticleList()");
+        } catch (JsonSyntaxException e){
+            System.out.println("ERROR: Article deserialise read failed in readArticleList() for line :");
         }
         return articleList;
     }

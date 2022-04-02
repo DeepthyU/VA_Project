@@ -1,6 +1,6 @@
 import preprocessing.Preprocessor;
-import vis.ArticleField;
-import vis.ArticleFilter;
+import vis.article.ArticleField;
+import vis.article.ArticleFilter;
 
 import javax.swing.*;
 import java.awt.*;

@@ -1,7 +1,8 @@
-package vis;
+package vis.article;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class ArticleFilter {
 
@@ -33,7 +34,9 @@ public class ArticleFilter {
     }
 
     public void setSelectedValues(List<String> selectedValues) {
-        this.selectedValues = selectedValues;
+        for (String selectedVal : selectedValues){
+            this.selectedValues.add(selectedVal.toLowerCase(Locale.ROOT));
+        }
     }
 
     public List<String> getUnselectedValues() {
