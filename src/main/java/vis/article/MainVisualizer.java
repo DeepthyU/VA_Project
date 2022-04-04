@@ -22,15 +22,16 @@ public class MainVisualizer {
         graph.setAutoCreate(true);
         graph.setStrict(false);
         System.setProperty("org.graphstream.ui", "swing");
-        System.setProperty("gs.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
+        //System.setProperty("gs.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
+        graph.setAttribute("ui.quality");
         return graph;
     }
 
-    public void makeGraph(List<ArticleFilter> filters, boolean showEdges) {
+    public void makeGraph(boolean showEdges) {
 
     }
 
-    public Graph prepareGraph(boolean showEdges) {
+    public Graph prepareGraph(boolean showEdges, boolean doFilter) {
         return null;
     }
 
@@ -115,7 +116,8 @@ public class MainVisualizer {
         filters = new ArrayList<>();
         ArticleFilter af = new ArticleFilter();
         af.setField(ArticleField.KEYWORD);
-        af.getSelectedValues().add("government");
+        af.getSelectedValues().add("investigation");
+        af.getSelectedValues().add("gastech");
         filters.add(af);
         af = new ArticleFilter();
         af.setField(ArticleField.PUBLICATION);

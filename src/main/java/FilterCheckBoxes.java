@@ -44,11 +44,11 @@ public class FilterCheckBoxes extends JFrame implements ActionListener {
         add(l);
         add(b);
         setSize(800, 800);
-        JScrollBar vbar=new JScrollBar(JScrollBar.VERTICAL);
-        add(vbar, BorderLayout.EAST);
-        setLayout(null);
-        setVisible(true);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+//        JScrollBar vbar=new JScrollBar(JScrollBar.VERTICAL);
+//        add(vbar, BorderLayout.EAST);
+//        setLayout(null);
+//        setVisible(true);
+//        setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
     public void actionPerformed(ActionEvent e) {

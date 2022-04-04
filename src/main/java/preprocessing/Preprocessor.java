@@ -9,13 +9,11 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
 public class Preprocessor {
     public static final String ARTICLE_LIST_FILE_PATH = "article_list.json";
-    public static final String ARTICLE_LIST_FILE_PATH2 = "article_list1.json";
     private static final String ARTICLES_PATH = "./src/main/data/gastech_data/data/articles/";
     private static final String HISTORIC_DOCS_PATH = "./src/main/data/gastech_data/data/HistoricalDocuments/txt versions";
     private List<Article> articleList;
@@ -24,16 +22,16 @@ public class Preprocessor {
 
     public Preprocessor() {
         // check file. if file exists, read from file
-        articleList = Utils.readArticleList(ARTICLE_LIST_FILE_PATH);
+        articleList = Utils.readArticles(ARTICLE_LIST_FILE_PATH);
         if (CollectionUtils.isEmpty(articleList)) {
-            articleList = makeArticleList(1000, false);
+            File file = new File(ARTICLES_PATH);
+            List<Article> articleList = readFiles(file);
+            SentimentAnalysis.setSentiments(articleList);
+
         }
+        articleList = fillArticleList();
     }
 
-    public Preprocessor(int count, boolean write) {
-        // check file. if file exists, read from file
-        articleList = makeArticleList(count, write);
-    }
 
     public List<Article> getArticleList() {
         return articleList;
@@ -47,12 +45,10 @@ public class Preprocessor {
         return keywordsArr;
     }
 
-    private List<Article> makeArticleList(int count, boolean write) {
-        File file = new File(ARTICLES_PATH);
-        List<Article> articleList = readFiles(file, count);
+    private List<Article> fillArticleList() {
         //get coordinates
         setXCoordinate(articleList);
-        setYCoordinate(articleList, write);
+        setYCoordinate(articleList);
         findEdges(articleList);
         return articleList;
     }
@@ -85,7 +81,7 @@ public class Preprocessor {
         }
     }
 
-    private void setYCoordinate(List<Article> articleList, boolean write) {
+    private void setYCoordinate(List<Article> articleList) {
         KeywordFinder kf = new KeywordFinder(articleList, HISTORY);
         String[] keywords = kf.getKeywordsArr();
         setKeywordsArr(keywords);
@@ -94,28 +90,20 @@ public class Preprocessor {
             String content = article.getContent();
             int count = 0;
             for (String keyword : keywords) {
-                if ((StringUtils.isNotBlank(title) && title.contains(keyword)) ||
-                        (StringUtils.isNotBlank(content) && content.contains(keyword))) {
+                if (StringUtils.containsIgnoreCase(title, keyword)
+                        || StringUtils.containsIgnoreCase(content, keyword)) {
                     article.getKeywordsList().add(keyword);
                     count++;
                 }
             }
             article.setyCoordinate(count);
-            if (write) {
-                SentimentAnalysis.setSentiments(article);
-                Utils.writeArticleToFile(ARTICLE_LIST_FILE_PATH2, article);
-            }
         }
     }
 
-    private List<Article> readFiles(File folder, int count) {
+
+    private static List<Article> readFiles(File folder) {
         List<Article> articleList = new ArrayList<>();
-        int counter = 0;
         for (final File fileEntry : folder.listFiles()) {
-            if (count == counter) {
-                break;
-            }
-            counter++;
             String text = Utils.readFile(fileEntry.getPath(), StandardCharsets.UTF_8);
             ArticleParser parser = new ArticleParser();
             Article article = parser.parseArticle(text);
@@ -137,8 +125,8 @@ public class Preprocessor {
         long startDate = articleList.get(0).getDate().getTime();
         long endDate = articleList.get(articleList.size() - 1).getDate().getTime();
         long totalDays = (endDate - startDate) / (1000 * 60 * 60 * 24);
-        System.out.println(startDate);
-        System.out.println(endDate);
+        System.out.println("START DATE:" + articleList.get(0).getDate());
+        System.out.println("END DATE:" + articleList.get(articleList.size() - 1).getDate());
         System.out.println(totalDays);
         for (Article article : articleList) {
             Timestamp date = article.getDate();
@@ -147,7 +135,4 @@ public class Preprocessor {
         }
     }
 
-    public static void main(String[] args) {
-        System.out.println(Utils.readArticleList("article_list.json"));
-    }
 }

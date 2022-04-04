@@ -24,9 +24,10 @@ all_stopwords = gensim.parsing.preprocessing.STOPWORDS
 local_stopwords = set()
 local_stopwords.update(STOPWORDS)
 local_stopwords.update(all_stopwords)
-
+custom_stopwords = {"year", "time", "said", "years", "new", "day", "question", "including","causes","days","remember", "denied","previous","soon","fields","reports", "change", "think", "aforesaid", "ask", "past", "current", "today", "field", "old", "hour", "place", "way", "local", "update", "bring", "site", "area", "come", "center", "break", "cause", "event", "know", "asked", "end", "started", "continue", "person", "need", "high", "caused", "dob", "left", "answer", "window", "times", "leave", "concerning", "help", "answered", "thing", "situation", "point", "sent", "morning", "driver", "life", "problem", "yesterday", "wfa", "resource", "action", "mean", "truck", "lead", "told", "good", "bend", "increase", "recent", "month", "taken", "known", "level", "hours", "outside", "questions", "little", "means", "took", "calls", "girl", "near", "second", "man", "began", "right", "door", "says", "large", "brought", "called", "possible", "certain", "groups", "additional", "present", "moved", "given", "clear", "jan", "ago", "use", "gen", "far", "updates", "turned", "long", "production", "responsible", "history", "offshore", "buildings", "lack", "held", "comment", "provide", "curve"}
+local_stopwords.update(custom_stopwords)
 # Generate word cloud
-wordcloud = WordCloud(normalize_plurals=True, include_numbers=False, collocation_threshold=30, width = 3000, height = 2000, random_state=1, background_color='black', colormap='Set2', collocations=False, min_word_length = 3, stopwords = local_stopwords).generate(text)
+wordcloud = WordCloud(normalize_plurals=False, include_numbers=False, collocation_threshold=30, width = 3000, height = 2000, random_state=1, background_color='black', colormap='Set2', collocations=False, min_word_length = 3, stopwords = local_stopwords).generate(text)
     
 #wordcloud = WordCloud(width = 3000, height = 2000, random_state=1, background_color='black', colormap='Set2', collocations=False, stopwords = STOPWORDS).generate(text)
 # Plot

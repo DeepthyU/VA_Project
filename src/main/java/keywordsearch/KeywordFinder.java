@@ -5,6 +5,7 @@ import preprocessing.Utils;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class KeywordFinder {
@@ -35,7 +36,7 @@ public class KeywordFinder {
         String outFileName = Utils.readAndDeleteFile("pythonOut.txt", Charset.defaultCharset());
         String data = Utils.readAndDeleteFile(outFileName + ".txt", Charset.defaultCharset());
         String[] keywords = data.split("##");
-        System.out.println("keycount: "+keywords.length);
+        System.out.println("keywords: "+keywords.length+" :: "+ Arrays.toString(keywords));
         return keywords;//Arrays.copyOfRange(keywords, 0, 10);
     }
 

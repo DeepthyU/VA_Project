@@ -11,7 +11,7 @@ public class PythonExecuter {
         try {
             Runtime RT = Runtime.getRuntime();
             System.out.println("INFO: run python script");
-            String command = "C:\\Users\\dipuu\\anaconda3\\Scripts\\conda.exe run python word_cloud.py search_text.txt 0.05";
+            String command = "C:\\Users\\dipuu\\anaconda3\\Scripts\\conda.exe run python word_cloud.py search_text.txt 0.05"; //0.05
             File file = new File("pythonOut.txt");
             Writer output = new BufferedWriter(new FileWriter(file));
             Process runObj = RT.exec(command);
