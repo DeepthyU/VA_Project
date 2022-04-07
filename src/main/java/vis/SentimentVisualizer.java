@@ -15,7 +15,11 @@ import java.util.List;
 public class SentimentVisualizer extends MainVisualizer {
 
     protected static String styleSheet =
-            "node {	size: 5px, 5px; fill-color: black; } " +
+            "graph {\n" +
+                    " fill-color: white;" +
+                    " fill-mode: plain;"+
+            "}"+
+            "node {	size: 2px, 2px; fill-color: black; } " +
                     "node.marked { fill-color: red;}" +
                     "node.positive { fill-color: blue;}" +
                     "node.negative { fill-color: red;}" +
@@ -30,7 +34,7 @@ public class SentimentVisualizer extends MainVisualizer {
                     "}";
 
     public void makeGraph(boolean showEdges, boolean doFilter) {
-        Graph graph = prepareGraph(showEdges, doFilter);
+        Graph graph = prepareGraph(doFilter);
 
         Viewer viewer = graph.display();
         viewer.disableAutoLayout();
@@ -57,7 +61,7 @@ public class SentimentVisualizer extends MainVisualizer {
         System.out.println("DONE");
     }
 
-    public Graph prepareGraph(boolean showEdges, boolean doFilter) {
+    public Graph prepareGraph(boolean doFilter) {
         Graph graph = initGraph(styleSheet);
         List<ArticleFilter> filters = new ArrayList<>();
         if (doFilter) {
@@ -84,17 +88,6 @@ public class SentimentVisualizer extends MainVisualizer {
             }
         }
         System.out.println("Remaining articles after filtering:" + currList.size());
-        if (showEdges) {
-            if (needEdgeUpdate) {
-                resetEdges(currList);
-                updateEdges(currList, filters);
-            }
-            for (Article article : currList) {
-                for (Edge edge : article.getEdges()) {
-                    graph.addEdge(String.valueOf(edge.hashCode()), edge.getNode1(), edge.getNode2());
-                }
-            }
-        }
         return graph;
     }
 

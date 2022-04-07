@@ -11,7 +11,7 @@ public class ArticleFilter {
     private List<String> unselectedValues = new ArrayList<>();
     private long startDate;
     private long endDate;
-    private boolean keepEmptyValue;
+    private boolean keepEmptyValue = true;
 
     public boolean isKeepEmptyValue() {
         return keepEmptyValue;

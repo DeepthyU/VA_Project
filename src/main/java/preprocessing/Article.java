@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 public class Article {
 
@@ -148,6 +149,11 @@ public class Article {
     }
 
     public List<String> getKeywordsList() {
+        List<String> list = new ArrayList<>();
+        for (String str : keywordsList){
+            list.add(str.toLowerCase(Locale.ROOT));
+        }
+        keywordsList = list;
         return keywordsList;
     }
 

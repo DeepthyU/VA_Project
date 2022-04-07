@@ -1,8 +1,10 @@
 package keywordsearch;
 
+import org.apache.commons.lang3.ArrayUtils;
 import preprocessing.Article;
 import preprocessing.Utils;
 
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,13 +13,36 @@ import java.util.List;
 public class KeywordFinder {
 
     public static String[] keywordsArr;
+    public static final String KEYWORDS_FILE_PATH = "keywords_list.txt";
 
-    public KeywordFinder(List<Article> articleList, String history){
-        keywordsArr = getKeywords(articleList, 0, Long.MAX_VALUE, history);
+    public KeywordFinder(List<Article> articleList, String history) {
+        getKeywordsFromFile();
+        findAndWriteKeywordsToFile(articleList, history);
     }
 
-    public String[] getKeywordsArr()
-    {
+    private void findAndWriteKeywordsToFile(List<Article> articleList, String history) {
+        if (ArrayUtils.isEmpty(keywordsArr)) {
+            keywordsArr = getKeywords(articleList, 0, Long.MAX_VALUE, history);
+            try {
+                ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(KEYWORDS_FILE_PATH));
+
+                outputStream.writeObject(keywordsArr);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void getKeywordsFromFile() {
+        try {
+            ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(KEYWORDS_FILE_PATH));
+            keywordsArr = (String[]) inputStream.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String[] getKeywordsArr() {
         return keywordsArr;
     }
 
@@ -36,7 +61,7 @@ public class KeywordFinder {
         String outFileName = Utils.readAndDeleteFile("pythonOut.txt", Charset.defaultCharset());
         String data = Utils.readAndDeleteFile(outFileName + ".txt", Charset.defaultCharset());
         String[] keywords = data.split("##");
-        System.out.println("keywords: "+keywords.length+" :: "+ Arrays.toString(keywords));
+        System.out.println("keywords: " + keywords.length + " :: " + Arrays.toString(keywords));
         return keywords;//Arrays.copyOfRange(keywords, 0, 10);
     }
 

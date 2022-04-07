@@ -22,8 +22,8 @@ public class MainVisualizer {
         graph.setAutoCreate(true);
         graph.setStrict(false);
         System.setProperty("org.graphstream.ui", "swing");
-        //System.setProperty("gs.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
-        graph.setAttribute("ui.quality");
+        System.setProperty("org.graphstream.ui.renderer",
+                "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
         return graph;
     }
 
@@ -118,14 +118,14 @@ public class MainVisualizer {
         af.setField(ArticleField.KEYWORD);
         af.getSelectedValues().add("investigation");
         af.getSelectedValues().add("gastech");
-        filters.add(af);
+        //filters.add(af);
         af = new ArticleFilter();
         af.setField(ArticleField.PUBLICATION);
         List<String> selectedPublications = new ArrayList<>();
         selectedPublications.add("International News");
         af.setSelectedValues(selectedPublications);
 
-        //filters.add(af);
+        filters.add(af);
         return filters;
     }
 

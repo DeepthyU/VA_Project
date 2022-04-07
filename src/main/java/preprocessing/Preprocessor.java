@@ -6,11 +6,15 @@ import org.apache.commons.lang3.StringUtils;
 import sentimentAnalysis.SentimentAnalysis;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class Preprocessor {
     public static final String ARTICLE_LIST_FILE_PATH = "article_list.json";
@@ -19,17 +23,28 @@ public class Preprocessor {
     private List<Article> articleList;
     private static final String HISTORY = Utils.getText(HISTORIC_DOCS_PATH);
     private String[] keywordsArr;
+    private List<String> places;
+    private List<String> authors;
+    private List<String> publications;
 
     public Preprocessor() {
         // check file. if file exists, read from file
         articleList = Utils.readArticles(ARTICLE_LIST_FILE_PATH);
+        KeywordFinder kf = new KeywordFinder(articleList, HISTORY);
+        keywordsArr = kf.getKeywordsArr();
+        places = articleList.stream().map(Article::getPlace).distinct().filter(Objects::nonNull)
+                .filter(Predicate.not(String::isBlank)).collect(Collectors.toList());
+        authors = articleList.stream().map(Article::getAuthor).distinct().filter(Objects::nonNull)
+                .filter(Predicate.not(String::isBlank)).collect(Collectors.toList());
+        publications = articleList.stream().map(Article::getPublication).distinct().filter(Objects::nonNull)
+                .filter(Predicate.not(String::isBlank)).collect(Collectors.toList());
+
         if (CollectionUtils.isEmpty(articleList)) {
             File file = new File(ARTICLES_PATH);
             List<Article> articleList = readFiles(file);
             SentimentAnalysis.setSentiments(articleList);
-
         }
-        articleList = fillArticleList();
+        //articleList = fillArticleList();
     }
 
 
@@ -47,9 +62,10 @@ public class Preprocessor {
 
     private List<Article> fillArticleList() {
         //get coordinates
+        Utils.readAndDeleteFile(ARTICLE_LIST_FILE_PATH, Charset.defaultCharset());
         setXCoordinate(articleList);
         setYCoordinate(articleList);
-        findEdges(articleList);
+        //findEdges(articleList);
         return articleList;
     }
 
@@ -82,14 +98,11 @@ public class Preprocessor {
     }
 
     private void setYCoordinate(List<Article> articleList) {
-        KeywordFinder kf = new KeywordFinder(articleList, HISTORY);
-        String[] keywords = kf.getKeywordsArr();
-        setKeywordsArr(keywords);
         for (Article article : articleList) {
             String title = article.getTitle();
             String content = article.getContent();
             int count = 0;
-            for (String keyword : keywords) {
+            for (String keyword : keywordsArr) {
                 if (StringUtils.containsIgnoreCase(title, keyword)
                         || StringUtils.containsIgnoreCase(content, keyword)) {
                     article.getKeywordsList().add(keyword);
@@ -97,6 +110,7 @@ public class Preprocessor {
                 }
             }
             article.setyCoordinate(count);
+            Utils.writeArticleToFile(ARTICLE_LIST_FILE_PATH, article);
         }
     }
 
@@ -135,4 +149,15 @@ public class Preprocessor {
         }
     }
 
+    public List<String> getPlaces() {
+        return places;
+    }
+
+    public List<String> getAuthors() {
+        return authors;
+    }
+
+    public List<String> getPublications() {
+        return publications;
+    }
 }

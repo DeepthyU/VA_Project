@@ -4,14 +4,13 @@ import org.graphstream.ui.swing_viewer.DefaultView;
 import org.graphstream.ui.swing_viewer.SwingViewer;
 import org.graphstream.ui.swing_viewer.ViewPanel;
 import org.graphstream.ui.view.Viewer;
-import org.graphstream.ui.view.ViewerPipe;
 import vis.SentimentVisualizer;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
-public class MainViewer implements Runnable {
+public class MainViewer2 implements Runnable {
 
     private boolean filterFlag;
     private JButton button;
@@ -41,7 +40,7 @@ public class MainViewer implements Runnable {
 
 
     public static void main(String args[]) {
-        SwingUtilities.invokeLater(new MainViewer());
+        SwingUtilities.invokeLater(new MainViewer2());
     }
 
 
