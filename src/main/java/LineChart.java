@@ -1,3 +1,4 @@
+import main.DateLabelFormatter;
 import net.sourceforge.jdatepicker.impl.JDatePanelImpl;
 import net.sourceforge.jdatepicker.impl.JDatePickerImpl;
 import net.sourceforge.jdatepicker.impl.UtilDateModel;
@@ -8,15 +9,9 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.axis.DateTickUnit;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
-import org.jfree.chart.title.LegendTitle;
-import org.jfree.chart.ui.RectangleEdge;
-import org.jfree.chart.ui.RectangleInsets;
-import org.jfree.data.time.TimeSeries;
-import org.jfree.data.time.TimeSeriesCollection;
-import org.jfree.data.xy.*;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 import preprocessing.Article;
 import preprocessing.Preprocessor;
 import vis.article.ArticleField;
@@ -33,68 +28,41 @@ import java.util.*;
 
 public class LineChart extends JFrame {
 
-    private static final long serialVersionUID = 1L;
-    private JTextField t1 = new JTextField("Start Date");
-    private JTextField t2 = new JTextField("End Date");
+    private final JTextField t1 = new JTextField("Start Date");
+    private final JTextField t2 = new JTextField("End Date");
     private boolean filterFlag;
-    private JButton button;
-    private JButton hideOrShowDateFitler;
-    private JButton hideOrShowAuthorFilter;
-    private JButton hideOrShowPlaceFilter;
-    private JButton hideOrShowPublicationFilter;
-    private JButton hideOrShowKeywordFilter;
-    private JButton unselectAllButton;
-    private JButton unselectAllPlaceButton;
-    private JButton unselectAllAuthorButton;
-    private JButton unselectAllPublicationButton;
+    private JButton filterButton;
+    private JButton hideOrShowDateFilter, hideOrShowAuthorFilter, hideOrShowPlaceFilter, hideOrShowPublicationFilter, hideOrShowKeywordFilter, unselectAllButton, unselectAllPlaceButton, unselectAllAuthorButton, unselectAllPublicationButton;
     private JButton resetAllButton;
-    private List<JCheckBox> cbList = new ArrayList<>();
+    private List<JCheckBox> keywordsCbList = new ArrayList<>();
     private List<JCheckBox> placeCbList = new ArrayList<>();
     private List<JCheckBox> publicationCbList = new ArrayList<>();
     private List<JCheckBox> authorCbList = new ArrayList<>();
     private JFreeChart chart;
     private ChartPanel panel;
-    private JPanel filterPanel;
-    private JPanel authorfilterPanel;
-    private JPanel keywordfilterPanel;
-    private JPanel datefilterPanel;
-    private JPanel publicationfilterPanel;
-    private JPanel placefilterPanel;
+    private JPanel filterPanel, authorFilterPanel, keywordFilterPanel, dateFilterPanel, publicationFilterPanel, placeFilterPanel;
     private static int[][] keywordCount;
     protected static final Preprocessor PREPROCESSOR = new Preprocessor();
-    private JDatePickerImpl startDatePicker;
-    private JDatePickerImpl endDatePicker;
+    private JDatePickerImpl startDatePicker, endDatePicker;
     private XYSeriesCollection dataset;
-    private boolean showDateFilter = true;
-    private boolean showKeywordFilter = true;
-    private boolean showAuthorFilter = true;
-    private boolean showPublicationFilter = true;
-    private boolean showPlaceFilter = true;
+    private boolean showDateFilter = true, showKeywordFilter = true, showAuthorFilter = true, showPublicationFilter = true, showPlaceFilter = true;
 
     public LineChart(String title, List<ArticleFilter> filters) {
         super(title);
         setLayout(new GridLayout(1, 2));
-        // Create dataset
-        dataset = createDataset(filters);
-        // Create chart
-        DateAxis dateAxis = new DateAxis("Date");
-        dateAxis.setDateFormatOverride(new SimpleDateFormat("dd-MM-yyyy"));
-        dateAxis.setVerticalTickLabels(true);
-        dateAxis.setAutoRange(false);
-        System.out.println(dateAxis.getTickUnit().getUnitType().toString());
-        chart = ChartFactory.createXYLineChart("Keyword Frequency", "Date", "Frequency"
-                , dataset, PlotOrientation.VERTICAL, true, true, false);
-        chart.getXYPlot().setDomainAxis(dateAxis);
-        chart.getXYPlot().mapDatasetToRangeAxis(0, 0);
-        panel = new ChartPanel(chart, 300, 300, 100, 100, 2000, 2000, true, false, true, true, true, true);
-        panel.setPreferredSize(new Dimension(500, 300));
+        panel = makeLineChart(filters);
         add(panel, BorderLayout.EAST);
-        filterPanel = new JPanel();
+        filterPanel = makeFilterPanel();
+        add(filterPanel, BorderLayout.WEST);
+    }
+
+    private JPanel makeFilterPanel() {
+        JPanel filterPanel = new JPanel();
         filterPanel.setLayout(new FlowLayout());
-        button = new JButton("Filter");
-        datefilterPanel = new JPanel();
-        hideOrShowDateFitler = new JButton("date filter");
-        hideOrShowDateFitler.setBackground(Color.RED);
+        filterButton = new JButton("Filter");
+        dateFilterPanel = new JPanel();
+        hideOrShowDateFilter = new JButton("date filter");
+        hideOrShowDateFilter.setBackground(Color.RED);
         UtilDateModel startDateModel = new UtilDateModel();
         startDateModel.setDate(1982, 10, 2);
         startDateModel.setSelected(true);
@@ -105,118 +73,98 @@ public class LineChart extends JFrame {
         JDatePanelImpl endDatePanel = new JDatePanelImpl(endDateModel);
         startDatePicker = new JDatePickerImpl(startDatePanel, new DateLabelFormatter());
         endDatePicker = new JDatePickerImpl(endDatePanel, new DateLabelFormatter());
-        datefilterPanel.add(startDatePicker);
-        datefilterPanel.add(endDatePicker);
-        datefilterPanel.setLayout(new GridLayout(2, 2));
+        dateFilterPanel.add(startDatePicker);
+        dateFilterPanel.add(endDatePicker);
+        dateFilterPanel.setLayout(new GridLayout(2, 2));
 
         ///////////////////////////////////////////////
-        keywordfilterPanel = new JPanel();
 
         int y = 100;
-        for (String keyword : PREPROCESSOR.getKeywordsArr()) {
-            JCheckBox cb = new JCheckBox(keyword, true);
-            cb.setBounds(100, y += 20, 150, 20);
-            cbList.add(cb);
-            keywordfilterPanel.add(cb);
-        }
+        keywordFilterPanel = addOptions(y, Arrays.asList(PREPROCESSOR.getKeywordsArr()), keywordsCbList);
         unselectAllButton = new JButton("UnselectAll");
-        keywordfilterPanel.add(unselectAllButton);
+        keywordFilterPanel.add(unselectAllButton);
         hideOrShowKeywordFilter = new JButton("keyword filter");
         hideOrShowKeywordFilter.setBackground(Color.RED);
-        keywordfilterPanel.setLayout(new GridLayout(20, 5));
+        panel.setLayout(new GridLayout(20, 5));
         //////////////////////////////////////////////////////////////
-        placefilterPanel = new JPanel();
-        placefilterPanel.setLayout(new FlowLayout());
-        y = 100;
-        for (String place : PREPROCESSOR.getPlaces()) {
-            JCheckBox cb = new JCheckBox(place, true);
-            cb.setBounds(100, y += 20, 150, 20);
-            placeCbList.add(cb);
-            placefilterPanel.add(cb);
-        }
+        placeFilterPanel = addOptions(y, PREPROCESSOR.getPlaces(), placeCbList);
         unselectAllPlaceButton = new JButton("Unselect All Place");
-        placefilterPanel.add(unselectAllPlaceButton);
-        placefilterPanel.setLayout(new GridLayout(5, 5));
+        placeFilterPanel.add(unselectAllPlaceButton);
+        placeFilterPanel.setLayout(new GridLayout(5, 5));
         hideOrShowPlaceFilter = new JButton("place filter");
         hideOrShowPlaceFilter.setBackground(Color.RED);
 
 ////////////////////////////////////////////////////////////////////////
-        authorfilterPanel = new JPanel();
-        authorfilterPanel.setLayout(new FlowLayout());
-        y = 100;
-        for (String author : PREPROCESSOR.getAuthors()) {
-            JCheckBox cb = new JCheckBox(author, true);
-            cb.setBounds(100, y += 20, 150, 20);
-            authorCbList.add(cb);
-            authorfilterPanel.add(cb);
-        }
+        authorFilterPanel = addOptions(100, PREPROCESSOR.getAuthors(), authorCbList);
         unselectAllAuthorButton = new JButton("Unselect All Author");
-        authorfilterPanel.add(unselectAllAuthorButton);
-        authorfilterPanel.setLayout(new GridLayout(5, 5));
+        authorFilterPanel.add(unselectAllAuthorButton);
+        authorFilterPanel.setLayout(new GridLayout(5, 5));
         hideOrShowAuthorFilter = new JButton("author filter");
         hideOrShowAuthorFilter.setBackground(Color.RED);
         /////////////////////////////////////////////////////////////
-        publicationfilterPanel = new JPanel();
-        publicationfilterPanel.setLayout(new FlowLayout());
-        y = 100;
+        publicationFilterPanel = addOptions(100, PREPROCESSOR.getPublications(), publicationCbList);
         unselectAllPublicationButton = new JButton("Unselect All Publication");
-
-        publicationfilterPanel.setLayout(new GridLayout(5, 5));
-        for (String pub : PREPROCESSOR.getPublications()) {
-            JCheckBox cb = new JCheckBox(pub, true);
-            //cb.setBounds(100, y += 20, 150, 20);
-            publicationCbList.add(cb);
-            publicationfilterPanel.add(cb);
-        }
-        publicationfilterPanel.add(unselectAllPublicationButton);
-        publicationfilterPanel.revalidate();
-        publicationfilterPanel.repaint();
+        publicationFilterPanel.setLayout(new GridLayout(5, 5));
+        publicationFilterPanel.add(unselectAllPublicationButton);
         hideOrShowPublicationFilter = new JButton("publication filter");
         hideOrShowPublicationFilter.setBackground(Color.RED);
         /////////////////////////////////
+
+        filterPanel.add(hideOrShowDateFilter);
+        filterPanel.add(dateFilterPanel);
+        filterPanel.add(hideOrShowKeywordFilter);
+        filterPanel.add(keywordFilterPanel);
+        filterPanel.add(hideOrShowPlaceFilter);
+        filterPanel.add(placeFilterPanel);
+        filterPanel.add(hideOrShowAuthorFilter);
+        filterPanel.add(authorFilterPanel);
+        filterPanel.add(hideOrShowPublicationFilter);
+        filterPanel.add(publicationFilterPanel);
+
         resetAllButton = new JButton("Reset All");
 
-        filterPanel.add(hideOrShowDateFitler);
-        filterPanel.add(datefilterPanel);
-        filterPanel.add(hideOrShowKeywordFilter);
-        filterPanel.add(keywordfilterPanel);
-        filterPanel.add(hideOrShowPlaceFilter);
-        filterPanel.add(placefilterPanel);
-        filterPanel.add(hideOrShowAuthorFilter);
-        filterPanel.add(authorfilterPanel);
-        filterPanel.add(hideOrShowPublicationFilter);
-        filterPanel.add(publicationfilterPanel);
-
         filterPanel.add(resetAllButton);
-        filterPanel.add(button);
+        filterPanel.add(filterButton);
+
         filterPanel.setPreferredSize(new Dimension(400, 700));
-        add(filterPanel, BorderLayout.WEST);
+        return filterPanel;
+    }
+
+    private JPanel addOptions(int y, List<String> options, List<JCheckBox> checkBoxListList) {
+        JPanel panel = new JPanel();
+        for (String option : options) {
+            JCheckBox cb = new JCheckBox(option, true);
+            cb.setBounds(100, y += 20, 150, 20);
+            checkBoxListList.add(cb);
+            panel.add(cb);
+        }
+        return panel;
+    }
+
+    private ChartPanel makeLineChart(List<ArticleFilter> filters) {
+        // Create dataset
+        dataset = createDataset(filters);
+        // Create chart
+        DateAxis dateAxis = new DateAxis("Date");
+        dateAxis.setDateFormatOverride(new SimpleDateFormat("dd-MM-yyyy"));
+        dateAxis.setVerticalTickLabels(true);
+        dateAxis.setAutoRange(false);
+        chart = ChartFactory.createXYLineChart("Keyword Frequency", "Date", "Frequency"
+                , dataset, PlotOrientation.VERTICAL, true, true, false);
+        chart.getXYPlot().setDomainAxis(dateAxis);
+        chart.getXYPlot().mapDatasetToRangeAxis(0, 0);
+        ChartPanel panel = new ChartPanel(chart, 300, 300, 100, 100, 2000, 2000, true, false, true, true, true, true);
+        panel.setPreferredSize(new Dimension(500, 300));
+        return panel;
     }
 
     public XYSeriesCollection createDataset(List<ArticleFilter> filters) {
-        long startDate = computeKeywordFrequency(filters);
         XYSeriesCollection dataset = new XYSeriesCollection();
-        String[] keywords = PREPROCESSOR.getKeywordsArr();
-        for (int i = 0; i < keywordCount.length; i++) {
-            XYSeries keywordSeries = new XYSeries(keywords[i]);
-            for (int j = 0; j < keywordCount[i].length; j++) {
-                if (keywordCount[i][j] >= 0) {
-                    keywordSeries.add(((long)j * (1000 * 60 * 60 * 24) + startDate), keywordCount[i][j]);
-                }
-            }
-            dataset.addSeries(keywordSeries);
-
-//            for (int j = 0; j < keywordCount[i].length; j++) {
-//                if (keywordCount[i][j] >= 0) {
-//                    dataset.addValue(keywordCount[i][j],  keywords[i], String.valueOf(j));
-//                }
-//            }
-        }
+        updateDataset(dataset, filters);
         return dataset;
     }
 
-    public XYDataset updateDataset(XYSeriesCollection dataset, List<ArticleFilter> articleFilter) {
-        System.out.println("dataset update called");
+    public void updateDataset(XYSeriesCollection dataset, List<ArticleFilter> articleFilter) {
         long startDate = computeKeywordFrequency(articleFilter);
         dataset.removeAllSeries();
         String[] keywords = PREPROCESSOR.getKeywordsArr();
@@ -224,22 +172,13 @@ public class LineChart extends JFrame {
             XYSeries keywordSeries = new XYSeries(keywords[i]);
             for (int j = 0; j < keywordCount[i].length; j++) {
                 if (keywordCount[i][j] >= 0) {
-                    keywordSeries.add(((long)j * (1000 * 60 * 60 * 24) + startDate), keywordCount[i][j]);
+                    keywordSeries.add(((long) j * (1000 * 60 * 60 * 24) + startDate), keywordCount[i][j]);
                 }
             }
             if (!keywordSeries.isEmpty()) {
                 dataset.addSeries(keywordSeries);
             }
         }
-//        String[] keywords = PREPROCESSOR.getKeywordsArr();
-//        for (int i = 0; i < keywordCount.length; i++) {
-//            for (int j = 0; j < keywordCount[i].length; j++) {
-//                if (keywordCount[i][j] >= 0) {
-//                    dataset.addValue(keywordCount[i][j], keywords[i], String.valueOf(j));
-//                }
-//            }
-//        }
-        return dataset;
     }
 
     private boolean hideOrShow(boolean show, JPanel panel) {
@@ -252,47 +191,47 @@ public class LineChart extends JFrame {
         List<ArticleFilter> filters = new ArrayList<>();
         SwingUtilities.invokeLater(() -> {
             LineChart example = new LineChart("Line Chart Example", filters);
-            example.hideOrShowDateFitler.addActionListener(new AbstractAction("hideOrShow") {
+            example.hideOrShowDateFilter.addActionListener(new AbstractAction("hideOrShow") {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    example.showDateFilter = example.hideOrShow(example.showDateFilter, example.datefilterPanel);
+                    example.showDateFilter = example.hideOrShow(example.showDateFilter, example.dateFilterPanel);
                 }
             });
             example.hideOrShowKeywordFilter.addActionListener(new AbstractAction("hideOrShow") {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    example.showKeywordFilter = example.hideOrShow(example.showKeywordFilter, example.keywordfilterPanel);
+                    example.showKeywordFilter = example.hideOrShow(example.showKeywordFilter, example.keywordFilterPanel);
                 }
             });
             example.hideOrShowAuthorFilter.addActionListener(new AbstractAction("hideOrShow") {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    example.showAuthorFilter = example.hideOrShow(example.showAuthorFilter, example.authorfilterPanel);
+                    example.showAuthorFilter = example.hideOrShow(example.showAuthorFilter, example.authorFilterPanel);
                 }
             });
             example.hideOrShowPublicationFilter.addActionListener(new AbstractAction("hideOrShow") {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    example.showPublicationFilter = example.hideOrShow(example.showPublicationFilter, example.publicationfilterPanel);
+                    example.showPublicationFilter = example.hideOrShow(example.showPublicationFilter, example.publicationFilterPanel);
                 }
             });
             example.hideOrShowPlaceFilter.addActionListener(new AbstractAction("hideOrShow") {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    example.showPlaceFilter = example.hideOrShow(example.showPlaceFilter, example.placefilterPanel);
+                    example.showPlaceFilter = example.hideOrShow(example.showPlaceFilter, example.placeFilterPanel);
                 }
             });
-            example.hideOrShowDateFitler.addActionListener(new AbstractAction("hideOrShow") {
+            example.hideOrShowDateFilter.addActionListener(new AbstractAction("hideOrShow") {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    example.hideOrShow(example.showDateFilter, example.datefilterPanel);
+                    example.hideOrShow(example.showDateFilter, example.dateFilterPanel);
                 }
             });
 
             example.unselectAllButton.addActionListener(new AbstractAction("unselect") {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    for (JCheckBox checkBox : example.cbList) {
+                    for (JCheckBox checkBox : example.keywordsCbList) {
                         checkBox.setSelected(false);
                     }
                 }
@@ -328,7 +267,7 @@ public class LineChart extends JFrame {
             example.resetAllButton.addActionListener(new AbstractAction("reset") {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    for (JCheckBox checkBox : example.cbList) {
+                    for (JCheckBox checkBox : example.keywordsCbList) {
                         checkBox.setSelected(true);
                     }
                     for (JCheckBox checkBox : example.authorCbList) {
@@ -343,18 +282,18 @@ public class LineChart extends JFrame {
                     example.startDatePicker.getModel().setDate(1982, 10, 2);
                     example.endDatePicker.getModel().setDate(2014, 3, 26);
                     example.showDateFilter = true;
-                    example.datefilterPanel.setVisible(true);
+                    example.dateFilterPanel.setVisible(true);
                     example.showAuthorFilter = true;
-                    example.authorfilterPanel.setVisible(true);
+                    example.authorFilterPanel.setVisible(true);
                     example.showPlaceFilter = true;
-                    example.placefilterPanel.setVisible(true);
+                    example.placeFilterPanel.setVisible(true);
                     example.showPublicationFilter = true;
-                    example.publicationfilterPanel.setVisible(true);
+                    example.publicationFilterPanel.setVisible(true);
                     example.showKeywordFilter = true;
-                    example.keywordfilterPanel.setVisible(true);
+                    example.keywordFilterPanel.setVisible(true);
                 }
             });
-            example.button.addActionListener(new AbstractAction("filter") {
+            example.filterButton.addActionListener(new AbstractAction("filter") {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     filters.clear();
@@ -362,7 +301,7 @@ public class LineChart extends JFrame {
                     List<String> selectedKeywords = new ArrayList<>();
                     //////////////////////////////////////////////
                     ArticleFilter keywordFilter = new ArticleFilter();
-                    for (JCheckBox checkBox : example.cbList) {
+                    for (JCheckBox checkBox : example.keywordsCbList) {
                         if (checkBox.isSelected()) {
                             selectedKeywords.add(checkBox.getText());
                         }
@@ -413,14 +352,7 @@ public class LineChart extends JFrame {
                     filters.add(publicationFilter);
 
                     example.updateDataset(example.dataset, filters);
-                    //example.panel.getChart().removeLegend();
                     example.panel.getChart().fireChartChanged();
-//                    LegendTitle legend = new LegendTitle(example.panel.getChart().getXYPlot());
-//                    legend.setMargin(new RectangleInsets(1.0, 1.0, 1.0, 1.0));
-//                    legend.setBackgroundPaint(Color.WHITE);
-//                    legend.setPosition(RectangleEdge.BOTTOM);
-//                    example.panel.getChart().addSubtitle(legend);
-//
 
                     example.panel.repaint();
                 }
@@ -445,11 +377,9 @@ public class LineChart extends JFrame {
     }
 
 
-    private static void clearKeycount() {
-        for (int i = 0; i < keywordCount.length; i++) {
-            for (int j = 0; j < keywordCount[i].length; j++) {
-                keywordCount[i][j] = -1;
-            }
+    private static void clearKeyCount() {
+        for (int[] ints : keywordCount) {
+            Arrays.fill(ints, -1);
         }
     }
 
@@ -477,9 +407,7 @@ public class LineChart extends JFrame {
         }
 
         keywordCount = new int[keywords.length][totalDays + 1];
-        clearKeycount();
-        int lastdateIdx = 0;
-        Article lastArticle = null;
+        clearKeyCount();
         for (int i = 0; i < keywords.length; i++) {
             for (Article article : articleList) {
                 if (!isRemoveItem(filters, article)) {
@@ -499,8 +427,6 @@ public class LineChart extends JFrame {
                             maxKeyCount = keywordCount[i][dateIdx];
                             maxKeyword = keywords[i] + " " + i;
                         }
-                        lastdateIdx = dateIdx;
-                        lastArticle = article;
                     }
                 }
             }
@@ -509,13 +435,6 @@ public class LineChart extends JFrame {
         System.out.println("Max key count = " + maxKeyCount);
         System.out.println("Max keyword = " + maxKeyword);
         System.out.println("Remaining articles = " + remainingArticlesCount);
-        System.out.println("lastdate" + lastdateIdx);
-        long num = (long)lastdateIdx * (1000 * 60 * 60 * 24);
-        System.out.println("num" + num);
-        num = num + startDate;
-        System.out.println("num+start" + num);
-        System.out.println("last date " + new Date(num) + ":::" + lastdateIdx + ":::" + startDate + "::::" + num);
-        System.out.println("last date " + new Date(lastArticle.getDate().getTime()) + ":::" + lastArticle.getDate().getTime());
         return startDate;
     }
 
@@ -529,7 +448,7 @@ public class LineChart extends JFrame {
                 long start = filter.getStartDate();
                 long end = filter.getEndDate();
                 if (article.getDate().getTime() < start || article.getDate().getTime() > end) {
-                    removeItem |= true;
+                    removeItem = true;
                     break;
                 }
             } else if (ArticleField.AUTHOR.equals(filter.getField())) {
@@ -546,9 +465,7 @@ public class LineChart extends JFrame {
                 removeItem |= isRemoveItemByFieldVal(filter, publication);
             } else if (ArticleField.PLACE.equals(filter.getField())) {
                 String place = article.getPlace().toLowerCase(Locale.ROOT);
-                if (null != place) {
-                    place = place.toLowerCase(Locale.ROOT);
-                }
+                place = place.toLowerCase(Locale.ROOT);
                 removeItem |= isRemoveItemByFieldVal(filter, place);
             } else if (ArticleField.KEYWORD.equals(filter.getField())) {
                 String keywords = "key";
@@ -563,19 +480,12 @@ public class LineChart extends JFrame {
 
     private static boolean isRemoveItem(ArticleFilter filter, String keywords, boolean contains, boolean contains2) {
         if (StringUtils.isBlank(keywords)) {
-            if (!filter.isKeepEmptyValue()) {
-                return true;
-            } else {
-                return false;
-            }
+            return !filter.isKeepEmptyValue();
         }
         if (!contains) {
             return true;
         }
-        if (contains2) {
-            return true;
-        }
-        return false;
+        return contains2;
     }
 
     private static boolean isRemoveItemByFieldVal(ArticleFilter filter, String fieldValue) {

@@ -2,9 +2,8 @@ package vis;
 
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
-import org.graphstream.ui.view.Viewer;
+import org.graphstream.ui.swingViewer.Viewer;
 import preprocessing.Article;
-import preprocessing.Edge;
 import vis.article.ArticleFilter;
 import vis.article.MainVisualizer;
 
@@ -63,20 +62,24 @@ public class SentimentVisualizer extends MainVisualizer {
 
     public Graph prepareGraph(boolean doFilter) {
         Graph graph = initGraph(styleSheet);
+        drawGraph(doFilter, graph);
+        return graph;
+    }
+
+    public void drawGraph(boolean doFilter, Graph graph) {
         List<ArticleFilter> filters = new ArrayList<>();
         if (doFilter) {
             filters = getFilters();
         }
         System.out.println("article list size is " + PREPROCESSOR.getArticleList().size());
         List<Article> currList = new ArrayList<>();
-        boolean needEdgeUpdate = false;
         for (Article article : PREPROCESSOR.getArticleList()) {
             if (isRemoveItem(filters, article)) {
-                needEdgeUpdate = true;
                 continue;
             }
             currList.add(article);
             Node node = graph.addNode(article.getFileName());
+
             node.setAttribute("xy", article.getxCoordinate(), article.getSentimentScore() * 100);
             node.setAttribute("title", article.getTitle());
             node.setAttribute("sentiment", article.getSentimentScore());
@@ -88,9 +91,33 @@ public class SentimentVisualizer extends MainVisualizer {
             }
         }
         System.out.println("Remaining articles after filtering:" + currList.size());
-        return graph;
     }
 
+
+
+    public void drawGraph(List<ArticleFilter> filters, Graph graph) {
+        graph.rem
+        System.out.println("article list size is " + PREPROCESSOR.getArticleList().size());
+        List<Article> currList = new ArrayList<>();
+        for (Article article : PREPROCESSOR.getArticleList()) {
+            if (isRemoveItem(filters, article)) {
+                continue;
+            }
+            currList.add(article);
+            Node node = graph.addNode(article.getFileName());
+
+            node.setAttribute("xy", article.getxCoordinate(), article.getSentimentScore() * 100);
+            node.setAttribute("title", article.getTitle());
+            node.setAttribute("sentiment", article.getSentimentScore());
+            node.setAttribute("publication", article.getPublication());
+            if (article.getSentimentScore() < 0) {
+                node.setAttribute("ui.class", "negative");
+            } else if (article.getSentimentScore() > 0) {
+                node.setAttribute("ui.class", "positive");
+            }
+        }
+        System.out.println("Remaining articles after filtering:" + currList.size());
+    }
 
     //TODO: zoom https://stackoverflow.com/questions/44675827/how-to-zoom-into-a-graphstream-view
     public static void main(String args[]) {

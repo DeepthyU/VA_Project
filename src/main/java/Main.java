@@ -1,13 +1,18 @@
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
+import vis.article.ArticleField;
+import vis.article.ArticleFilter;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 
 public class Main {
-    public static void main(String args[]) {
-        new Main();
-    }
+
 
     public Main() {
         Graph graph = new SingleGraph("tutorial 1");
@@ -48,7 +53,11 @@ public class Main {
     }
 
     protected void sleep() {
-        try { Thread.sleep(1000); } catch (Exception e) {e.printStackTrace();}
+        try {
+            Thread.sleep(1000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     protected String styleSheet =
