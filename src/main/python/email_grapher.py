@@ -1,16 +1,17 @@
 import pandas as pd
 from pathlib import Path
 from argparse import ArgumentParser
-from typing import List
 import json
-
+import numpy as np
 
 
 def parse_args():
     p = ArgumentParser(description='Returns nodes and edges on the email graph')
 
     p.add_argument('PATH', type=Path,
-                   help='Path toe the `email headers.csv` file.')
+                   help='Path to the `email headers.csv` file.')
+    p.add_argument('EXCEL', type=Path,
+                   help='Path to the `EmployeeRecords.xlsx` file')
     p.add_argument('--out', type=Path,
                    help='Output nodes and edges JSON to a file')
 
@@ -22,52 +23,112 @@ def process_to_col(text: str) -> list:
 
     Remove quotation marks, spaces, lower, and split into a list
     """
-    return text \
+    texts = text \
         .strip('"') \
         .strip(" ") \
-        .lower() \
         .split(",")
+    return [t.strip() for t in texts]
 
 
-def get_all_users(df: pd.DataFrame) -> list:
+def get_all_users(df: pd.DataFrame, xlsx: Path) -> dict:
     """Gets all users involved in email exchanges."""
     users = set()
     for user in df['From'].tolist():
-        users.add(user.lower())
+        users.add(user.strip())
 
     for recipients in df['To'].tolist():
         for recipient in process_to_col(recipients):
             users.add(recipient)
 
-    return list(users)
+    # Open the excel file
+    emp_recs = pd.read_excel(xlsx, "Employee Records",
+                             usecols=['LastName', 'FirstName',
+                                      'CurrentEmploymentType',
+                                      'EmailAddress'])
+
+    for col in emp_recs.columns.tolist():
+        emp_recs[col] = emp_recs[col].str.strip()
+
+    emp_recs['Name'] = emp_recs['FirstName'] + ' ' + emp_recs['LastName']
+    emp_recs = emp_recs.drop(['FirstName', 'LastName'], axis=1)
+    emp_recs['Id'] = emp_recs.index
+    emp_recs = emp_recs.set_index('EmailAddress')
+    emp_recs = emp_recs.rename(columns={'CurrentEmploymentType': 'Department'})
+    unknown_user_id = len(emp_recs)
+    user_info = {}
+
+    for user in list(users):
+        try:
+            user_info[user] = emp_recs.loc[user].to_dict()
+        except KeyError:
+            user_info[user] = {
+                'Name': user,
+                'Id': unknown_user_id,
+                'Department': 'Unknown'
+            }
+            unknown_user_id += 1
+
+    return user_info
 
 
-def generate_edges(df: pd.DataFrame) -> List[dict]:
+def generate_edges(df: pd.DataFrame, user_info: dict) -> np.ndarray:
     """Generates a list of dictionary entries.
 
     Returns:
-        List of dictionaries. Each dictionary contains: [`edge_id`, `subject`,
-        `date`, `from`, `to`]
+        3-dimensional adjacency matrix where the depth represents the time
+        dimension.
     """
-    result = []
     dfd = df.to_dict('split')  # [D]ata[F]rame as [D]ictionary
     curr_id = 0
+
+    # Get unique dates to know depth of the array
+    date_map = {date: depth
+                for depth, date
+                in enumerate(df['Date'].dt.date.unique().tolist())}
+
+    # adj_matrix takes has shape (sender, recipient, date)
+    adj_matrix = np.full((len(user_info), len(user_info), len(date_map)),
+                         fill_value=0)
+
     for i in range(len(df)):
         data = dfd['data']
-        f = data[i][0].lower()  # f since from is a reserved keyword
+        f = data[i][0]  # f since from is a reserved keyword
         to = process_to_col(data[i][1])
         date = data[i][2]
-        subject = data[i][3]
-        for recipient in to:
-            edge = {'edge_id': curr_id,
-                    'subject': subject,
-                    'date': str(date),
-                    'from': f,
-                    'to': recipient}
-            curr_id += 1
-            result.append(edge)
 
-    return result
+        for recipient in to:
+            f_idx = user_info[f]['Id']
+            r_idx = user_info[recipient]['Id']
+            d_idx = date_map[date.date()]
+
+            adj_matrix[f_idx, r_idx, d_idx] += 1
+    return adj_matrix
+
+def np_to_dict(arr: np.ndarray) -> dict:
+    """Converts a numpy array into a dictionary.
+
+    We need this, as bad as it seems, to make a reasonable JSON.
+    """
+    out = {}
+    for i in range(arr.shape[0]):
+        j_dict = {}
+        for j in range(arr.shape[1]):
+            k_dict = {}
+            for k in range(arr.shape[2]):
+                k_dict[k] = int(arr[i, j, k])
+            j_dict[j] = k_dict
+        out[i] = j_dict
+    return out
+
+
+def verify_equivalency(adj_matrix, dict_matrix):
+    for i in range(adj_matrix.shape[0]):
+        for j in range(adj_matrix.shape[1]):
+            for k in range(adj_matrix.shape[2]):
+                error_msg = (f'Not equal at: '
+                             f'{adj_matrix[i, j, k]=}, '
+                             f'{dict_matrix[i][j][k]=}')
+                assert adj_matrix[i, j, k] == dict_matrix[i][j][k], error_msg
 
 
 if __name__ == '__main__':
@@ -75,8 +136,13 @@ if __name__ == '__main__':
 
     headers = pd.read_csv(args.PATH, parse_dates=['Date'])
 
-    output = {'nodes': get_all_users(headers),
-              'edges': generate_edges(headers)}
+    users = get_all_users(headers, args.EXCEL)
+    adj_matrix = generate_edges(headers, users)
+    dict_matrix = np_to_dict(adj_matrix)
+    verify_equivalency(adj_matrix, dict_matrix)
+
+    output = {'emailNameIdMap': users,
+              'edges': dict_matrix}
 
     if args.out is not None:
         with open(args.out, 'w') as out_file:
