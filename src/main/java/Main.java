@@ -1,21 +1,18 @@
-import javafx.scene.canvas.GraphicsContext;
-import org.graphstream.graph.*;
-import org.graphstream.graph.implementations.*;
-import org.graphstream.ui.fx_viewer.FxDefaultView;
-import org.graphstream.ui.graphicGraph.GraphicGraph;
-import org.graphstream.ui.javafx.FxGraphRenderer;
-import org.graphstream.ui.view.GraphRenderer;
-import org.graphstream.ui.view.LayerRenderer;
-import org.graphstream.ui.view.View;
-import org.graphstream.ui.view.Viewer;
+import org.graphstream.graph.Graph;
+import org.graphstream.graph.Node;
+import org.graphstream.graph.implementations.SingleGraph;
+import vis.article.ArticleField;
+import vis.article.ArticleFilter;
 
-import java.awt.*;
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 
 public class Main {
-    public static void main(String args[]) {
-        new Main();
-    }
+
 
     public Main() {
         Graph graph = new SingleGraph("tutorial 1");
@@ -24,8 +21,7 @@ public class Main {
         graph.setAutoCreate(true);
         graph.setStrict(false);
         System.setProperty("org.graphstream.ui", "javafx");
-        Viewer viewer = graph.display(true);
-        FxDefaultView view = (FxDefaultView) viewer.getDefaultView();
+        graph.display(true);
 
         graph.addEdge("AB", "A", "B");
         graph.addEdge("AC", "A", "C");
@@ -57,7 +53,11 @@ public class Main {
     }
 
     protected void sleep() {
-        try { Thread.sleep(1000); } catch (Exception e) {e.printStackTrace();}
+        try {
+            Thread.sleep(1000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     protected String styleSheet =
