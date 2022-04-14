@@ -96,7 +96,7 @@ public class SentimentVisualizer extends MainVisualizer {
 
 
     public void drawGraph(List<ArticleFilter> filters, Graph graph) {
-        graph.rem
+//        graph.rem
         System.out.println("article list size is " + PREPROCESSOR.getArticleList().size());
         List<Article> currList = new ArrayList<>();
         for (Article article : PREPROCESSOR.getArticleList()) {
