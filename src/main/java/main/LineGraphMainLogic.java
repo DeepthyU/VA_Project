@@ -1,5 +1,6 @@
 package main;
 
+import gsim.GraphSim;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jfree.chart.ChartFactory;
@@ -12,6 +13,7 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import preprocessing.Article;
 import preprocessing.Preprocessor;
+import preprocessing.Utils;
 import vis.article.ArticleField;
 import vis.article.ArticleFilter;
 
@@ -57,6 +59,13 @@ public class LineGraphMainLogic {
         scrollPane.setVisible(true);
         return panel;
     }
+
+    public void applyFilters(List filters){
+        updateDataset(dataset, filters);
+        panel.getChart().fireChartChanged();
+        panel.repaint();
+    }
+
 
     public XYPlot getGraph() {
         return chart.getXYPlot();
@@ -109,7 +118,7 @@ public class LineGraphMainLogic {
         clearKeyCount();
         for (int i = 0; i < keywords.length; i++) {
             for (Article article : articleList) {
-                if (!isRemoveItem(filters, article)) {
+                if (!Utils.isRemoveItem(filters, article)) {
                     remainingArticlesCount++;
                     if (currKeywords != null) {
                         if (!currKeywords.contains(keywords[i].toLowerCase(Locale.ROOT))) {
@@ -144,61 +153,6 @@ public class LineGraphMainLogic {
         }
     }
 
-
-    public static boolean isRemoveItem(List<ArticleFilter> filters, Article article) {
-        boolean removeItem = false;
-        if (filters == null) {
-            return false;
-        }
-        for (ArticleFilter filter : filters) {
-            if (ArticleField.DATE.equals(filter.getField())) {
-                long start = filter.getStartDate();
-                long end = filter.getEndDate();
-                if (article.getDate().getTime() < start || article.getDate().getTime() > end) {
-                    removeItem = true;
-                    break;
-                }
-            } else if (ArticleField.AUTHOR.equals(filter.getField())) {
-                String author = article.getAuthor();
-                if (null != author) {
-                    author = author.toLowerCase(Locale.ROOT);
-                }
-                removeItem |= isRemoveItemByFieldVal(filter, author);
-            } else if (ArticleField.PUBLICATION.equals(filter.getField())) {
-                String publication = article.getPublication();
-                if (null != publication) {
-                    publication = publication.toLowerCase(Locale.ROOT);
-                }
-                removeItem |= isRemoveItemByFieldVal(filter, publication);
-            } else if (ArticleField.PLACE.equals(filter.getField())) {
-                String place = article.getPlace().toLowerCase(Locale.ROOT);
-                place = place.toLowerCase(Locale.ROOT);
-                removeItem |= isRemoveItemByFieldVal(filter, place);
-            } else if (ArticleField.KEYWORD.equals(filter.getField())) {
-                String keywords = "key";
-                List<String> valList = article.getKeywordsList();
-                removeItem |= isRemoveItem(filter, keywords,
-                        CollectionUtils.isNotEmpty(CollectionUtils.intersection(filter.getSelectedValues(), valList)),
-                        CollectionUtils.isNotEmpty(CollectionUtils.intersection(filter.getUnselectedValues(), valList)));
-            }
-        }
-        return removeItem;
-    }
-
-    private static boolean isRemoveItem(ArticleFilter filter, String keywords, boolean contains, boolean contains2) {
-        if (StringUtils.isBlank(keywords)) {
-            return !filter.isKeepEmptyValue();
-        }
-        if (!contains) {
-            return true;
-        }
-        return contains2;
-    }
-
-    private static boolean isRemoveItemByFieldVal(ArticleFilter filter, String fieldValue) {
-        return isRemoveItem(filter, fieldValue, filter.getSelectedValues().contains(fieldValue),
-                filter.getUnselectedValues().contains(fieldValue));
-    }
 
 
 }

@@ -5,16 +5,13 @@ import org.graphstream.ui.swingViewer.Viewer;
 import org.graphstream.ui.swingViewer.ViewerListener;
 import org.graphstream.ui.swingViewer.ViewerPipe;
 import org.jfree.chart.ChartPanel;
-import vis.article.ArticleFilter;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.plaf.FontUIResource;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.Arrays;
 
 
 /**
@@ -47,10 +44,12 @@ public class ControlUI extends JFrame implements ActionListener, MouseWheelListe
 
     private JPanel ctrl_panel;
 
-    private JScrollPane filterPanel;
+    private JPanel filterPanel;
+
     private JPanel filterButtonPanel;
 
     private ChartPanel chartPanel;
+
     private View vw = null;
 
     // Set % of span
@@ -122,7 +121,7 @@ public class ControlUI extends JFrame implements ActionListener, MouseWheelListe
             ControlUI.class.getResourceAsStream("./src/main/java/main/images/graph.png");
             BufferedImage myPicture = ImageIO.read(new File("./src/main/java/main/images/graph.png"));
             JLabel picLabel = new JLabel(new ImageIcon(myPicture));
-            picLabel.setPreferredSize(new Dimension(100,100));
+            picLabel.setPreferredSize(new Dimension(100, 100));
             ctrl_panel.add(picLabel);
             System.out.println("Picture dimension = " + picLabel.getSize().getHeight() + picLabel.getSize().getWidth());
 
@@ -131,7 +130,7 @@ public class ControlUI extends JFrame implements ActionListener, MouseWheelListe
         }
 
         lbl_name = new JLabel("Kronos Visualisation Tool");
-        lbl_name.setFont(new Font("Helvetica", Font.BOLD, 16 ));
+        lbl_name.setFont(new Font("Century", Font.BOLD, 16));
         ctrl_panel.add(lbl_name);
 
         btn_loadNgram = new JButton("Show keyword ngram");
@@ -192,10 +191,10 @@ public class ControlUI extends JFrame implements ActionListener, MouseWheelListe
         if (source == btn_loadNgram) {
             loadNgram();
         }
-        if (source == filterButton){
+        if (source == filterButton) {
             filterMLogic.makeFilters();
-            //reloadNgram(filterMLogic.getFilters());
             reloadGraph(filterMLogic.getFilters());
+            reloadNgram(filterMLogic.getFilters());
         }
 
     }
@@ -282,10 +281,10 @@ public class ControlUI extends JFrame implements ActionListener, MouseWheelListe
         vwr.disableAutoLayout();
         vw = vwr.addDefaultView(false);
 
-        JLabel xtitle = new JLabel("Timeline");
+        JLabel title = new JLabel("Sentiment Trend");
         vw.setSize(gUIProp.width, gUIProp.height / 2);
         vw.setLocation(gUIProp.posx, gUIProp.posy);
-        vw.add(xtitle);
+        vw.add(title);
 
 
         // We connect back the viewer to the graph,
@@ -297,7 +296,6 @@ public class ControlUI extends JFrame implements ActionListener, MouseWheelListe
         fromViewer.addViewerListener((ViewerListener) clisten);
         vw.addMouseWheelListener(this);
         vw.addMouseMotionListener(this);
-
 
         // Add in frame
         jfrm.add(vw, BorderLayout.LINE_START);
@@ -325,7 +323,7 @@ public class ControlUI extends JFrame implements ActionListener, MouseWheelListe
         vwr.disableAutoLayout();
         vw = vwr.addDefaultView(false);
 
-        JLabel xtitle = new JLabel("Timeline");
+        JLabel xtitle = new JLabel("Sentiment Trend");
         vw.setSize(gUIProp.width, gUIProp.height / 2);
         vw.setLocation(gUIProp.posx, gUIProp.posy);
         vw.add(xtitle);
@@ -361,6 +359,9 @@ public class ControlUI extends JFrame implements ActionListener, MouseWheelListe
         filterPanel = filterMLogic.simulate_filter();
 
         filterPanel.setSize(ctrl_width, frm_height - ctrl_height - filter_button_height);
+        System.out.println("ctrl_width"+ctrl_width);
+        System.out.println("ctrl_height"+(frm_height - ctrl_height - filter_button_height));
+
         filterPanel.setLocation(frm_width - ctrl_width, ctrl_height);
 
         filterPanel.setVisible(true);
@@ -372,15 +373,8 @@ public class ControlUI extends JFrame implements ActionListener, MouseWheelListe
     /**
      * Function to load graph and create graph listener
      */
-    NodeClickListener nclisten = null;
-
     public void loadNgram() {
 
-        // close event listener for mouse first before removing view
-        // in next step
-        if (nclisten != null) {
-            nclisten.viewClosed(null);
-        }
         // Remove view if exists
         if (chartPanel != null) {
             jfrm.remove(chartPanel);
@@ -396,8 +390,22 @@ public class ControlUI extends JFrame implements ActionListener, MouseWheelListe
         chartPanel.setSize(gUIProp.width, gUIProp.height / 2);
         chartPanel.setLocation(gUIProp.posx, gUIProp.height / 2);
 
-        chartPanel.addMouseWheelListener(this);
-        chartPanel.addMouseMotionListener(this);
+        chartPanel.setVisible(true);
+        // Add in frame
+        jfrm.add(chartPanel, BorderLayout.LINE_START);
+    }
+
+    public void reloadNgram(java.util.List articleFilter) {
+
+        // Remove view if exists
+        if (chartPanel != null) {
+            jfrm.remove(chartPanel);
+        }
+        ngramMLogic.applyFilters(articleFilter);
+        chartPanel = ngramMLogic.simulate_graph();
+
+        chartPanel.setSize(gUIProp.width, gUIProp.height / 2);
+        chartPanel.setLocation(gUIProp.posx, gUIProp.height / 2);
 
         chartPanel.setVisible(true);
         // Add in frame
