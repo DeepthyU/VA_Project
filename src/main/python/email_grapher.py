@@ -3,7 +3,7 @@ from pathlib import Path
 from argparse import ArgumentParser
 import json
 import numpy as np
-
+import plotly.express as px
 
 def parse_args():
     p = ArgumentParser(description='Returns nodes and edges on the email graph')
@@ -152,6 +152,18 @@ if __name__ == '__main__':
 
     users = get_all_users(headers, args.EXCEL)
     adj_matrix = generate_edges(headers, users)
+
+    # Normalize matrix
+    # Use a log scale then min-max to 0-255
+    adj_matrix = np.log(adj_matrix + 1)  # + 1 to avoid log(0)
+    adj_matrix /= adj_matrix.max() / 255.
+
+
+    # Plot adjacency matrix counts
+    flattened_matrix = np.sum(adj_matrix, axis=2).flatten()
+    fig = px.histogram(flattened_matrix)
+    fig.show()
+
     dict_matrix = np_to_dict(adj_matrix)
     verify_equivalency(adj_matrix, dict_matrix)
 
