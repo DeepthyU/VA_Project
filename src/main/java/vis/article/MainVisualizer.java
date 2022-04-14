@@ -1,7 +1,5 @@
 package vis.article;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.SingleGraph;
 import preprocessing.Article;
@@ -10,7 +8,6 @@ import preprocessing.Preprocessor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class MainVisualizer {
     protected static final Preprocessor PREPROCESSOR = new Preprocessor();
@@ -58,55 +55,6 @@ public class MainVisualizer {
         }
     }
 
-    protected boolean isRemoveItem(List<ArticleFilter> filters, Article article) {
-        boolean removeItem = false;
-        for (ArticleFilter filter : filters) {
-            if (ArticleField.DATE.equals(filter.getField())) {
-                long start = filter.getStartDate();
-                long end = filter.getEndDate();
-                if (article.getDate().getTime() < start || article.getDate().getTime() > end) {
-                    removeItem |= true;
-                    break;
-                }
-            } else if (ArticleField.AUTHOR.equals(filter.getField())) {
-                String author = article.getAuthor().toLowerCase(Locale.ROOT);
-                removeItem |= isRemoveItemByFieldVal(filter, author);
-            } else if (ArticleField.PUBLICATION.equals(filter.getField())) {
-                String publication = article.getPublication().toLowerCase(Locale.ROOT);
-                removeItem |= isRemoveItemByFieldVal(filter, publication);
-            } else if (ArticleField.PLACE.equals(filter.getField())) {
-                String place = article.getPlace().toLowerCase(Locale.ROOT);
-                removeItem |= isRemoveItemByFieldVal(filter, place);
-            } else if (ArticleField.KEYWORD.equals(filter.getField())) {
-                String keywords = "key";
-                List<String> valList = article.getKeywordsList();
-                removeItem |= isRemoveItem(filter, keywords,
-                        CollectionUtils.isNotEmpty(CollectionUtils.intersection(filter.getSelectedValues(), valList)),
-                        CollectionUtils.isNotEmpty(CollectionUtils.intersection(filter.getUnselectedValues(), valList)));
-            }
-        }
-        return removeItem;
-    }
-
-    private static boolean isRemoveItem(ArticleFilter filter, String keywords, boolean contains, boolean contains2) {
-        if (StringUtils.isBlank(keywords)) {
-            if (!filter.isKeepEmptyValue()) {
-                return true;
-            }
-        }
-        if (!contains) {
-            return true;
-        }
-        if (contains2) {
-            return true;
-        }
-        return false;
-    }
-
-    private static boolean isRemoveItemByFieldVal(ArticleFilter filter, String fieldValue) {
-        return isRemoveItem(filter, fieldValue, filter.getSelectedValues().contains(fieldValue),
-                filter.getUnselectedValues().contains(fieldValue));
-    }
 
     public void setFilters(List<ArticleFilter> filters) {
         this.filters = filters;

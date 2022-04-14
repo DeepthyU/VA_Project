@@ -16,11 +16,11 @@ public class SentimentMainLogic {
 
 
 	private GraphSim gs;
-
+	SentimentVisualizer sv;
 	public SentimentMainLogic()
 	{
 		gs = new GraphSim("SentimentGraph");
-		SentimentVisualizer sv = new SentimentVisualizer();
+		sv = new SentimentVisualizer();
 		sv.drawGraph(false, gs.getGraph());
 		gs.setStyle();
 	}
@@ -31,10 +31,11 @@ public class SentimentMainLogic {
 	}
 
 	public void applyFilters(List filters){
-		SentimentVisualizer sv = new SentimentVisualizer();
+		gs = new GraphSim("SentimentGraph");
 		sv.drawGraph(filters, gs.getGraph());
 		gs.setStyle();
 	}
+
 	public Graph getGraph()
 	{
 		return gs.getGraph();
