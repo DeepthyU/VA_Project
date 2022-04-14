@@ -30,8 +30,6 @@ import org.graphstream.ui.swingViewer.Viewer;
  */
 public class GraphSim { 
 	private Graph graph;
-	private GraphSimAlgorithm galgo;
-
 
 	/**
 	 * Creates a new Graph Simulator Object
@@ -73,17 +71,12 @@ public class GraphSim {
 						"}"+
 						"node {	size: 5px, 5px; fill-color: black; } " +
 						"node.marked { fill-color: red;}" +
-						"node.positive { fill-color: blue;}" +
+						"node.positive { fill-color: green;}" +
 						"node.negative { fill-color: red;}" +
 						"edge {\n" +
 						"\tshape: line;\n" +
 						"\tarrow-size: 3px, 2px;\n" +
-						"}" +
-						"edge.marked {\n" +
-						"\tshape: line;\n" +
-						"\tfill-color: red;\n" +
-						"\tarrow-size: 3px, 2px;\n" +
-						"}";
+						"}" ;
 
 		graph.setAttribute("ui.stylesheet", style);
 

@@ -9,6 +9,8 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.axis.LogAxis;
+import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
@@ -148,11 +150,13 @@ public class LineChart extends JFrame {
         DateAxis dateAxis = new DateAxis("Date");
         dateAxis.setDateFormatOverride(new SimpleDateFormat("dd-MM-yyyy"));
         dateAxis.setVerticalTickLabels(true);
-        dateAxis.setAutoRange(false);
+        LogAxis logAxis = new LogAxis("Frequency");
+        logAxis.setBase(2);
+        logAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
         chart = ChartFactory.createXYLineChart("Keyword Frequency", "Date", "Frequency"
                 , dataset, PlotOrientation.VERTICAL, true, true, false);
         chart.getXYPlot().setDomainAxis(dateAxis);
-        chart.getXYPlot().mapDatasetToRangeAxis(0, 0);
+        chart.getXYPlot().setRangeAxis(logAxis);
         ChartPanel panel = new ChartPanel(chart, 300, 300, 100, 100, 2000, 2000, true, false, true, true, true, true);
         panel.setPreferredSize(new Dimension(500, 300));
         return panel;

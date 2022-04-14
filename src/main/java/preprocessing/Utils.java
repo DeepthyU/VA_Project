@@ -8,6 +8,8 @@ import org.apache.commons.lang3.StringUtils;
 import vis.article.ArticleField;
 import vis.article.ArticleFilter;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
@@ -89,6 +91,37 @@ public class Utils {
             e.printStackTrace();
         }
         return new String(encoded, encoding);
+    }
+
+
+    public static BufferedImage readAndDeleteImageFile(String path) {
+        BufferedImage image = null;
+        try {
+            image = ImageIO.read(new File(path));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("ERROR: image read failed for " + path);
+        }
+        try {
+            Files.delete(Paths.get(path));
+        } catch (IOException e) {
+            System.out.println("ERROR: delete operation failed for " + path);
+            e.printStackTrace();
+        }
+        return image;
+    }
+
+    public static BufferedImage readImageFile(String path) {
+        BufferedImage image = null;
+        try {
+            image = ImageIO.read(new File(path));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("ERROR: image read failed for " + path);
+        }
+        return image;
     }
 
     public static String getText(String path) {

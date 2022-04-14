@@ -1,8 +1,5 @@
 package main;
 
-import gsim.GraphSim;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -28,13 +25,14 @@ import java.util.Locale;
 public class LineGraphMainLogic {
 
     private ChartPanel panel;
-    private static final Preprocessor PREPROCESSOR = new Preprocessor();
+    private static Preprocessor PREPROCESSOR;
     private XYSeriesCollection dataset;
     private JFreeChart chart;
     private static int[][] keywordCount;
 
 
-    public LineGraphMainLogic() {
+    public LineGraphMainLogic(Preprocessor preprocessor) {
+        PREPROCESSOR = preprocessor;
         // Create dataset
         dataset = createDataset(null);
         // Create chart
@@ -43,7 +41,7 @@ public class LineGraphMainLogic {
         dateAxis.setVerticalTickLabels(true);
         chart = ChartFactory.createXYLineChart("Keyword Frequency", "Date", "Frequency"
                 , dataset, PlotOrientation.VERTICAL, true, true, false);
-        //chart.getTitle().setFont(new Font("Tahoma", Font.PLAIN, 12));
+        chart.getTitle().setFont(new Font("Tahoma", Font.PLAIN, 12));
         chart.getXYPlot().setDomainAxis(dateAxis);
         //chart.getXYPlot().mapDatasetToRangeAxis(0, 0);
         panel = new ChartPanel(chart, 300, 300, 100, 100, 2000, 2000, true, false, true, true, true, true);
@@ -137,7 +135,6 @@ public class LineGraphMainLogic {
                     }
                 }
             }
-
         }
         System.out.println("Max key count = " + maxKeyCount);
         System.out.println("Max keyword = " + maxKeyword);
@@ -151,7 +148,4 @@ public class LineGraphMainLogic {
             Arrays.fill(ints, -1);
         }
     }
-
-
-
 }

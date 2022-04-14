@@ -57,8 +57,8 @@ public class KeywordFinder {
         //https://github.com/kennycason/kumo
         Utils.writeFile("search_text.txt", searchText);
         PythonExecuter executer = new PythonExecuter();
-        executer.runWordCloudScript();
-        String outFileName = Utils.readAndDeleteFile("pythonOut.txt", Charset.defaultCharset());
+        executer.runWordCloudScript("freq_count.py", new String[]{"search_text.txt", "0.05"}, "kf");
+        String outFileName = Utils.readAndDeleteFile("kfpythonOut.txt", Charset.defaultCharset());
         String data = Utils.readAndDeleteFile(outFileName + ".txt", Charset.defaultCharset());
         String[] keywords = data.split("##");
         System.out.println("keywords: " + keywords.length + " :: " + Arrays.toString(keywords));

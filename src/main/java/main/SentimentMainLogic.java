@@ -7,11 +7,6 @@ import vis.SentimentVisualizer;
 
 import java.util.List;
 
-/**
- * Maing logic controller which the UI calls
- * @author brandon
- *
- */
 public class SentimentMainLogic {
 
 
@@ -23,6 +18,8 @@ public class SentimentMainLogic {
 		sv = new SentimentVisualizer();
 		sv.drawGraph(false, gs.getGraph());
 		gs.setStyle();
+		gs.getGraph().addAttribute("ui.quality");
+		gs.getGraph().addAttribute("ui.antialias");
 	}
 
 	public Viewer simulate_graph()

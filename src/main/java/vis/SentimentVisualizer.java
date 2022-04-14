@@ -1,9 +1,13 @@
 package vis;
 
+import jdk.jshell.execution.Util;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.ListUtils;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.ui.swingViewer.Viewer;
 import preprocessing.Article;
+import preprocessing.Utils;
 import vis.article.ArticleFilter;
 import vis.article.MainVisualizer;
 
@@ -74,7 +78,7 @@ public class SentimentVisualizer extends MainVisualizer {
         System.out.println("article list size is " + PREPROCESSOR.getArticleList().size());
         List<Article> currList = new ArrayList<>();
         for (Article article : PREPROCESSOR.getArticleList()) {
-            if (isRemoveItem(filters, article)) {
+            if (Utils.isRemoveItem(filters, article)) {
                 continue;
             }
             currList.add(article);
@@ -96,11 +100,10 @@ public class SentimentVisualizer extends MainVisualizer {
 
 
     public void drawGraph(List<ArticleFilter> filters, Graph graph) {
-//        graph.rem
         System.out.println("article list size is " + PREPROCESSOR.getArticleList().size());
         List<Article> currList = new ArrayList<>();
         for (Article article : PREPROCESSOR.getArticleList()) {
-            if (isRemoveItem(filters, article)) {
+            if (Utils.isRemoveItem(filters, article)) {
                 continue;
             }
             currList.add(article);
