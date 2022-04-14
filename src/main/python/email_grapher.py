@@ -31,7 +31,12 @@ def process_to_col(text: str) -> list:
 
 
 def get_all_users(df: pd.DataFrame, xlsx: Path) -> dict:
-    """Gets all users involved in email exchanges."""
+    """Gets all users involved in email exchanges.
+
+    Returns:
+        A dictionary with email as the key and a dictionary as its value with
+        keys ('Name', 'Id', 'Department').
+    """
     users = set()
     for user in df['From'].tolist():
         users.add(user.strip())
@@ -54,6 +59,13 @@ def get_all_users(df: pd.DataFrame, xlsx: Path) -> dict:
     emp_recs['Id'] = emp_recs.index
     emp_recs = emp_recs.set_index('EmailAddress')
     emp_recs = emp_recs.rename(columns={'CurrentEmploymentType': 'Department'})
+
+    # Give every department an ID
+    dept_id_map = {d: i for i, d in enumerate(emp_recs['Department'].unique())}
+    emp_recs['DeptId'] = emp_recs.apply(
+        (lambda row: dept_id_map[row['Department']]), axis=1)
+
+    # Special handling of unknown
     unknown_user_id = len(emp_recs)
     user_info = {}
 
@@ -64,7 +76,8 @@ def get_all_users(df: pd.DataFrame, xlsx: Path) -> dict:
             user_info[user] = {
                 'Name': user,
                 'Id': unknown_user_id,
-                'Department': 'Unknown'
+                'Department': 'Unknown',
+                'DeptId': len(dept_id_map)
             }
             unknown_user_id += 1
 
@@ -104,6 +117,7 @@ def generate_edges(df: pd.DataFrame, user_info: dict) -> np.ndarray:
             adj_matrix[f_idx, r_idx, d_idx] += 1
     return adj_matrix
 
+
 def np_to_dict(arr: np.ndarray) -> dict:
     """Converts a numpy array into a dictionary.
 
@@ -142,7 +156,8 @@ if __name__ == '__main__':
     verify_equivalency(adj_matrix, dict_matrix)
 
     output = {'emailNameIdMap': users,
-              'edges': dict_matrix}
+              'edges': dict_matrix,
+              'edgesShape': adj_matrix.shape}
 
     if args.out is not None:
         with open(args.out, 'w') as out_file:
