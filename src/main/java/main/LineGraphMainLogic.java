@@ -41,12 +41,11 @@ public class LineGraphMainLogic {
         DateAxis dateAxis = new DateAxis("Date");
         dateAxis.setDateFormatOverride(new SimpleDateFormat("dd-MM-yyyy"));
         dateAxis.setVerticalTickLabels(true);
-        dateAxis.setAutoRange(false);
         chart = ChartFactory.createXYLineChart("Keyword Frequency", "Date", "Frequency"
                 , dataset, PlotOrientation.VERTICAL, true, true, false);
         //chart.getTitle().setFont(new Font("Tahoma", Font.PLAIN, 12));
         chart.getXYPlot().setDomainAxis(dateAxis);
-        chart.getXYPlot().mapDatasetToRangeAxis(0, 0);
+        //chart.getXYPlot().mapDatasetToRangeAxis(0, 0);
         panel = new ChartPanel(chart, 300, 300, 100, 100, 2000, 2000, true, false, true, true, true, true);
         panel.setPreferredSize(new Dimension(500, 300));
 
