@@ -89,6 +89,21 @@ def plot_tsne(arr: np.ndarray, df: pd.DataFrame):
     fig.show()
 
 
+def output_tsne(embedded: np.ndarray, df: pd.DataFrame, out_path: Path):
+    """Ouputs the TSNE as a csv file with added info."""
+    out = pd.DataFrame(df['Name'])
+    out['DeptId'] = df['DeptId'].tolist()
+    out['Department'] = df['Department'].tolist()
+    embedded = pd.DataFrame(embedded)
+    out['x'] = embedded[0].tolist()
+    out['y'] = embedded[1].tolist()
+    if out_path is not None:
+        print(f"Writing out TSNE coordinates to {out_path}...")
+        out.to_csv(out_path)
+    else:
+        print(out.info())
+
+
 def main():
     args = parse_args()
 
@@ -102,6 +117,8 @@ def main():
     users_embedded = TSNE(learning_rate='auto', random_state=0,
                           verbose=0, n_jobs=-1).fit_transform(one_hot_np)
     plot_tsne(users_embedded, one_hot)
+    output_tsne(users_embedded, one_hot, args.out)
+
 
 
 if __name__ == '__main__':
