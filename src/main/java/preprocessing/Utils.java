@@ -81,14 +81,12 @@ public class Utils {
             encoded = Files.readAllBytes(Paths.get(path));
 
         } catch (IOException e) {
-            e.printStackTrace();
             System.out.println("ERROR: file read failed for " + path);
         }
         try {
             Files.delete(Paths.get(path));
         } catch (IOException e) {
             System.out.println("ERROR: delete operation failed for " + path);
-            e.printStackTrace();
         }
         return new String(encoded, encoding);
     }
@@ -100,14 +98,12 @@ public class Utils {
             image = ImageIO.read(new File(path));
 
         } catch (IOException e) {
-            e.printStackTrace();
             System.out.println("ERROR: image read failed for " + path);
         }
         try {
             Files.delete(Paths.get(path));
         } catch (IOException e) {
             System.out.println("ERROR: delete operation failed for " + path);
-            e.printStackTrace();
         }
         return image;
     }
@@ -118,7 +114,6 @@ public class Utils {
             image = ImageIO.read(new File(path));
 
         } catch (IOException e) {
-            e.printStackTrace();
             System.out.println("ERROR: image read failed for " + path);
         }
         return image;
@@ -144,14 +139,8 @@ public class Utils {
             myWriter.write(text);
             myWriter.close();
         } catch (IOException e) {
-            System.out.println("An error occurred.");
-            e.printStackTrace();
+            System.out.println("ERROR: An error occurred during file write to path "+ path);
         }
-    }
-
-    public static void main(String[] args) {
-        Timestamp output = format_date("2007/03/22");
-        System.out.println(output);
     }
 
     public static int writeArticleListToFile(String fileName, List<Article> articleList) {

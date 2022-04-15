@@ -1,15 +1,22 @@
-plugins {
-    id 'java'
-    id 'application'
-    id 'org.openjfx.javafxplugin' version '0.0.10'
+apply plugin: 'java'
+apply plugin: 'eclipse'
+//apply plugin: 'java-library'
+apply plugin: 'application'
+apply plugin: 'idea'
+buildscript {
+    repositories {
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath 'gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0'
+    }
 }
-group 'org.example'
-version '1.0-SNAPSHOT'
 
-//javafx {
-//    version = "11.0.2"
-//    modules = [ 'javafx.controls' ]
-//}
+apply plugin: 'com.github.johnrengelman.shadow'
+
+
+
+mainClassName = "main.Main"
 
 repositories {
     mavenCentral()
@@ -21,6 +28,41 @@ repositories {
     }
 
 }
+
+configurations {
+    // configuration that holds jars to include in the jar
+    extraLibs
+}
+
+sourceSets {
+    single{
+        java {
+            srcDir 'src'
+
+        }
+    }
+}
+
+task compile(type: JavaCompile) {
+    source = sourceSets.single.java
+    sourceSets.main.java.srcDirs = ['src']
+    classpath = sourceSets.main.compileClasspath
+    destinationDirectory = sourceSets.main.output.classesDirs[0]
+
+}
+
+compileJava {
+    options.release = 15
+}
+
+//
+//java {
+//    toolchain {
+//        languageVersion.set(JavaLanguageVersion.of(15))
+//    }
+//}
+
+
 
 allprojects {
     repositories {
@@ -63,6 +105,43 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.9.0'
 }
 
-test {
-    useJUnitPlatform()
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(15)
+    }
 }
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'main.Main'
+        )
+    }
+}
+
+
+task fatJar(type: Jar) {
+    manifest.from jar.manifest
+    classifier = 'all'
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    } {
+        exclude "META-INF/*.SF"
+        exclude "META-INF/*.DSA"
+        exclude "META-INF/*.RSA"
+    }
+    with jar
+}
+
+shadowJar {
+    archiveBaseName.set('shadow')
+    archiveClassifier.set('')
+    archiveVersion.set('')
+    manifest {
+        inheritFrom project.tasks.fatJar.manifest
+    }
+}
+
+version = '0.1.0'

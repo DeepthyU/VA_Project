@@ -18,8 +18,7 @@ public class Main {
                 data = reader.nextLine();
             }
         } catch (FileNotFoundException e) {
-            System.out.println("Error occured");
-            e.printStackTrace();
+            System.out.println("ERROR: reading adjacency.json file failed");
         }
 
         HebFrame hebFrame = new HebFrame(data);

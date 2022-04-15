@@ -28,7 +28,7 @@ public class KeywordFinder {
 
                 outputStream.writeObject(keywordsArr);
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("ERROR: write keyword to file failed");
             }
         }
     }
@@ -38,7 +38,7 @@ public class KeywordFinder {
             ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(KEYWORDS_FILE_PATH));
             keywordsArr = (String[]) inputStream.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+            System.out.println("ERROR: getKeywordsFromFile failed");
         }
     }
 

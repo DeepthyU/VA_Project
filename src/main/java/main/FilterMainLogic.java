@@ -148,13 +148,10 @@ public class FilterMainLogic {
                 int count = travel > 0 ? 0 : travel;
                 //TODO : change dy using function
                 int dy = travel > 0 ? 8 : -8;
-                System.out.println("-----travel=" + travel);
-                System.out.println("--count---=" + count);
-                System.out.println("-limit-" + limit);
 
                 while (count < limit) {
                     try {
-                        Thread.sleep(25);
+                        Thread.sleep(2);
                     } catch (InterruptedException e) {
                         System.out.println("interrupted");
                         break;
@@ -168,7 +165,6 @@ public class FilterMainLogic {
                         Point p = c[index].getLocation();
                         p.y += dy;
                         c[index].setLocation(p.x, p.y);
-                        System.out.println("x=" + p.x + "y=" + p.y);
                     }
                     filterMainPanel.repaint();
                     count = count + 8;
@@ -417,4 +413,46 @@ public class FilterMainLogic {
         }
     }
 
+    class ControlPanel extends JPanel {
+        int id;
+        String name;
+        JLabel titleLabel;
+        Color c1 = new Color(200,180,180);
+        Color c2 = new Color(200,220,220);
+        Color fontFg = Color.blue;
+        Color rolloverFg = Color.red;
+        public final static int HEIGHT = 30;
+
+        public ControlPanel(String name, int id, MouseListener ml) {
+            this.id = id;
+            this.name = name;
+            setLayout(new BorderLayout());
+            add(titleLabel = new JLabel(name + " Filter", JLabel.CENTER));
+            titleLabel.setForeground(fontFg);
+            Dimension d = getPreferredSize();
+            d.height = HEIGHT;
+            setPreferredSize(d);
+            addMouseListener(ml);
+            addMouseListener(listener);
+        }
+
+        protected void paintComponent(Graphics g) {
+            int w = getWidth();
+            Graphics2D g2 = (Graphics2D)g;
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setPaint(new GradientPaint(w/2, 0, c1, w/2, HEIGHT/2, c2));
+            g2.fillRect(0,0,w,HEIGHT);
+        }
+
+        private MouseListener listener = new MouseAdapter() {
+            public void mouseEntered(MouseEvent e) {
+                titleLabel.setForeground(rolloverFg);
+            }
+
+            public void mouseExited(MouseEvent e) {
+                titleLabel.setForeground(fontFg);
+            }
+        };
+    }
 }

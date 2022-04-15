@@ -33,7 +33,6 @@ public class MainVisualizer {
     }
 
 
-    //TODO: zoom https://stackoverflow.com/questions/44675827/how-to-zoom-into-a-graphstream-view
     protected void updateEdges(List<Article> currList, List<ArticleFilter> filters) {
         ArticleFilter keywordFilter = null;
         List<String> keywords = null;
@@ -81,7 +80,7 @@ public class MainVisualizer {
         try {
             Thread.sleep(10);
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("ERROR: exception occured in method sleep()");
         }
     }
 

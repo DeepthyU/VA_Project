@@ -91,9 +91,7 @@ public class TabbedVisMainLogic extends JPanel implements ActionListener, MouseW
         frm_height = screen_dim.height;
 
         ctrl_width = (int) (0.2 * (double) screen_dim.width);
-        //ctrl_height = screen_dim.height;
         ctrl_height = (int) (0.2 * (double) screen_dim.height);
-        //System.out.println(screen_dim.height);
 
         // Initialize graph UI property object to pass to sim
         gUIProp = new GraphUIProperty();

@@ -4,31 +4,7 @@ import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.SingleGraph;
 import org.graphstream.ui.swingViewer.Viewer;
 
-/**
- * The Graph Simulator object. This should be the object that the caller
- * should interface with.
- * 
- * To use this class:
- * 1) create an object
- * 2) (optional) importGraph - import a graph 
- * 3) (optional) display - display graph
- * 4) (optional) compute - Starts worker thread to simulate graph animations
- * 5) (optional) importEvents/exportEvents - import/export events for worker
- * thread
- * 
- * 
- * 
- * *) Run actions
- * - addVertex
- * - addEdge
- * - ppr_teleport
- * - ppr_go
- * - etc.
- * 
- * @author brandon
- *
- */
-public class GraphSim { 
+public class GraphSim {
 	private Graph graph;
 
 	/**

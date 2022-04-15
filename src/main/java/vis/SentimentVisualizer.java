@@ -48,14 +48,7 @@ public class SentimentVisualizer extends MainVisualizer {
             while (k.hasNext()) {
 
                 Node next = k.next();
-//            if (null != previous) {
-//                org.graphstream.graph.Edge edge = previous.getEdgeBetween(next.getId());
-//                if (null == edge) {
-//                    System.out.println("Edge missing for :" + previous.getId() + " , " + next.getId());
-//                } else {
-//                    edge.setAttribute("ui.class", "marked");
-//                }
-//            }
+
                 next.setAttribute("ui.class", "marked");
                 previous = next;
                 sleep();

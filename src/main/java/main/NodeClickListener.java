@@ -174,9 +174,6 @@ public class NodeClickListener implements ViewerListener , MouseInputListener{
 	 */
 	@Override
 	public void mousePressed(MouseEvent e) {
-		// TODO Auto-generated method stub
-		//vpipe.pump();
-		//System.out.println("Pump it!");
 	}
 
 

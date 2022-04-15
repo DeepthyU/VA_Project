@@ -10,7 +10,7 @@ public class PythonExecuter {
         try {
             Runtime RT = Runtime.getRuntime();
             System.out.println("INFO: run python script");
-            String command = "C:\\Users\\dipuu\\anaconda3\\Scripts\\conda.exe run python " + filename + " " + params[0] + " " + params[1]; //0.05
+            String command = "conda run python " + filename + " " + params[0] + " " + params[1]; //0.05
             File file = new File(identifier + "pythonOut.txt");
             Writer output = new BufferedWriter(new FileWriter(file));
             Process runObj = RT.exec(command);

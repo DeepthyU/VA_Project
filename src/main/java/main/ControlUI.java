@@ -11,7 +11,6 @@ import java.io.File;
 /**
  * UI Class that contains all the UI functions
  *
- * @author brandon
  */
 public class ControlUI extends JFrame implements ActionListener, MouseWheelListener, MouseMotionListener {
 
@@ -97,7 +96,7 @@ public class ControlUI extends JFrame implements ActionListener, MouseWheelListe
             ctrl_panel.add(picLabel);
             jfrm.setIconImage(myPicture);
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("ERROR: Icon load failed");
         }
         jfrm.setTitle("Kronos Visualisation Tool");
 
