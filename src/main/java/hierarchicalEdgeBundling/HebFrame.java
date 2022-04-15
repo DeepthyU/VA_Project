@@ -1,6 +1,7 @@
 package hierarchicalEdgeBundling;
 
 import com.google.gson.Gson;
+import style.EmailColors;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,21 +20,10 @@ public class HebFrame extends JPanel{
     // For easier access of which IDs belong to who
     private final Map<Integer, String> idEmailMap = new HashMap<>();
     private int radius;
-    private final int padding = 150;
+    private final int padding = 180;
 
     private int startFilter = 0;
     private int endFilter = 6;  // end is inclusive of the day
-
-    // Colors for each department
-    private final int[][] colors = {
-            {214, 0, 0},
-            {140, 59, 255},
-            {1, 135, 0},
-            {0, 172, 198},
-            {151, 255, 0},
-            {255, 126, 209},
-            {107, 0, 79}
-    };
 
     public HebFrame(String jsonString) {
         this.setLayout(null);
@@ -122,9 +112,9 @@ public class HebFrame extends JPanel{
                 }
             }
         }
-        long elapsedTime = System.nanoTime() - startTime;
-        System.out.println("Time taken to read JSON:");
-        System.out.println(elapsedTime);
+        long elapsedTime = System.nanoTime();
+        System.out.println("Time taken to read JSON (ms):");
+        System.out.println((elapsedTime - startTime) / 1000000);
     }
 
     private int[] polarToCartesian(float r, float theta) {
@@ -167,11 +157,11 @@ public class HebFrame extends JPanel{
         }
 
         // Sum connections
-        int[][] connections = new int[adjacencyMatrix.length][adjacencyMatrix[0].length];
-        ArrayList<Integer> counts = new ArrayList<>();
+        float[][] connections = new float[adjacencyMatrix.length][adjacencyMatrix[0].length];
+        ArrayList<Float> counts = new ArrayList<>();
         for (int i = 0; i < adjacencyMatrix.length; i++) {
             for (int j = 0; j < adjacencyMatrix[i].length; j++) {
-                int numConnections = 0;
+                float numConnections = 0;
                 if (i != j) {
                     for (int k = start; k <= end; k++) {
                         // End is inclusive
@@ -185,16 +175,21 @@ public class HebFrame extends JPanel{
                 counts.add(numConnections);
             }
         }
-        IntSummaryStatistics stats = counts.stream().collect(Collectors.summarizingInt(Integer::intValue));
+
+        ArrayList<Integer> intCounts = new ArrayList<>();
+        for (float i:counts) {
+            intCounts.add(((Float) i).intValue());
+        }
+        IntSummaryStatistics stats = intCounts.stream().collect(Collectors.summarizingInt(Integer::intValue));
         int max = stats.getMax();
         return new Object[] {connections, max};
     }
 
-    private void drawArcs(int[][] connections, float normalizer, Graphics2D g2d) {
+    private void drawArcs(float[][] connections, float normalizer, Graphics2D g2d) {
         // Draws the arcs between each node according to the given adjacency graph
         for (int i = 0; i < connections.length; i++) {
             for (int j = 0; j < connections[i].length; j++) {
-                int value = connections[i][j];
+                float value = connections[i][j];
                 if (value > 0) {
                     // Get sender info
                     Employee senderInfo = emailNameIdMap.get(idEmailMap.get(i));
@@ -222,12 +217,11 @@ public class HebFrame extends JPanel{
                             dest[0], dest[1]
                     );
 
-                    // Connection strength is log-normalized
-                    float strength = (float) (Math.log(value + 1) / normalizer);
-                    int opacity = Math.round(strength * 127);
-                    opacity = Math.min(opacity, 255);
+                    // Connection strength is is between 0 and 1
+                    float strength = value / normalizer;
+                    int opacity = Math.round(strength * 200);
 
-                    int thickness = Math.min((Math.round(strength) * 2), 6);
+                    float thickness = strength * 6;
                     g2d.setStroke(new BasicStroke(thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
                     g2d.setColor(new Color(94, 207, 255, opacity));
 
@@ -243,10 +237,9 @@ public class HebFrame extends JPanel{
             // Add the node
             Employee data = this.emailNameIdMap.get(email);
             int[] center = polarToCartesian(this.radius, data.getAngle());
-            int[] colorTuple = colors[data.getDeptId()];
             drawCircleFromCenter(
                     center[0], center[1], 4,
-                    new Color(colorTuple[0], colorTuple[1], colorTuple[2]),
+                    EmailColors.deptColors[data.getDeptId()],
                     g2d
             );
 
@@ -280,18 +273,14 @@ public class HebFrame extends JPanel{
         // TODO Make start and end not hardcoded
         Object[] connectionSums = sumConnections();
 
-        int[][] connections = (int[][]) connectionSums[0];
-        float normalizer = (float) Math.log((int) connectionSums[1]);
+        float[][] connections = (float[][]) connectionSums[0];
+        float normalizer = ((Integer) connectionSums[1]).floatValue();
 
         drawArcs(connections, normalizer, g2d);
         drawNodes(g2d);
 
         long elapsedTime = System.nanoTime();
-        System.out.println("Time to paint:");
-        System.out.println(elapsedTime - startTime);
-
+        System.out.println("Time to paint (ms):");
+        System.out.println((elapsedTime - startTime) / 1000000);
     }
 }
-
-// TODO: Mouseover
-// TODO: Add event listener callback for k
