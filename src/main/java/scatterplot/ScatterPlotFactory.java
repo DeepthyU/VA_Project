@@ -15,6 +15,7 @@ import org.jfree.data.xy.XYDataItem;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import style.GlasbeyColors;
 
 import java.awt.*;
 import java.io.FileNotFoundException;
@@ -40,15 +41,14 @@ public class ScatterPlotFactory {
         );
         chart.setAntiAlias(true);
         XYPlot plot = (XYPlot) chart.getPlot();
-        // Set background to white
-        plot.setBackgroundPaint(new Color(255, 255, 255));
+        // Set background to a lighter color
+        plot.setBackgroundPaint(new Color(229, 235, 247));
         // Hide x and y axis
         plot.getDomainAxis().setVisible(false);
         plot.getRangeAxis().setVisible(false);
 
         // The whole thing below this is to make a tooltip
         XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();
-
         XYToolTipGenerator xyToolTipGenerator = new XYToolTipGenerator() {
             @Override
             public String generateToolTip(XYDataset dataset, int series, int item) {
@@ -90,7 +90,9 @@ public class ScatterPlotFactory {
             System.out.println("CSV Validation failed.");
         }
         // Remove header
-        stringList.remove(0);
+        if (stringList.size() > 0) {
+            stringList.remove(0);
+        }
         return stringList;
     }
     private Object[] parseEmailCsv(String csvPath) {
@@ -127,8 +129,6 @@ public class ScatterPlotFactory {
                 seenDeptIds.add(deptId);
                 xySeries.put(deptId, new XYSeries(dept));
             }
-
-            xySeries.get(deptId).add(dataValue.getX(), dataValue.getY());
             xySeries.get(deptId).add(new XYDataItem(dataValue.getX(), dataValue.getY()));
         }
         for (XYSeries xy:xySeries.values()) {
@@ -139,8 +139,49 @@ public class ScatterPlotFactory {
 
     /** Produce a JPanel which shows the clustering of articles by words they contain */
     public ChartPanel getArticleClusteringPlot(String csvPath) {
-        Object[] parsedCsv = parseArticleCsv(csvPath);
-        return null;
+        Map<XYDataItem, ArticleData> parsedCsv = parseArticleCsv(csvPath);
+
+        XYDataset dataset = createArticleTsneDataset(parsedCsv);
+
+        JFreeChart chart = ChartFactory.createScatterPlot(
+                "TSNE Clustering of News Articles after TF-IDF Vectorization",
+                "", "", dataset,
+                PlotOrientation.HORIZONTAL, true, true, true
+        );
+        chart.setAntiAlias(true);
+        XYPlot plot = (XYPlot) chart.getPlot();
+        // Set background to lighter color
+        plot.setBackgroundPaint(new Color(229, 235, 247));
+        // Hide x and y axis
+        plot.getDomainAxis().setVisible(false);
+        plot.getRangeAxis().setVisible(false);
+
+        // The whole thing below this is to make a tooltip
+        XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();
+        XYToolTipGenerator xyToolTipGenerator = new XYToolTipGenerator() {
+            @Override
+            public String generateToolTip(XYDataset dataset, int series, int item) {
+                XYDataItem dataItem = new XYDataItem(dataset.getX(series, item), dataset.getY(series, item));
+                ArticleData articleData = parsedCsv.get(dataItem);
+                String title = articleData.getTitle();
+                String publication = articleData.getPublication();
+                String date = articleData.getDate();
+                String filename = articleData.getFilename();
+                return String.format("<html><p><b>%s</b></p>", title) +
+                        String.format("<p>%s</p>", publication) +
+                        String.format("<p>%s</p>", date) +
+                        String.format("<p>filename: %s</p>", filename) +
+                        "</html>";
+            }
+        };
+        renderer.setDefaultToolTipGenerator(xyToolTipGenerator);
+        for (int i = 0; i < plot.getSeriesCount(); i++) {
+            renderer.setSeriesPaint(i, GlasbeyColors.colors[i]);
+        }
+        ChartPanel chartPanel = new ChartPanel(chart);
+        chartPanel.setInitialDelay(0);
+
+        return chartPanel;
     }
 
     /**
@@ -168,5 +209,26 @@ public class ScatterPlotFactory {
             dataMap.put(xyDataItem, articleData);
         }
         return dataMap;
+    }
+
+    /** Creates a dataset, grouped by publication, for visualization */
+    private XYDataset createArticleTsneDataset(Map<XYDataItem, ArticleData> parsedCsv) {
+        XYSeriesCollection dataset = new XYSeriesCollection();
+
+        ArrayList<Integer> seenPubIds = new ArrayList<>();
+        Map<Integer, XYSeries> xySeries = new HashMap<>();
+        for (Map.Entry<XYDataItem, ArticleData> entry : parsedCsv.entrySet()) {
+            int pubId = entry.getValue().getPublicationId();
+            String pub = entry.getValue().getPublication();
+            if (!seenPubIds.contains(pubId)) {
+                seenPubIds.add(pubId);
+                xySeries.put(pubId, new XYSeries(pub));
+            }
+            xySeries.get(pubId).add(entry.getKey());
+        }
+        for (XYSeries xy : xySeries.values()) {
+            dataset.addSeries(xy);
+        }
+        return dataset;
     }
 }

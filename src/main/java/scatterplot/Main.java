@@ -11,10 +11,15 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        ChartPanel scatterPlot = new ScatterPlotFactory().getEmailClusteringPlot(
-                "/Users/Yvan/Git/VA_Project/src/main/data/gastech_data/data/tsne.csv"
+        ChartPanel emailPlot = new ScatterPlotFactory().getEmailClusteringPlot(
+                "/Users/Yvan/Git/VA_Project/src/main/data/gastech_data/data/email_tsne.csv"
         );
-        scatterPlot.setSize(750, 750);
+        emailPlot.setSize(400, 400);
+
+        ChartPanel articlePlot = new ScatterPlotFactory().getArticleClusteringPlot(
+                "/Users/Yvan/Git/VA_Project/src/main/data/gastech_data/data/article_tsne.csv"
+        );
+        articlePlot.setSize(750, 750);
 
 
         JFrame frame = new JFrame("ScatterPlot Frame Test");
@@ -23,7 +28,8 @@ public class Main {
         frame.setLocationRelativeTo(null);
         frame.setResizable(false);
         frame.setVisible(true);
-        frame.setLayout(new GridLayout(1, 1));
-        frame.add(scatterPlot);
+        frame.setLayout(new GridLayout(1, 2));
+//        frame.add(emailPlot);
+        frame.add(articlePlot);
     }
 }
