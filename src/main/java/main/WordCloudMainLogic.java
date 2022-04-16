@@ -4,6 +4,7 @@ import keywordsearch.PythonExecuter;
 import preprocessing.Article;
 import preprocessing.Preprocessor;
 import preprocessing.Utils;
+import vis.ZoomablePicturePanel;
 import vis.article.ArticleFilter;
 
 import javax.swing.*;

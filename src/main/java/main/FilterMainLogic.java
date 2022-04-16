@@ -4,6 +4,7 @@ import net.sourceforge.jdatepicker.impl.JDatePanelImpl;
 import net.sourceforge.jdatepicker.impl.JDatePickerImpl;
 import net.sourceforge.jdatepicker.impl.UtilDateModel;
 import preprocessing.Preprocessor;
+import vis.SearchableJComboBox;
 import vis.article.ArticleField;
 import vis.article.ArticleFilter;
 
@@ -31,7 +32,8 @@ public class FilterMainLogic {
     private AtomicBoolean includeEmptyAuthor, includeEmptyPublication, includeEmptyPlace;
     private List<ArticleFilter> filters = new ArrayList<>();
     private JPanel filterMainPanel = new JPanel();
-
+    private JComboBox keywordsCombo, placeCombo, authorCombo, publicationCombo;
+    private JButton addKeyword, addPlace, addAuthor, addPublication;
     private boolean movingComponents = false;
     private int visibleIndex = 4;
 
@@ -49,20 +51,43 @@ public class FilterMainLogic {
 
         ///////////////////////////////////////////////
         unselectAllKeywordCbs = new JButton("Unselect All Keywords");
+        keywordsCombo = new JComboBox(new Preprocessor().getKeywordsArr());
+        // has to be editable
+        keywordsCombo.setEditable(true);
+        // change the editor's document
+        new SearchableJComboBox(keywordsCombo);
+        addKeyword = new JButton("ADD");
         //////////////////////////////////////////////////////////////
         unselectAllPlaceCbs = new JButton("Unselect All Place");
         includeEmptyPlaceFilter = new JToggleButton("Include emtpy values");
         includeEmptyPlaceFilter.setSelected(true);
+        placeCombo = new JComboBox(new Preprocessor().getPlaces().toArray());
+        // has to be editable
+        placeCombo.setEditable(true);
+        // change the editor's document
+        new SearchableJComboBox(placeCombo);
+        addPlace = new JButton("ADD");
         ////////////////////////////////////////////////////////////////////////
         unselectAllAuthorCbs = new JButton("Unselect All Author");
         includeEmptyAuthorFilter = new JToggleButton("Include emtpy values");
         includeEmptyAuthorFilter.setSelected(true);
+        authorCombo = new JComboBox(new Preprocessor().getAuthors().toArray());
+        // has to be editable
+        authorCombo.setEditable(true);
+        // change the editor's document
+        new SearchableJComboBox(authorCombo);
+        addAuthor = new JButton("ADD");
         /////////////////////////////////////////////////////////////
         unselectAllPublicationCbs = new JButton("Unselect All Publication");
         includeEmptyPublicationFilter = new JToggleButton("Include emtpy values");
         includeEmptyPublicationFilter.setSelected(true);
+        publicationCombo = new JComboBox(new Preprocessor().getPublications().toArray());
+        // has to be editable
+        publicationCombo.setEditable(true);
+        // change the editor's document
+        new SearchableJComboBox(publicationCombo);
+        addPublication = new JButton("ADD");
         /////////////////////////////////
-
         includeEmptyPublication = new AtomicBoolean(true);
         includeEmptyPlace = new AtomicBoolean(true);
         includeEmptyAuthor = new AtomicBoolean(true);
@@ -233,17 +258,6 @@ public class FilterMainLogic {
         filters.add(publicationFilter);
     }
 
-    private JPanel addOptions(List<String> options, List<JCheckBox> checkBoxListList) {
-        JPanel panel = new JPanel();
-        for (String option : options) {
-            JCheckBox cb = new JCheckBox(option, true);
-            cb.setPreferredSize(new Dimension(150, 20));
-            checkBoxListList.add(cb);
-            panel.add(cb);
-        }
-        return panel;
-    }
-
     private void addOptions(List<String> options, JPanel panel, List<JCheckBox> checkBoxListList) {
         for (String option : options) {
             JCheckBox cb = new JCheckBox(option, true);
@@ -262,6 +276,10 @@ public class FilterMainLogic {
         includeEmptyPlaceFilter.addActionListener(new IncludeEmptyButtonActionListener(includeEmptyPlace));
         includeEmptyPublicationFilter.addActionListener(new IncludeEmptyButtonActionListener(includeEmptyPublication));
         includeEmptyAuthorFilter.addActionListener(new IncludeEmptyButtonActionListener(includeEmptyAuthor));
+        addKeyword.addActionListener(new AddButtonActionListener(keywordsCombo, keywordsCbList));
+        addAuthor.addActionListener(new AddButtonActionListener(authorCombo, authorCbList));
+        addPlace.addActionListener(new AddButtonActionListener(placeCombo, placeCbList));
+        addPublication.addActionListener(new AddButtonActionListener(publicationCombo, publicationCbList));
     }
 
     public void doResetButtonAction() {
@@ -287,6 +305,23 @@ public class FilterMainLogic {
         includeEmptyPublicationFilter.setSelected(true);
     }
 
+    class AddButtonActionListener implements ActionListener {
+        private JComboBox comboBox;
+        private List<JCheckBox> cbList;
+
+        public AddButtonActionListener(JComboBox comboBox, List<JCheckBox> cbList) {
+            this.comboBox = comboBox;
+            this.cbList = cbList;
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            int keywordIdx = comboBox.getSelectedIndex();
+            if (keywordIdx > -1) {
+                cbList.get(keywordIdx).setSelected(true);
+            }
+        }
+
+    }
 
     class IncludeEmptyButtonActionListener implements ActionListener {
         private AtomicBoolean include;
@@ -331,30 +366,43 @@ public class FilterMainLogic {
 
         private JPanel getContent(String name) {
             JPanel panel = new JPanel(new GridLayout());
-            panel.setLayout(new GridLayout(10, 1));
             switch (name) {
                 case "Date":
                     panel.add(startDatePicker);
                     panel.add(endDatePicker);
+                    panel.setLayout(new GridLayout(2, 2));
                     break;
                 case "Keyword":
-                    addOptions(Arrays.asList(PREPROCESSOR.getKeywordsArr()), panel, keywordsCbList);
+                    panel.add(keywordsCombo);
+                    panel.add(addKeyword);
                     panel.add(unselectAllKeywordCbs);
+                    panel.add(new JLabel());
+                    addOptions(Arrays.asList(PREPROCESSOR.getKeywordsArr()), panel, keywordsCbList);
+                    panel.setLayout(new GridLayout(44, 2));
                     break;
                 case "Author":
-                    addOptions(PREPROCESSOR.getAuthors(), panel, authorCbList);
-                    panel.add(includeEmptyAuthorFilter);
+                    panel.add(authorCombo);
+                    panel.add(addAuthor);
                     panel.add(unselectAllAuthorCbs);
+                    panel.add(includeEmptyAuthorFilter);
+                    addOptions(PREPROCESSOR.getAuthors(), panel, authorCbList);
+                    panel.setLayout(new GridLayout(7, 2));
                     break;
                 case "Place":
-                    addOptions(PREPROCESSOR.getPlaces(), panel, placeCbList);
-                    panel.add(includeEmptyPlaceFilter);
+                    panel.add(placeCombo);
+                    panel.add(addPlace);
                     panel.add(unselectAllPlaceCbs);
+                    panel.add(includeEmptyPlaceFilter);
+                    addOptions(PREPROCESSOR.getPlaces(), panel, placeCbList);
+                    panel.setLayout(new GridLayout(7, 2));
                     break;
                 case "Publication":
-                    addOptions(PREPROCESSOR.getPublications(), panel, publicationCbList);
-                    panel.add(includeEmptyPublicationFilter);
+                    panel.add(publicationCombo);
+                    panel.add(addPublication);
                     panel.add(unselectAllPublicationCbs);
+                    panel.add(includeEmptyPublicationFilter);
+                    addOptions(PREPROCESSOR.getPublications(), panel, publicationCbList);
+                    panel.setLayout(new GridLayout(17, 2));
                     break;
             }
             return panel;
