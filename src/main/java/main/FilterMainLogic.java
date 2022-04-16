@@ -9,7 +9,6 @@ import vis.article.ArticleFilter;
 
 import javax.swing.*;
 import java.awt.*;
-
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,25 +18,24 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FilterMainLogic {
 
-    private JButton unselectAllButton, unselectAllPlaceButton, unselectAllAuthorButton, unselectAllPublicationButton;
-    private JToggleButton includeEmptyDateFilter, includeEmptyAuthorFilter, includeEmptyPlaceFilter, includeEmptyPublicationFilter, includeEmptyKeywordFilter;
+    private static Preprocessor PREPROCESSOR = new Preprocessor();
+    private JButton unselectAllKeywordCbs, unselectAllPlaceCbs, unselectAllAuthorCbs, unselectAllPublicationCbs;
+    private JToggleButton includeEmptyAuthorFilter, includeEmptyPlaceFilter, includeEmptyPublicationFilter;
 
     private List<JCheckBox> keywordsCbList = new ArrayList<>();
     private List<JCheckBox> placeCbList = new ArrayList<>();
     private List<JCheckBox> publicationCbList = new ArrayList<>();
     private List<JCheckBox> authorCbList = new ArrayList<>();
-    protected static Preprocessor PREPROCESSOR = new Preprocessor();
-    private JDatePickerImpl startDatePicker, endDatePicker;
-    private AtomicBoolean showDateFilter, showKeywordFilter, showAuthorFilter, showPublicationFilter, showPlaceFilter;
-    private AtomicBoolean includeEmptyDate, includeEmptyKeyword, includeEmptyAuthor, includeEmptyPublication, includeEmptyPlace;
-    List<ArticleFilter> filters = new ArrayList<>();
-    JPanel filterMainPanel = new JPanel();
-    boolean movingComponents = false;
-    int visibleIndex = 4;
 
-    public  FilterMainLogic(){
-        includeEmptyDateFilter = new JToggleButton("Include emtpy values");
-        includeEmptyDateFilter.setSelected(true);
+    private JDatePickerImpl startDatePicker, endDatePicker;
+    private AtomicBoolean includeEmptyAuthor, includeEmptyPublication, includeEmptyPlace;
+    private List<ArticleFilter> filters = new ArrayList<>();
+    private JPanel filterMainPanel = new JPanel();
+
+    private boolean movingComponents = false;
+    private int visibleIndex = 4;
+
+    public FilterMainLogic() {
         UtilDateModel startDateModel = new UtilDateModel();
         startDateModel.setDate(1982, 10, 2);
         startDateModel.setSelected(true);
@@ -50,55 +48,40 @@ public class FilterMainLogic {
         endDatePicker = new JDatePickerImpl(endDatePanel, new DateLabelFormatter());
 
         ///////////////////////////////////////////////
-        unselectAllButton = new JButton("Unselect All Keywords");
-        includeEmptyKeywordFilter = new JToggleButton("Include emtpy values");
-        includeEmptyKeywordFilter.setSelected(true);
+        unselectAllKeywordCbs = new JButton("Unselect All Keywords");
         //////////////////////////////////////////////////////////////
-        unselectAllPlaceButton = new JButton("Unselect All Place");
+        unselectAllPlaceCbs = new JButton("Unselect All Place");
         includeEmptyPlaceFilter = new JToggleButton("Include emtpy values");
         includeEmptyPlaceFilter.setSelected(true);
         ////////////////////////////////////////////////////////////////////////
-        unselectAllAuthorButton = new JButton("Unselect All Author");
+        unselectAllAuthorCbs = new JButton("Unselect All Author");
         includeEmptyAuthorFilter = new JToggleButton("Include emtpy values");
         includeEmptyAuthorFilter.setSelected(true);
         /////////////////////////////////////////////////////////////
-        unselectAllPublicationButton = new JButton("Unselect All Publication");
+        unselectAllPublicationCbs = new JButton("Unselect All Publication");
         includeEmptyPublicationFilter = new JToggleButton("Include emtpy values");
         includeEmptyPublicationFilter.setSelected(true);
         /////////////////////////////////
 
-        showDateFilter = new AtomicBoolean(true);
-        showKeywordFilter = new AtomicBoolean(true);
-        showPublicationFilter = new AtomicBoolean(true);
-        showPlaceFilter = new AtomicBoolean(true);
-        showAuthorFilter = new AtomicBoolean(true);
-
-        includeEmptyDate = new AtomicBoolean(true);
-        includeEmptyKeyword = new AtomicBoolean(true);
         includeEmptyPublication = new AtomicBoolean(true);
         includeEmptyPlace = new AtomicBoolean(true);
         includeEmptyAuthor = new AtomicBoolean(true);
 
         addActionListeners();
 
-
-
-
         filterMainPanel.setLayout(null);
         // Add children and compute prefSize.
 
         Dimension d = new Dimension();
         int h = 0;
-        String[] child_names = {"date", "keyword", "place", "publication", "author"};
-        for (int j= 0; j < child_names.length; j++) {
+        String[] child_names = {"Date", "Keyword", "Place", "Author", "Publication"};
+        for (int j = 0; j < child_names.length; j++) {
             ChildPanel child = new ChildPanel(child_names[j], j + 1, ml);
             filterMainPanel.add(child);
             d = child.getPreferredSize();
             child.setBounds(0, h, d.width, d.height);
-            if (j < child_names.length - 1)
-                h += ControlPanel.HEIGHT;
+            h += ControlPanel.HEIGHT;
         }
-        h += d.height;
         filterMainPanel.setPreferredSize(new Dimension(d.width, h));
         // Set z-order for children.
         setZOrder();
@@ -146,7 +129,6 @@ public class FilterMainLogic {
                 Component[] c = filterMainPanel.getComponents();
                 int limit = travel > 0 ? travel : 0;
                 int count = travel > 0 ? 0 : travel;
-                //TODO : change dy using function
                 int dy = travel > 0 ? 8 : -8;
 
                 while (count < limit) {
@@ -157,7 +139,6 @@ public class FilterMainLogic {
                         break;
                     }
                     for (int j = 0; j < indices.length; j++) {
-
                         // The z-order reversed the order returned
                         // by getComponents. Adjust the indices to
                         // get the correct components to relocate.
@@ -178,7 +159,7 @@ public class FilterMainLogic {
 
     private MouseListener ml = new MouseAdapter() {
         public void mousePressed(MouseEvent e) {
-            int index = ((ControlPanel)e.getSource()).id-1;
+            int index = ((ControlPanel) e.getSource()).id - 1;
             if (!movingComponents)
                 setChildVisible(index);
         }
@@ -205,7 +186,6 @@ public class FilterMainLogic {
         }
         keywordFilter.setField(ArticleField.KEYWORD);
         keywordFilter.setSelectedValues(selectedKeywords);
-        keywordFilter.setKeepEmptyValue(includeEmptyKeyword.get());
         filters.add(keywordFilter);
         //////////////////////////////
         ArticleFilter dateFilter = new ArticleFilter();
@@ -214,7 +194,6 @@ public class FilterMainLogic {
         Date selectedEndDate = (Date) endDatePicker.getModel().getValue();
         dateFilter.setStartDate(selectedStartDate.getTime());
         dateFilter.setEndDate(selectedEndDate.getTime());
-        dateFilter.setKeepEmptyValue(includeEmptyDate.get());
         filters.add(dateFilter);
         ////////////////////////////////////
         selectedKeywords = new ArrayList<>();
@@ -276,15 +255,13 @@ public class FilterMainLogic {
 
 
     private void addActionListeners() {
-        unselectAllButton.addActionListener(new UnselectAllActionListener(keywordsCbList));
-        unselectAllPublicationButton.addActionListener(new UnselectAllActionListener(publicationCbList));
-        unselectAllAuthorButton.addActionListener(new UnselectAllActionListener(authorCbList));
-        unselectAllPlaceButton.addActionListener(new UnselectAllActionListener(placeCbList));
-        includeEmptyDateFilter.addActionListener(new IncludeEmptyButtonActionListener(includeEmptyDate));
+        unselectAllKeywordCbs.addActionListener(new UnselectAllActionListener(keywordsCbList));
+        unselectAllPublicationCbs.addActionListener(new UnselectAllActionListener(publicationCbList));
+        unselectAllAuthorCbs.addActionListener(new UnselectAllActionListener(authorCbList));
+        unselectAllPlaceCbs.addActionListener(new UnselectAllActionListener(placeCbList));
         includeEmptyPlaceFilter.addActionListener(new IncludeEmptyButtonActionListener(includeEmptyPlace));
         includeEmptyPublicationFilter.addActionListener(new IncludeEmptyButtonActionListener(includeEmptyPublication));
         includeEmptyAuthorFilter.addActionListener(new IncludeEmptyButtonActionListener(includeEmptyAuthor));
-        includeEmptyKeywordFilter.addActionListener(new IncludeEmptyButtonActionListener(includeEmptyKeyword));
     }
 
     public void doResetButtonAction() {
@@ -302,10 +279,6 @@ public class FilterMainLogic {
         }
         startDatePicker.getModel().setDate(1982, 10, 2);
         endDatePicker.getModel().setDate(2014, 3, 26);
-        includeEmptyDate.set(true);
-        includeEmptyDateFilter.setSelected(true);
-        includeEmptyKeyword.set(true);
-        includeEmptyKeywordFilter.setSelected(true);
         includeEmptyAuthor.set(true);
         includeEmptyAuthorFilter.setSelected(true);
         includeEmptyPlace.set(true);
@@ -314,26 +287,6 @@ public class FilterMainLogic {
         includeEmptyPublicationFilter.setSelected(true);
     }
 
-    class HideOrShowActionListener implements ActionListener {
-        private AtomicBoolean showFilter;
-        private JPanel panel;
-
-        public HideOrShowActionListener(AtomicBoolean showFilter, JPanel panel) {
-            this.showFilter = showFilter;
-            this.panel = panel;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            showFilter.set(hideOrShow(showFilter.get(), panel));
-        }
-
-        private boolean hideOrShow(boolean show, JPanel panel) {
-            show = !show;
-            panel.setVisible(show);
-            return show;
-        }
-    }
 
     class IncludeEmptyButtonActionListener implements ActionListener {
         private AtomicBoolean include;
@@ -380,29 +333,28 @@ public class FilterMainLogic {
             JPanel panel = new JPanel(new GridLayout());
             panel.setLayout(new GridLayout(10, 1));
             switch (name) {
-                case "date":
+                case "Date":
                     panel.add(startDatePicker);
                     panel.add(endDatePicker);
                     break;
-                case "keyword":
+                case "Keyword":
                     addOptions(Arrays.asList(PREPROCESSOR.getKeywordsArr()), panel, keywordsCbList);
-                    panel.add(includeEmptyKeywordFilter);
-                    panel.add(unselectAllButton);
+                    panel.add(unselectAllKeywordCbs);
                     break;
-                case "author":
+                case "Author":
                     addOptions(PREPROCESSOR.getAuthors(), panel, authorCbList);
                     panel.add(includeEmptyAuthorFilter);
-                    panel.add(unselectAllAuthorButton);
+                    panel.add(unselectAllAuthorCbs);
                     break;
-                case "place":
+                case "Place":
                     addOptions(PREPROCESSOR.getPlaces(), panel, placeCbList);
                     panel.add(includeEmptyPlaceFilter);
-                    panel.add(unselectAllPlaceButton);
+                    panel.add(unselectAllPlaceCbs);
                     break;
-                case "publication":
+                case "Publication":
                     addOptions(PREPROCESSOR.getPublications(), panel, publicationCbList);
                     panel.add(includeEmptyPublicationFilter);
-                    panel.add(unselectAllPublicationButton);
+                    panel.add(unselectAllPublicationCbs);
                     break;
             }
             return panel;
@@ -417,18 +369,19 @@ public class FilterMainLogic {
         int id;
         String name;
         JLabel titleLabel;
-        Color c1 = new Color(200,180,180);
-        Color c2 = new Color(200,220,220);
-        Color fontFg = Color.blue;
-        Color rolloverFg = Color.red;
+        Color c1 = new Color(187, 193, 198);
+        Color fontFg = new Color(250, 249, 249);
+        Color rolloverFg = new Color(0, 94, 184);
         public final static int HEIGHT = 30;
 
         public ControlPanel(String name, int id, MouseListener ml) {
             this.id = id;
             this.name = name;
             setLayout(new BorderLayout());
-            add(titleLabel = new JLabel(name + " Filter", JLabel.CENTER));
+            titleLabel = new JLabel("  " + name + " Filter", JLabel.LEFT);
+            add(titleLabel);
             titleLabel.setForeground(fontFg);
+            titleLabel.setFont(new Font("Tahoma", Font.PLAIN, 12));
             Dimension d = getPreferredSize();
             d.height = HEIGHT;
             setPreferredSize(d);
@@ -438,11 +391,11 @@ public class FilterMainLogic {
 
         protected void paintComponent(Graphics g) {
             int w = getWidth();
-            Graphics2D g2 = (Graphics2D)g;
+            Graphics2D g2 = (Graphics2D) g;
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                     RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setPaint(new GradientPaint(w/2, 0, c1, w/2, HEIGHT/2, c2));
-            g2.fillRect(0,0,w,HEIGHT);
+            g2.setPaint(new GradientPaint(w / 2, 0, c1, w / 2, HEIGHT / 2, c1));
+            g2.fillRect(0, 0, w, HEIGHT);
         }
 
         private MouseListener listener = new MouseAdapter() {

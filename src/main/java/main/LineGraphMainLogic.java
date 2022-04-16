@@ -3,9 +3,11 @@ package main;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.axis.*;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.util.LogFormat;
+import org.jfree.data.Range;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import preprocessing.Article;
@@ -37,14 +39,32 @@ public class LineGraphMainLogic {
         dataset = createDataset(null);
         // Create chart
         DateAxis dateAxis = new DateAxis("Date");
-        dateAxis.setDateFormatOverride(new SimpleDateFormat("dd-MM-yyyy"));
+        dateAxis.setDateFormatOverride(new SimpleDateFormat("dd/MM/yy"));
         dateAxis.setVerticalTickLabels(true);
-        chart = ChartFactory.createXYLineChart("Keyword Frequency", "Date", "Frequency"
+
+        LogarithmicAxis logAxis = new LogarithmicAxis("log(Frequency)");
+        logAxis.setAllowNegativesFlag(false);
+        logAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+        chart = ChartFactory.createXYLineChart(null, "Date", "Frequency"
                 , dataset, PlotOrientation.VERTICAL, true, true, false);
-        chart.getTitle().setFont(new Font("Tahoma", Font.PLAIN, 12));
-        chart.getXYPlot().setDomainAxis(dateAxis);
-        //chart.getXYPlot().mapDatasetToRangeAxis(0, 0);
-        panel = new ChartPanel(chart, 300, 300, 100, 100, 2000, 2000, true, false, true, true, true, true);
+        XYPlot plot = chart.getXYPlot();
+        plot.getRangeAxis().setLabelFont(new Font("Tahoma", Font.PLAIN, 10));
+        plot.getRangeAxis().setTickLabelFont(new Font("Tahoma", Font.PLAIN, 8));
+        plot.setDomainAxis(dateAxis);
+        plot.getDomainAxis().setLabelFont(new Font("Tahoma", Font.PLAIN, 12));
+        plot.getDomainAxis().setTickLabelFont(new Font("Tahoma", Font.PLAIN, 8));
+        chart.getLegend().setItemFont(new Font("Tahoma", Font.PLAIN, 9));
+
+        plot.setRangeAxis(logAxis);
+        plot.setBackgroundAlpha(0.25f);
+        plot.setBackgroundPaint(Color.white);
+        plot.setDomainMinorGridlinePaint(Color.WHITE);
+        plot.setDomainGridlinePaint(Color.DARK_GRAY);
+        plot.setRangeMinorGridlinePaint(Color.WHITE);
+        plot.setRangeGridlinePaint(Color.DARK_GRAY);
+
+
+        panel = new ChartPanel(chart, 300, 300, 0, 0, 2000, 2000, true, false, true, true, true, true);
         panel.setPreferredSize(new Dimension(500, 300));
 
     }
@@ -57,7 +77,7 @@ public class LineGraphMainLogic {
         return panel;
     }
 
-    public void applyFilters(List filters){
+    public void applyFilters(List filters) {
         updateDataset(dataset, filters);
         panel.getChart().fireChartChanged();
         panel.repaint();
@@ -82,7 +102,7 @@ public class LineGraphMainLogic {
         for (int i = 0; i < keywordCount.length; i++) {
             XYSeries keywordSeries = new XYSeries(keywords[i]);
             for (int j = 0; j < keywordCount[i].length; j++) {
-                if (keywordCount[i][j] >= 0) {
+                if (keywordCount[i][j] > 0) {
                     keywordSeries.add(((long) j * (1000 * 60 * 60 * 24) + startDate), keywordCount[i][j]);
                 }
             }
@@ -112,7 +132,7 @@ public class LineGraphMainLogic {
         }
 
         keywordCount = new int[keywords.length][totalDays + 1];
-        clearKeyCount();
+        //clearKeyCount();
         for (int i = 0; i < keywords.length; i++) {
             for (Article article : articleList) {
                 if (!Utils.isRemoveItem(filters, article)) {
@@ -124,9 +144,9 @@ public class LineGraphMainLogic {
                     }
                     if (article.getKeywordsList().contains(keywords[i].toLowerCase(Locale.ROOT))) {
                         int dateIdx = (int) ((article.getDate().getTime() - startDate) / (1000 * 60 * 60 * 24));
-                        if (keywordCount[i][dateIdx] == -1) {
-                            keywordCount[i][dateIdx] = 0;
-                        }
+//                        if (keywordCount[i][dateIdx] == -1) {
+//                            keywordCount[i][dateIdx] = 0;
+//                        }
                         keywordCount[i][dateIdx]++;
                         if (maxKeyCount < keywordCount[i][dateIdx]) {
                             maxKeyCount = keywordCount[i][dateIdx];

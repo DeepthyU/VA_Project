@@ -1,6 +1,7 @@
 package main;
 
 import gsim.GraphSim;
+import org.apache.commons.collections4.CollectionUtils;
 import org.graphstream.graph.Graph;
 import org.graphstream.ui.swingViewer.Viewer;
 import vis.SentimentVisualizer;
@@ -28,9 +29,11 @@ public class SentimentMainLogic {
 	}
 
 	public void applyFilters(List filters){
-		gs = new GraphSim("SentimentGraph");
-		sv.drawGraph(filters, gs.getGraph());
-		gs.setStyle();
+		if (CollectionUtils.isNotEmpty(filters)) {
+			gs = new GraphSim("SentimentGraph");
+			sv.drawGraph(filters, gs.getGraph());
+			gs.setStyle();
+		}
 	}
 
 	public Graph getGraph()

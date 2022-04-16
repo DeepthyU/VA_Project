@@ -4,11 +4,15 @@ import org.graphstream.ui.swingViewer.View;
 import org.graphstream.ui.swingViewer.Viewer;
 import org.graphstream.ui.swingViewer.ViewerListener;
 import org.graphstream.ui.swingViewer.ViewerPipe;
+import preprocessing.Article;
 import preprocessing.Preprocessor;
+import vis.article.ArticleFilter;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 import java.awt.event.*;
+import java.util.ArrayList;
 
 public class TabbedVisMainLogic extends JPanel implements ActionListener, MouseWheelListener, MouseMotionListener {
 
@@ -23,13 +27,14 @@ public class TabbedVisMainLogic extends JPanel implements ActionListener, MouseW
     private HebMainLogic hebMainLogic;
 
     private JTabbedPane mainVisPanel;
-    private JPanel articlePanel;
+    private JLayeredPane articlePanel;
     private JPanel employeePanel;
 
     private JButton filterButton;
     private JButton resetAllButton;
 
     private JPanel filterPanel;
+    private JSplitPane articleVisPanel;
     private JPanel filterButtonPanel;
     private JPanel sliderPanel;
     private JTabbedPane freqPanel;
@@ -39,10 +44,9 @@ public class TabbedVisMainLogic extends JPanel implements ActionListener, MouseW
     private int frm_width, frm_height;
     private int ctrl_width, ctrl_height;
     private int filter_button_height;
-    
+
     public TabbedVisMainLogic() {
         mainVisPanel = new JTabbedPane();
-        articlePanel = new JPanel();
         initGUI();
         sentimentMainLogic = new SentimentMainLogic();
         filterMainLogic = new FilterMainLogic();
@@ -70,17 +74,18 @@ public class TabbedVisMainLogic extends JPanel implements ActionListener, MouseW
         employeePanel.add(hebPanel);
     }
 
-    public JTabbedPane simulateTabView(){
+    public JTabbedPane simulateTabView() {
         mainVisPanel.setSize(frm_width, frm_height);
         mainVisPanel.setLocation(gUIProp.posx, gUIProp.posy);
         mainVisPanel.setVisible(true);
         return mainVisPanel;
     }
 
-    public JPanel getArticlePanel(){
+    public JLayeredPane getArticlePanel() {
         return articlePanel;
     }
-    public JPanel getEmployeePanel(){
+
+    public JPanel getEmployeePanel() {
         return employeePanel;
     }
 
@@ -104,24 +109,35 @@ public class TabbedVisMainLogic extends JPanel implements ActionListener, MouseW
 
 
     private void makeArticleVis() {
-        articlePanel = new JPanel();
+        articlePanel = new JLayeredPane();
         articlePanel.setBounds(0, 0, frm_width, frm_height);
         articlePanel.setLayout(null);
 
+        articleVisPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        articleVisPanel.setOneTouchExpandable(true);
+        articleVisPanel.setDividerLocation(frm_height / 2);
 
         loadFilterPanel();
-        loadGraph();
-        loadFreqTab();
 
+        loadGraph(null);
+        loadFreqTab(null);
+        articleVisPanel.setSize(gUIProp.width, gUIProp.height);
+        articleVisPanel.setLocation(gUIProp.posx, gUIProp.posy);
+        articlePanel.add(articleVisPanel);
         filterButtonPanel = new JPanel();
-        filterButton = new JButton("FILTER");
+        filterButton = new JButton("Filter");
         filterButton.addActionListener(this);
-        resetAllButton = new JButton("REMOVE FILTERS");
+        filterButton.setPreferredSize(new Dimension(ctrl_width - 30, 25));
+        filterButton.setFont(new Font("Tahoma", Font.PLAIN, 12));
+        resetAllButton = new JButton("Remove Filters");
         resetAllButton.addActionListener(this);
+        resetAllButton.setPreferredSize(new Dimension(ctrl_width - 30, 25));
+        resetAllButton.setFont(new Font("Tahoma", Font.PLAIN, 12));
+
         filterButtonPanel.add(filterButton);
         filterButtonPanel.add(resetAllButton);
-        filterButtonPanel.setBounds(frm_width - ctrl_width, frm_height - ctrl_height, ctrl_width, ctrl_height);
-        articlePanel.add(filterButtonPanel);
+        filterButtonPanel.setBounds(frm_width - ctrl_width, frm_height - ctrl_height - 50, ctrl_width, ctrl_height);
+        articlePanel.add(filterButtonPanel, JLayeredPane.PALETTE_LAYER);
 
         // Features to add
         // Block Label
@@ -135,18 +151,16 @@ public class TabbedVisMainLogic extends JPanel implements ActionListener, MouseW
      */
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
-
         if (source == filterButton) {
             filterMainLogic.makeFilters();
-            reloadGraph(filterMainLogic.getFilters());
-            reloadFreqTab(filterMainLogic.getFilters());
+            loadGraph(filterMainLogic.getFilters());
+            loadFreqTab(filterMainLogic.getFilters());
         } else if (source == resetAllButton) {
             filterMainLogic.doResetButtonAction();
             filterMainLogic.makeFilters();
-            reloadGraph(filterMainLogic.getFilters());
-            reloadFreqTab(filterMainLogic.getFilters());
+            loadGraph(filterMainLogic.getFilters());
+            loadFreqTab(filterMainLogic.getFilters());
         }
-
     }
 
     /**
@@ -210,7 +224,7 @@ public class TabbedVisMainLogic extends JPanel implements ActionListener, MouseW
      */
     NodeClickListener clisten = null;
 
-    public void loadGraph() {
+    public void loadGraph(java.util.List articleFilterList) {
 
         // close event listener for mouse first before removing view
         // in next step
@@ -219,49 +233,7 @@ public class TabbedVisMainLogic extends JPanel implements ActionListener, MouseW
         }
         // Remove view if exists
         if (vw != null) {
-            articlePanel.remove(vw);
-        }
-
-        //This is a sort of wrapper class which calls all
-        //the other methods in GraphSims and GraphSimsAlgorithm
-        //the actually creates the graph and animates it
-
-
-        Viewer vwr = sentimentMainLogic.simulate_graph();
-        vwr.disableAutoLayout();
-        vw = vwr.addDefaultView(false);
-
-        JLabel title = new JLabel("Sentiment Trend");
-        vw.setSize(gUIProp.width, gUIProp.height / 2);
-        vw.setLocation(gUIProp.posx, gUIProp.posy);
-        vw.add(title);
-
-
-        // We connect back the viewer to the graph,
-        // the graph becomes a sink for the viewer.
-        // We also install us as a viewer listener to
-        // intercept the graphic events.
-        ViewerPipe fromViewer = vwr.newViewerPipe();
-        clisten = new NodeClickListener(fromViewer, vw, sentimentMainLogic.getGraph());
-        fromViewer.addViewerListener((ViewerListener) clisten);
-        vw.addMouseWheelListener(this);
-        vw.addMouseMotionListener(this);
-
-        // Add in frame
-        articlePanel.add(vw, BorderLayout.LINE_START);
-
-    }
-
-    public void reloadGraph(java.util.List articleFilterList) {
-
-        // close event listener for mouse first before removing view
-        // in next step
-        if (clisten != null) {
-            clisten.viewClosed(null);
-        }
-        // Remove view if exists
-        if (vw != null) {
-            articlePanel.remove(vw);
+            articleVisPanel.remove(vw);
         }
 
         //This is a sort of wrapper class which calls all
@@ -273,12 +245,12 @@ public class TabbedVisMainLogic extends JPanel implements ActionListener, MouseW
         vwr.disableAutoLayout();
         vw = vwr.addDefaultView(false);
 
-        JLabel xtitle = new JLabel("Sentiment Trend");
+        JLabel title = new JLabel("Sentiment Trend");
         vw.setSize(gUIProp.width, gUIProp.height / 2);
         vw.setLocation(gUIProp.posx, gUIProp.posy);
-        vw.add(xtitle);
+        vw.add(title);
 
-
+        vw.setMinimumSize(new Dimension(0, 0));
         // We connect back the viewer to the graph,
         // the graph becomes a sink for the viewer.
         // We also install us as a viewer listener to
@@ -289,9 +261,8 @@ public class TabbedVisMainLogic extends JPanel implements ActionListener, MouseW
         vw.addMouseWheelListener(this);
         vw.addMouseMotionListener(this);
 
-
         // Add in frame
-        articlePanel.add(vw, BorderLayout.LINE_START);
+        articleVisPanel.setTopComponent(vw);
 
     }
 
@@ -343,45 +314,25 @@ public class TabbedVisMainLogic extends JPanel implements ActionListener, MouseW
     }
 
 
-    /**
-     * Function to load graph and create graph listener
-     */
-    public void loadFreqTab() {
+    public void loadFreqTab(java.util.List articleFilter) {
 
         // Remove view if exists
         if (freqPanel != null) {
-            articlePanel.remove(freqPanel);
-        }
-
-        //This is a sort of wrapper class which calls all
-        //the other methods in GraphSims and GraphSimsAlgorithm
-        //the actually creates the graph and animates it
-
-
-        freqPanel = frequencyVisMainLogic.simulate_tab(gUIProp.posx, gUIProp.height / 2, gUIProp.width, gUIProp.height / 2);
-        freqPanel.setSize(gUIProp.width, gUIProp.height / 2);
-        freqPanel.setLocation(gUIProp.posx, gUIProp.height / 2);
-
-        freqPanel.setVisible(true);
-        // Add in frame
-        articlePanel.add(freqPanel, BorderLayout.LINE_START);
-    }
-
-    public void reloadFreqTab(java.util.List articleFilter) {
-
-        // Remove view if exists
-        if (freqPanel != null) {
-            articlePanel.remove(freqPanel);
+            articleVisPanel.remove(freqPanel);
         }
         frequencyVisMainLogic.applyFilters(articleFilter);
-        freqPanel = frequencyVisMainLogic.simulate_tab(gUIProp.posx, gUIProp.height / 2, gUIProp.width, gUIProp.height / 2);
+        freqPanel = frequencyVisMainLogic.simulate_tab(gUIProp.width, gUIProp.height / 2);
         freqPanel.setSize(gUIProp.width, gUIProp.height / 2);
         freqPanel.setLocation(gUIProp.posx, gUIProp.height / 2);
 
+
+        freqPanel.setMinimumSize(new Dimension(0, 0));
         freqPanel.repaint();
+
         // Add in frame
-        articlePanel.add(freqPanel, BorderLayout.LINE_START);
+        articleVisPanel.setBottomComponent(freqPanel);
     }
+
 
     @Override
     public void mouseDragged(MouseEvent e) {

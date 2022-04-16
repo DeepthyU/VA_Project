@@ -1,5 +1,6 @@
 package main;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.jfree.chart.ChartPanel;
 import preprocessing.Preprocessor;
 
@@ -26,7 +27,7 @@ public class FrequencyVisMainLogic {
         wordCloudPanel = wordCloudMainLogic.simulate_graph();
     }
 
-    public JTabbedPane simulate_tab(int x, int y, int width, int height) {
+    public JTabbedPane simulate_tab(int width, int height) {
         //tab1
         lineChartPanel.setSize(width, height);
         lineChartPanel.setVisible(true);
@@ -34,14 +35,17 @@ public class FrequencyVisMainLogic {
         mainFrequencyPanel.addTab("Ngram", lineChartPanel);
         //tab2
         wordCloudPanel.setSize(width, height);
+
         // Add in frame
         mainFrequencyPanel.addTab("WordCloud", wordCloudPanel);
         return mainFrequencyPanel;
     }
 
     public void applyFilters(List filters){
-        lineGraphMainLogic.applyFilters(filters);
-        wordCloudMainLogic.applyFilters(filters);
+        if (CollectionUtils.isNotEmpty(filters)) {
+            lineGraphMainLogic.applyFilters(filters);
+            wordCloudMainLogic.applyFilters(filters);
+        }
     }
     public JTabbedPane getPane() {
         return mainFrequencyPanel;
