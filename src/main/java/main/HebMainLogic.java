@@ -1,6 +1,6 @@
 package main;
 
-import hierarchicalEdgeBundling.HebFrame;
+import hierarchicaledgebundling.HebFrame;
 import preprocessing.Utils;
 
 import javax.swing.*;
