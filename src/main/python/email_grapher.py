@@ -5,6 +5,7 @@ import json
 import numpy as np
 import plotly.express as px
 
+
 def parse_args():
     p = ArgumentParser(description='Returns nodes and edges on the email graph')
 
@@ -92,7 +93,6 @@ def generate_edges(df: pd.DataFrame, user_info: dict) -> np.ndarray:
         dimension.
     """
     dfd = df.to_dict('split')  # [D]ata[F]rame as [D]ictionary
-    curr_id = 0
 
     # Get unique dates to know depth of the array
     date_map = {date: depth
@@ -129,7 +129,7 @@ def np_to_dict(arr: np.ndarray) -> dict:
         for j in range(arr.shape[1]):
             k_dict = {}
             for k in range(arr.shape[2]):
-                k_dict[k] = int(arr[i, j, k])
+                k_dict[k] = arr[i, j, k]
             j_dict[j] = k_dict
         out[i] = j_dict
     return out
@@ -160,8 +160,12 @@ if __name__ == '__main__':
 
 
     # Plot adjacency matrix counts
-    flattened_matrix = np.sum(adj_matrix, axis=2).flatten()
+    adj_sums = np.sum(adj_matrix, axis=2)
+    flattened_matrix = adj_sums.flatten()
     fig = px.histogram(flattened_matrix)
+    fig.show()
+
+    fig = px.imshow(adj_sums)
     fig.show()
 
     dict_matrix = np_to_dict(adj_matrix)
