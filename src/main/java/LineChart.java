@@ -374,7 +374,7 @@ public class LineChart extends JFrame {
         try {
             date = df.parse(textField.getText());
         } catch (ParseException parseException) {
-            parseException.printStackTrace();
+            System.out.println("ERROR: Error parsing date : " + parseException.getCause());
         }
         long timestamp = date.getTime();
         return timestamp;

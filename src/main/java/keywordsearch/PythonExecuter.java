@@ -32,7 +32,7 @@ public class PythonExecuter {
             }
             output.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Python code execution failed with error "+ e.getCause()+ ". Check pythonError.txt for more details.");
         }
     }
 }

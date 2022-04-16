@@ -58,7 +58,7 @@ public class Utils {
                         Timestamp ts = new Timestamp(d.getTime());
                         return ts;
                     } catch (ParseException parseEx) {
-                        parseException.printStackTrace();
+                        System.out.println("ERROR: parsing date failed with error " + parseEx.getCause());
                     }
                 }
             }
@@ -71,6 +71,7 @@ public class Utils {
             byte[] encoded = Files.readAllBytes(Paths.get(path));
             return new String(encoded, encoding);
         } catch (IOException e) {
+            System.out.println("ERROR: File read failed for "+ path + " with error "+ e.getCause());
             return "";
         }
     }

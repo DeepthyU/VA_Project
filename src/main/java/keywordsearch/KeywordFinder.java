@@ -38,7 +38,7 @@ public class KeywordFinder {
             ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(KEYWORDS_FILE_PATH));
             keywordsArr = (String[]) inputStream.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            System.out.println("ERROR: getKeywordsFromFile failed");
+            System.out.println("ERROR: getKeywordsFromFile failed:"+ e.getLocalizedMessage());
         }
     }
 

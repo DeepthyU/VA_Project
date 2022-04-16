@@ -34,22 +34,6 @@ configurations {
     extraLibs
 }
 
-sourceSets {
-    single{
-        java {
-            srcDir 'src'
-
-        }
-    }
-}
-
-task compile(type: JavaCompile) {
-    source = sourceSets.single.java
-    sourceSets.main.java.srcDirs = ['src']
-    classpath = sourceSets.main.compileClasspath
-    destinationDirectory = sourceSets.main.output.classesDirs[0]
-
-}
 
 compileJava {
     options.release = 15
