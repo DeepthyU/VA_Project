@@ -54,7 +54,13 @@ def read_articles(fp: Path) -> pd.DataFrame:
                         articles[key].append(data[key])
                         articles['pubId'].append(pub_ids[data[key]])
                     elif key == 'pubId':
+                        # Already handled in key == 'publication'
                         pass
+                    elif key == 'title':
+                        title = data[key].strip()
+                        if len(title) == 0:
+                            title = 'Title Not Given'
+                        articles[key].append(title)
                     else:
                         articles[key].append(data[key])
                 except KeyError:
