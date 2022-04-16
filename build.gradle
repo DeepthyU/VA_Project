@@ -13,9 +13,6 @@ buildscript {
 }
 
 apply plugin: 'com.github.johnrengelman.shadow'
-
-
-
 mainClassName = "main.Main"
 
 repositories {
@@ -26,7 +23,6 @@ repositories {
     maven {
         url "https://maven.repository.redhat.com/ga/"
     }
-
 }
 
 configurations {
@@ -48,21 +44,16 @@ task compile(type: JavaCompile) {
     sourceSets.main.java.srcDirs = ['src']
     classpath = sourceSets.main.compileClasspath
     destinationDirectory = sourceSets.main.output.classesDirs[0]
-
 }
 
-compileJava {
-    options.release = 15
-}
-
-//
+//compileJava {
+//    options.release = 15
+//}
 //java {
 //    toolchain {
 //        languageVersion.set(JavaLanguageVersion.of(15))
 //    }
 //}
-
-
 
 allprojects {
     repositories {
@@ -103,13 +94,6 @@ dependencies {
     // https://mvnrepository.com/artifact/org.jfree/jfreechart
     implementation 'org.jfree:jfreechart:1.5.3'
     implementation 'com.google.code.gson:gson:2.9.0'
-}
-
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(15)
-    }
 }
 
 jar {
