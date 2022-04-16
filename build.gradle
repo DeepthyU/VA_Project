@@ -39,12 +39,12 @@ sourceSets {
     }
 }
 
-task compile(type: JavaCompile) {
-    source = sourceSets.single.java
-    sourceSets.main.java.srcDirs = ['src']
-    classpath = sourceSets.main.compileClasspath
-    destinationDirectory = sourceSets.main.output.classesDirs[0]
-}
+//task compile(type: JavaCompile) {
+//    source = sourceSets.single.java
+//    sourceSets.main.java.srcDirs = ['src']
+//    classpath = sourceSets.main.compileClasspath
+//    destinationDirectory = sourceSets.main.output.classesDirs[0]
+//}
 
 //compileJava {
 //    options.release = 15
@@ -94,6 +94,8 @@ dependencies {
     // https://mvnrepository.com/artifact/org.jfree/jfreechart
     implementation 'org.jfree:jfreechart:1.5.3'
     implementation 'com.google.code.gson:gson:2.9.0'
+    // https://mvnrepository.com/artifact/com.opencsv/opencsv
+    implementation group: 'com.opencsv', name: 'opencsv', version: '5.6'
 }
 
 jar {
