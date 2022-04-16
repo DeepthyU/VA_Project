@@ -1,4 +1,4 @@
-package hierarchicalEdgeBundling;
+package hierarchicaledgebundling;
 
 import com.google.gson.Gson;
 import style.EmailColors;

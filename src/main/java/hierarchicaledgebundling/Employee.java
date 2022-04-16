@@ -1,4 +1,4 @@
-package hierarchicalEdgeBundling;
+package hierarchicaledgebundling;
 
 public class Employee {
     private final String name;

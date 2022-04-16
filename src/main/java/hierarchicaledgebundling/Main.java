@@ -1,4 +1,4 @@
-package hierarchicalEdgeBundling;
+package hierarchicaledgebundling;
 
 import javax.swing.*;
 import java.awt.*;
