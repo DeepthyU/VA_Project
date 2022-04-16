@@ -1,5 +1,7 @@
 package scatterplot;
 
+import style.EmailColors;
+
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import org.jfree.chart.ChartFactory;
@@ -13,9 +15,7 @@ import org.jfree.data.xy.XYDataItem;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import style.EmailColors;
 
-import javax.swing.*;
 import java.awt.*;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -69,7 +69,7 @@ public class ScatterPlotFactory {
 
         return chartPanel;
     }
-    private Object[] parseEmailCsv(String csvPath) {
+    private ArrayList<String[]> parseCsv(String csvPath) {
         // Read the CSV
         ArrayList<String[]> stringList = new ArrayList<>();
         try {
@@ -91,6 +91,10 @@ public class ScatterPlotFactory {
         }
         // Remove header
         stringList.remove(0);
+        return stringList;
+    }
+    private Object[] parseEmailCsv(String csvPath) {
+        ArrayList<String[]> stringList = parseCsv(csvPath);
 
         // Transform CSV lines into DataValue objects
         ArrayList<DataValue> parsingList = new ArrayList<>();
@@ -133,7 +137,36 @@ public class ScatterPlotFactory {
         return dataset;
     }
 
-    public JPanel getArticleClusteringPlot(String csvPath) {
+    /** Produce a JPanel which shows the clustering of articles by words they contain */
+    public ChartPanel getArticleClusteringPlot(String csvPath) {
+        Object[] parsedCsv = parseArticleCsv(csvPath);
         return null;
+    }
+
+    /**
+     * Parse the article_tsne.csv file.
+     *
+     * @return A {@code Map<XYDataItem, ArticleData>} object where the XYDataItem is the position
+     * of the article on the TSNE plot.
+     */
+    private Map<XYDataItem, ArticleData> parseArticleCsv(String csvPath) {
+        ArrayList<String[]> stringList = parseCsv(csvPath);
+
+        Map<XYDataItem, ArticleData> dataMap = new HashMap<>();
+        for (String[] line:stringList) {
+            String filename = line[0];
+            String publication = line[1];
+            int publicationId = Integer.parseInt(line[2]);
+            String title = line[3];
+            String date = line[4];
+            double x = Double.parseDouble(line[5]);
+            double y = Double.parseDouble(line[6]);
+
+            XYDataItem xyDataItem = new XYDataItem(x, y);
+            ArticleData articleData = new ArticleData(title, publication, publicationId, date, filename);
+
+            dataMap.put(xyDataItem, articleData);
+        }
+        return dataMap;
     }
 }

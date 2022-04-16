@@ -61,10 +61,18 @@ def read_articles(fp: Path) -> pd.DataFrame:
                         if len(title) == 0:
                             title = 'Title Not Given'
                         articles[key].append(title)
+                    elif key == 'date':
+                        # Remove the time
+                        formatted_date = ','.join(data[key].split(',')[:2])
+                        articles[key].append(formatted_date)
                     else:
                         articles[key].append(data[key])
                 except KeyError:
-                    articles[key].append("Unknown")
+                    if key == 'title':
+                        value = 'Title Not Given'
+                    else:
+                        value = 'Unknown'
+                    articles[key].append(value)
 
     return pd.DataFrame.from_dict(articles)
 
