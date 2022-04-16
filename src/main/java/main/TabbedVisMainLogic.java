@@ -155,11 +155,17 @@ public class TabbedVisMainLogic extends JPanel implements ActionListener, MouseW
             filterMainLogic.makeFilters();
             loadGraph(filterMainLogic.getFilters());
             loadFreqTab(filterMainLogic.getFilters());
+            articleVisPanel.setOneTouchExpandable(true);
+            articleVisPanel.setDividerLocation(frm_height / 2);
+
         } else if (source == resetAllButton) {
             filterMainLogic.doResetButtonAction();
             filterMainLogic.makeFilters();
             loadGraph(filterMainLogic.getFilters());
             loadFreqTab(filterMainLogic.getFilters());
+            articleVisPanel.setOneTouchExpandable(true);
+            articleVisPanel.setDividerLocation(frm_height / 2);
+
         }
     }
 
