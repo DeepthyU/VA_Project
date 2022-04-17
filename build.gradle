@@ -35,9 +35,9 @@ configurations {
 }
 
 
-compileJava {
-    options.release = 15
-}
+//compileJava {
+//    options.release = 15
+//}
 
 //
 //java {
@@ -94,11 +94,11 @@ dependencies {
 
 
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(15)
-    }
-}
+//java {
+//    toolchain {
+//        languageVersion = JavaLanguageVersion.of(15)
+//    }
+//}
 
 jar {
     manifest {

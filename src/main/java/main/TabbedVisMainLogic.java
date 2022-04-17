@@ -3,15 +3,12 @@ package main;
 import main.article.*;
 import main.employee.EmployeeTSNEMainLogic;
 import main.employee.HebMainLogic;
-import org.graphstream.ui.swingViewer.View;
-import org.graphstream.ui.swingViewer.Viewer;
-import org.graphstream.ui.swingViewer.ViewerListener;
-import org.graphstream.ui.swingViewer.ViewerPipe;
 import org.jfree.chart.ChartPanel;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Objects;
 
 public class TabbedVisMainLogic extends JPanel implements ActionListener, MouseWheelListener, MouseMotionListener {
 
@@ -35,7 +32,9 @@ public class TabbedVisMainLogic extends JPanel implements ActionListener, MouseW
     private JPanel filterPanel;
     private JSplitPane articleVisPanel;
     private JPanel filterButtonPanel;
-    private JPanel sliderPanel;
+    private JPanel datePanel;
+    private JComboBox<String> startDatePicker;
+    private JComboBox<String> endDatePicker;
     private JTabbedPane freqPanel;
     private JTabbedPane autoPanel;
 
@@ -76,7 +75,7 @@ public class TabbedVisMainLogic extends JPanel implements ActionListener, MouseW
         empVisPanel.setLocation(gUIProp.posx, gUIProp.posy);
         empVisPanel.setSize(frm_width - 200, frm_height - 100);
         employeePanel.add(empVisPanel);
-        loadSliderPanel();
+        loadDatePanel();
     }
 
     private void loadHebPanel() {
@@ -180,7 +179,7 @@ public class TabbedVisMainLogic extends JPanel implements ActionListener, MouseW
      */
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
-        if (source == filterButton) {
+        if (source == filterButton ) {
             filterMainLogic.makeFilters();
             loadGraph(filterMainLogic.getFilters());
             loadFreqTab(filterMainLogic.getFilters());
@@ -194,10 +193,24 @@ public class TabbedVisMainLogic extends JPanel implements ActionListener, MouseW
             loadFreqTab(filterMainLogic.getFilters());
             articleVisPanel.setOneTouchExpandable(true);
             articleVisPanel.setDividerLocation(frm_height / 2);
+        } else if (source == startDatePicker || source == endDatePicker) {
+            System.out.println("DatePicker fired an action");
+            if (Objects.equals(e.getActionCommand(), "comboBoxChanged")) {
+                // Prepare variables for easier access
+                String startDate = (String) startDatePicker.getSelectedItem();
+                int startIndex = startDatePicker.getSelectedIndex();
+                String endDate = (String) endDatePicker.getSelectedItem();
+                int endIndex = endDatePicker.getSelectedIndex();
+                // Debug prints
+                System.out.println("Chosen dates: " + startDate + " [" + startIndex + "] to " + endDate + " [" + endIndex + "]");
+                // Set the HEB to use a filter
+                hebMainLogic.setStartFilter(startIndex);
+                hebMainLogic.setEndFilter(endIndex);
 
+
+            }
         }
     }
-
 
     /**
      * Function to load graph and create graph listener
@@ -257,28 +270,46 @@ public class TabbedVisMainLogic extends JPanel implements ActionListener, MouseW
     }
 
 
-    public void loadSliderPanel() {
+    public void loadDatePanel() {
         // Remove view if exists
-        if (sliderPanel != null) {
-            employeePanel.remove(sliderPanel);
+        if (datePanel != null) {
+            employeePanel.remove(datePanel);
         }
 
         //This is a sort of wrapper class which calls all
         //the other methods in GraphSims and GraphSimsAlgorithm
         //the actually creates the graph and animates it
+        datePanel = new JPanel();
+        String[] dateStrings = {
+                "January 6, 2014", "January 7, 2014", "January 8, 2014", "January 9, 2014",
+                "January 10, 2014", "January 13, 2014", "January 14, 2014", "January 15, 2015",
+                "January 16, 2014", "January 17, 2014"
+        };
+        // Start Date Filter Picker
+        JLabel startDateLabel = new JLabel("Filter Start Date");
+        startDatePicker = new JComboBox<>(dateStrings);
+        startDatePicker.addActionListener(this);
 
-        sliderPanel = new JPanel();
+        JLabel endDateLabel = new JLabel("Filter End Date");
+        endDatePicker = new JComboBox<>(dateStrings);
+        endDatePicker.setSelectedIndex(dateStrings.length - 1);
+        endDatePicker.addActionListener(this);
 
-        JSlider slider = new JSlider(JSlider.VERTICAL);
-        sliderPanel.add(slider);
+        datePanel.add(startDateLabel);
+        datePanel.add(startDatePicker);
+        datePanel.add(endDateLabel);
+        datePanel.add(endDatePicker);
 
-        sliderPanel.setSize(200, frm_height - filter_button_height);
+//        JSlider slider = new JSlider(JSlider.VERTICAL);
+//        datePanel.add(slider);
 
-        sliderPanel.setLocation(frm_width - 200, ctrl_height);
+        datePanel.setSize(200, frm_height - filter_button_height);
 
-        sliderPanel.setVisible(true);
+        datePanel.setLocation(frm_width - 200, ctrl_height);
+
+        datePanel.setVisible(true);
         // Add in frame
-        employeePanel.add(sliderPanel, BorderLayout.LINE_START);
+        employeePanel.add(datePanel, BorderLayout.LINE_START);
     }
 
 

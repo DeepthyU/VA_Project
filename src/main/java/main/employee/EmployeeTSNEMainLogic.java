@@ -11,7 +11,6 @@ public class EmployeeTSNEMainLogic {
         emailPlot = new ScatterPlotFactory().getEmailClusteringPlot(DATA_PATH);
     }
 
-
     public ChartPanel simulate_graph() {
         return emailPlot;
     }

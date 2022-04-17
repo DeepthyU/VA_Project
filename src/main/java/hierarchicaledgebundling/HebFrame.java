@@ -25,6 +25,8 @@ public class HebFrame extends JPanel{
     private int startFilter = 0;
     private int endFilter = 6;  // end is inclusive of the day
 
+    private int maxValue = 0;
+
     public HebFrame(String jsonString) {
         this.setLayout(null);
         readDataFromJsonString(jsonString);
@@ -54,12 +56,14 @@ public class HebFrame extends JPanel{
         // Value between 0-6
         this.startFilter = startFilter;
         this.updateUI();
+//        this.repaint();
     }
 
     public void setEndFilter(int endFilter) {
         // Inclusive the end date. Should be a value between 1-6
         this.endFilter = endFilter;
         this.updateUI();
+//        this.repaint();
     }
 
     private void readDataFromJsonString(String jsonString) {
@@ -106,9 +110,15 @@ public class HebFrame extends JPanel{
             int i_int = Integer.parseInt(i);
             for (String j: adjMatrix.get(i).keySet()) {
                 int j_int = Integer.parseInt(j);
+                int personSum = 0;
                 for (String k: adjMatrix.get(i).get(j).keySet()) {
                     int k_int = Integer.parseInt(k);
-                    this.adjacencyMatrix[i_int][j_int][k_int] = adjMatrix.get(i).get(j).get(k).intValue();
+                    int val = adjMatrix.get(i).get(j).get(k).intValue();
+                    this.adjacencyMatrix[i_int][j_int][k_int] = val;
+                    personSum += val;
+                }
+                if (personSum > maxValue) {
+                    maxValue = personSum;
                 }
             }
         }
@@ -145,7 +155,7 @@ public class HebFrame extends JPanel{
         g2d.fillOval(centerX - r, centerY - r, r * 2, r * 2);
     }
 
-    private Object[] sumConnections() {
+    private float[][] sumConnections() {
         // Sums connections between a start and end date. Assumes that start and end are within the right boundary
         // otherwise silently clips it.
         int start = Math.max(this.startFilter, 0);
@@ -175,17 +185,10 @@ public class HebFrame extends JPanel{
                 counts.add(numConnections);
             }
         }
-
-        ArrayList<Integer> intCounts = new ArrayList<>();
-        for (float i:counts) {
-            intCounts.add(((Float) i).intValue());
-        }
-        IntSummaryStatistics stats = intCounts.stream().collect(Collectors.summarizingInt(Integer::intValue));
-        int max = stats.getMax();
-        return new Object[] {connections, max};
+        return connections;
     }
 
-    private void drawArcs(float[][] connections, float normalizer, Graphics2D g2d) {
+    private void drawArcs(float[][] connections, Graphics2D g2d) {
         // Draws the arcs between each node according to the given adjacency graph
         for (int i = 0; i < connections.length; i++) {
             for (int j = 0; j < connections[i].length; j++) {
@@ -218,10 +221,10 @@ public class HebFrame extends JPanel{
                     );
 
                     // Connection strength is is between 0 and 1
-                    float strength = value / normalizer;
-                    int opacity = Math.round(strength * 200);
+                    float strength = value / maxValue;
+                    int opacity = Math.max(Math.round(strength * 200), 20);
 
-                    float thickness = strength * 6;
+                    float thickness = Math.max((strength * 6), 0.5f);
                     g2d.setStroke(new BasicStroke(thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
                     g2d.setColor(new Color(94, 207, 255, opacity));
 
@@ -259,7 +262,8 @@ public class HebFrame extends JPanel{
         }
     }
 
-    public void paint(Graphics g) {
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
         long startTime = System.nanoTime();
         Graphics2D g2d = (Graphics2D) g;
 
@@ -271,12 +275,9 @@ public class HebFrame extends JPanel{
         g2d.setFont(currentFont.deriveFont(9F));
 
         // TODO Make start and end not hardcoded
-        Object[] connectionSums = sumConnections();
+        float[][] connections = sumConnections();
 
-        float[][] connections = (float[][]) connectionSums[0];
-        float normalizer = ((Integer) connectionSums[1]).floatValue();
-
-        drawArcs(connections, normalizer, g2d);
+        drawArcs(connections, g2d);
         drawNodes(g2d);
 
         long elapsedTime = System.nanoTime();
