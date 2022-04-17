@@ -1,7 +1,5 @@
 package scatterplot;
 
-import style.EmailColors;
-
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import org.jfree.chart.ChartFactory;
@@ -15,6 +13,7 @@ import org.jfree.data.xy.XYDataItem;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import style.EmailColors;
 import style.GlasbeyColors;
 
 import java.awt.*;
@@ -26,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ScatterPlotFactory {
+
     /** Produce a JPanel which shows the clustering of emailers in the company */
     public ChartPanel getEmailClusteringPlot(String csvPath) {
         Object[] parsedCsv = parseEmailCsv(csvPath);
@@ -190,7 +190,7 @@ public class ScatterPlotFactory {
      * @return A {@code Map<XYDataItem, ArticleData>} object where the XYDataItem is the position
      * of the article on the TSNE plot.
      */
-    private Map<XYDataItem, ArticleData> parseArticleCsv(String csvPath) {
+    public Map<XYDataItem, ArticleData> parseArticleCsv(String csvPath) {
         ArrayList<String[]> stringList = parseCsv(csvPath);
 
         Map<XYDataItem, ArticleData> dataMap = new HashMap<>();
@@ -212,7 +212,7 @@ public class ScatterPlotFactory {
     }
 
     /** Creates a dataset, grouped by publication, for visualization */
-    private XYDataset createArticleTsneDataset(Map<XYDataItem, ArticleData> parsedCsv) {
+    public XYSeriesCollection createArticleTsneDataset(Map<XYDataItem, ArticleData> parsedCsv) {
         XYSeriesCollection dataset = new XYSeriesCollection();
 
         ArrayList<Integer> seenPubIds = new ArrayList<>();
@@ -231,4 +231,6 @@ public class ScatterPlotFactory {
         }
         return dataset;
     }
+
+
 }

@@ -4,20 +4,16 @@ import org.jfree.chart.ChartPanel;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.lang.*;
-import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
         ChartPanel emailPlot = new ScatterPlotFactory().getEmailClusteringPlot(
-                "/Users/Yvan/Git/VA_Project/src/main/data/gastech_data/data/email_tsne.csv"
+                "./src/main/data/gastech_data/data/email_tsne.csv"
         );
         emailPlot.setSize(400, 400);
 
         ChartPanel articlePlot = new ScatterPlotFactory().getArticleClusteringPlot(
-                "/Users/Yvan/Git/VA_Project/src/main/data/gastech_data/data/article_tsne.csv"
+                "./src/main/data/gastech_data/data/article_tsne.csv"
         );
         articlePlot.setSize(750, 750);
 

@@ -1,10 +1,11 @@
 package preprocessing;
 
+import scatterplot.ArticleData;
+
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class Article {
 
@@ -50,6 +51,22 @@ public class Article {
         this.content = content;
         this.hasDeletedImg = hasDeletedImg;
     }
+
+    public Article(ArticleData articleData) {
+        this.title = articleData.getTitle();
+        this.publication = articleData.getPublication();
+        SimpleDateFormat sdf = new SimpleDateFormat("MMM d, y");
+        Date d = null;
+        try {
+            d = sdf.parse(articleData.getDate());
+            Timestamp ts = new Timestamp(d.getTime());
+            this.date = ts;
+        } catch (ParseException e) {
+            System.out.println("ERROR: Date parse error in Article constructor :"+ e.getCause());
+        }
+        this.fileName = articleData.getFilename();
+    }
+
 
     public String getFileName() {
         return fileName;

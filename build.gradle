@@ -13,6 +13,9 @@ buildscript {
 }
 
 apply plugin: 'com.github.johnrengelman.shadow'
+
+
+
 mainClassName = "main.Main"
 
 repositories {
@@ -23,6 +26,7 @@ repositories {
     maven {
         url "https://maven.repository.redhat.com/ga/"
     }
+
 }
 
 configurations {
@@ -30,30 +34,19 @@ configurations {
     extraLibs
 }
 
-sourceSets {
-    single{
-        java {
-            srcDir 'src'
 
-        }
-    }
+compileJava {
+    options.release = 15
 }
 
-//task compile(type: JavaCompile) {
-//    source = sourceSets.single.java
-//    sourceSets.main.java.srcDirs = ['src']
-//    classpath = sourceSets.main.compileClasspath
-//    destinationDirectory = sourceSets.main.output.classesDirs[0]
-//}
-
-//compileJava {
-//    options.release = 15
-//}
+//
 //java {
 //    toolchain {
 //        languageVersion.set(JavaLanguageVersion.of(15))
 //    }
 //}
+
+
 
 allprojects {
     repositories {
@@ -96,6 +89,15 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.9.0'
     // https://mvnrepository.com/artifact/com.opencsv/opencsv
     implementation group: 'com.opencsv', name: 'opencsv', version: '5.6'
+}
+
+
+
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(15)
+    }
 }
 
 jar {

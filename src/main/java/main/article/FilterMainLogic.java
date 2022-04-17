@@ -1,5 +1,6 @@
-package main;
+package main.article;
 
+import main.DateLabelFormatter;
 import net.sourceforge.jdatepicker.impl.JDatePanelImpl;
 import net.sourceforge.jdatepicker.impl.JDatePickerImpl;
 import net.sourceforge.jdatepicker.impl.UtilDateModel;
@@ -39,7 +40,7 @@ public class FilterMainLogic {
 
     public FilterMainLogic() {
         UtilDateModel startDateModel = new UtilDateModel();
-        startDateModel.setDate(1982, 10, 2);
+        startDateModel.setDate(1982, 9, 2);
         startDateModel.setSelected(true);
         UtilDateModel endDateModel = new UtilDateModel();
         endDateModel.setDate(2014, 03, 26);
@@ -295,7 +296,7 @@ public class FilterMainLogic {
         for (JCheckBox checkBox : publicationCbList) {
             checkBox.setSelected(true);
         }
-        startDatePicker.getModel().setDate(1982, 10, 2);
+        startDatePicker.getModel().setDate(1982, 9, 2);
         endDatePicker.getModel().setDate(2014, 3, 26);
         includeEmptyAuthor.set(true);
         includeEmptyAuthorFilter.setSelected(true);

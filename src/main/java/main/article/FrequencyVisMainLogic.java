@@ -1,11 +1,10 @@
-package main;
+package main.article;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.jfree.chart.ChartPanel;
 import preprocessing.Preprocessor;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.List;
 
 public class FrequencyVisMainLogic {
@@ -42,10 +41,8 @@ public class FrequencyVisMainLogic {
     }
 
     public void applyFilters(List filters){
-        if (CollectionUtils.isNotEmpty(filters)) {
             lineGraphMainLogic.applyFilters(filters);
             wordCloudMainLogic.applyFilters(filters);
-        }
     }
     public JTabbedPane getPane() {
         return mainFrequencyPanel;

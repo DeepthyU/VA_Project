@@ -1,30 +1,29 @@
 package main;
 
+import main.article.*;
+import main.employee.EmployeeTSNEMainLogic;
+import main.employee.HebMainLogic;
 import org.graphstream.ui.swingViewer.View;
 import org.graphstream.ui.swingViewer.Viewer;
 import org.graphstream.ui.swingViewer.ViewerListener;
 import org.graphstream.ui.swingViewer.ViewerPipe;
-import preprocessing.Article;
-import preprocessing.Preprocessor;
-import vis.article.ArticleFilter;
+import org.jfree.chart.ChartPanel;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
 import java.awt.event.*;
-import java.util.ArrayList;
 
 public class TabbedVisMainLogic extends JPanel implements ActionListener, MouseWheelListener, MouseMotionListener {
-
-    private static final Preprocessor PREPROCESSOR = new Preprocessor();
 
     //article tab
     private SentimentMainLogic sentimentMainLogic;
     private FrequencyVisMainLogic frequencyVisMainLogic;
     private FilterMainLogic filterMainLogic;
+    private ArticleAutoVisMainLogic articleAutoVisMainLogic;
 
     //employee tab
     private HebMainLogic hebMainLogic;
+    private EmployeeTSNEMainLogic empTSNEMainLogic;
 
     private JTabbedPane mainVisPanel;
     private JLayeredPane articlePanel;
@@ -38,7 +37,11 @@ public class TabbedVisMainLogic extends JPanel implements ActionListener, MouseW
     private JPanel filterButtonPanel;
     private JPanel sliderPanel;
     private JTabbedPane freqPanel;
-    private View vw = null;
+    private JTabbedPane autoPanel;
+
+    private JPanel hebPanel;
+    private ChartPanel empTSNEChart;
+    private JSplitPane empVisPanel;
     private GraphUIProperty gUIProp;
 
     private int frm_width, frm_height;
@@ -51,7 +54,9 @@ public class TabbedVisMainLogic extends JPanel implements ActionListener, MouseW
         sentimentMainLogic = new SentimentMainLogic();
         filterMainLogic = new FilterMainLogic();
         frequencyVisMainLogic = new FrequencyVisMainLogic();
+        articleAutoVisMainLogic = new ArticleAutoVisMainLogic();
         hebMainLogic = new HebMainLogic();
+        empTSNEMainLogic = new EmployeeTSNEMainLogic();
         makeArticleVis();
         makeEmployeeVis();
         mainVisPanel = new JTabbedPane();
@@ -61,17 +66,41 @@ public class TabbedVisMainLogic extends JPanel implements ActionListener, MouseW
 
     private void makeEmployeeVis() {
         employeePanel = new JPanel();
-        employeePanel.setBounds(0, 0, frm_width, frm_height);
+        empVisPanel = new JSplitPane();
+        employeePanel.setBounds(0, 0, gUIProp.width, gUIProp.height);
         employeePanel.setLayout(null);
-        loadSliderPanel();
+        empVisPanel.setOneTouchExpandable(true);
+        empVisPanel.setDividerLocation(frm_width / 2 - 100);
         loadHebPanel();
+        loadEmpTSNEPanel();
+        empVisPanel.setLocation(gUIProp.posx, gUIProp.posy);
+        empVisPanel.setSize(frm_width - 200, frm_height - 100);
+        employeePanel.add(empVisPanel);
+        loadSliderPanel();
     }
 
     private void loadHebPanel() {
-        JPanel hebPanel = hebMainLogic.simulate_graph();
-        hebPanel.setSize(gUIProp.width, gUIProp.height);
+        // Remove view if exists
+        if (hebPanel != null) {
+            empVisPanel.remove(hebPanel);
+        }
+
+        hebPanel = hebMainLogic.simulate_graph();
+        hebPanel.setSize(frm_width / 2 - 100, frm_height - 100);
         hebPanel.setLocation(gUIProp.posx, gUIProp.posy);
-        employeePanel.add(hebPanel);
+        empVisPanel.setLeftComponent(hebPanel);
+    }
+
+    private void loadEmpTSNEPanel() {
+        // Remove view if exists
+        if (empTSNEChart != null) {
+            empVisPanel.remove(empTSNEChart);
+        }
+
+        empTSNEChart = empTSNEMainLogic.simulate_graph();
+        empTSNEChart.setSize(frm_width / 2 - 100, frm_height - 150);
+        empTSNEChart.setLocation(frm_width / 2 - 100, gUIProp.posy);
+        empVisPanel.setRightComponent(empTSNEChart);
     }
 
     public JTabbedPane simulateTabView() {
@@ -169,61 +198,6 @@ public class TabbedVisMainLogic extends JPanel implements ActionListener, MouseW
         }
     }
 
-    /**
-     * Action listener for when the mouse wheel is moved.
-     * Depending on if the mouse wheel is moved up or down the
-     * graph zooms in our out. Also, it zooms in on a section of the graph
-     * where the mouse is. It does this by dividing the graph
-     * into a three by three grid. I have it hard coded for values that I
-     * believe are specific for my computer. One of the things I wanted to
-     * change was get it so that the value are based of the fields that get
-     * the screen size.
-     */
-    public void mouseWheelMoved(MouseWheelEvent e) {
-        if (vw != null) {
-            int notches = e.getWheelRotation();
-            Point point = e.getPoint();
-            double i = vw.getCamera().getViewPercent();
-            if (i < 1) {
-                if (point.getX() < 400) {
-                    //400 is an example of a hardcode value to change
-                    if (point.getY() < 300) {
-                        vw.getCamera().getViewCenter().move(-1, 1);
-                    } else if (point.getY() < 600) {
-                        vw.getCamera().getViewCenter().move(-1, 0);
-                    } else {
-                        vw.getCamera().getViewCenter().move(-1, -1);
-                    }
-                } else if (point.getX() < 800) {
-                    if (point.getY() < 300) {
-                        vw.getCamera().getViewCenter().move(0, 1);
-                    } else if (point.getY() < 600) {
-                        vw.getCamera().getViewCenter().move(0, 0);
-                    } else {
-                        vw.getCamera().getViewCenter().move(0, -1);
-                    }
-                } else {
-                    if (point.getY() < 300) {
-                        vw.getCamera().getViewCenter().move(1, 1);
-                    } else if (point.getY() < 600) {
-                        vw.getCamera().getViewCenter().move(1, 0);
-                    } else {
-                        vw.getCamera().getViewCenter().move(1, -1);
-                    }
-                }
-            } else {
-                vw.getCamera().resetView();
-            }
-
-
-            if (notches > 0) {
-                vw.getCamera().setViewPercent(i * 1.1);
-            } else {
-
-                vw.getCamera().setViewPercent(i * 0.9);
-            }
-        }
-    }
 
     /**
      * Function to load graph and create graph listener
@@ -238,37 +212,25 @@ public class TabbedVisMainLogic extends JPanel implements ActionListener, MouseW
             clisten.viewClosed(null);
         }
         // Remove view if exists
-        if (vw != null) {
-            articleVisPanel.remove(vw);
+        if (autoPanel != null) {
+            articleVisPanel.remove(autoPanel);
         }
+
 
         //This is a sort of wrapper class which calls all
         //the other methods in GraphSims and GraphSimsAlgorithm
         //the actually creates the graph and animates it
 
-        sentimentMainLogic.applyFilters(articleFilterList);
-        Viewer vwr = sentimentMainLogic.simulate_graph();
-        vwr.disableAutoLayout();
-        vw = vwr.addDefaultView(false);
+        articleAutoVisMainLogic.applyFilters(articleFilterList);
+        autoPanel = articleAutoVisMainLogic.simulate_tab(gUIProp.width, gUIProp.height / 2);
+        autoPanel.setSize(gUIProp.width, gUIProp.height / 2);
+        autoPanel.setLocation(gUIProp.posx, gUIProp.height);
 
-        JLabel title = new JLabel("Sentiment Trend");
-        vw.setSize(gUIProp.width, gUIProp.height / 2);
-        vw.setLocation(gUIProp.posx, gUIProp.posy);
-        vw.add(title);
+        autoPanel.setMinimumSize(new Dimension(0, 0));
 
-        vw.setMinimumSize(new Dimension(0, 0));
-        // We connect back the viewer to the graph,
-        // the graph becomes a sink for the viewer.
-        // We also install us as a viewer listener to
-        // intercept the graphic events.
-        ViewerPipe fromViewer = vwr.newViewerPipe();
-        clisten = new NodeClickListener(fromViewer, vw, sentimentMainLogic.getGraph());
-        fromViewer.addViewerListener((ViewerListener) clisten);
-        vw.addMouseWheelListener(this);
-        vw.addMouseMotionListener(this);
 
         // Add in frame
-        articleVisPanel.setTopComponent(vw);
+        articleVisPanel.setTopComponent(autoPanel);
 
     }
 
@@ -310,9 +272,9 @@ public class TabbedVisMainLogic extends JPanel implements ActionListener, MouseW
         JSlider slider = new JSlider(JSlider.VERTICAL);
         sliderPanel.add(slider);
 
-        sliderPanel.setSize(ctrl_width, frm_height - filter_button_height);
+        sliderPanel.setSize(200, frm_height - filter_button_height);
 
-        sliderPanel.setLocation(frm_width - ctrl_width, ctrl_height);
+        sliderPanel.setLocation(frm_width - 200, ctrl_height);
 
         sliderPanel.setVisible(true);
         // Add in frame
@@ -346,10 +308,17 @@ public class TabbedVisMainLogic extends JPanel implements ActionListener, MouseW
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        if (vw != null) {
-
-        }
     }
 
 
+    /**
+     * Invoked when the mouse wheel is rotated.
+     *
+     * @param e the event to be processed
+     * @see MouseWheelEvent
+     */
+    @Override
+    public void mouseWheelMoved(MouseWheelEvent e) {
+
+    }
 }

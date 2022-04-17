@@ -1,4 +1,4 @@
-package main;
+package main.article;
 
 import keywordsearch.PythonExecuter;
 import preprocessing.Article;
