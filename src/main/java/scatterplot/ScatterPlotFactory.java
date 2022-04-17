@@ -21,6 +21,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -116,8 +117,8 @@ public class ScatterPlotFactory {
 
         return new Object[] {parsingList, coordinateNameMap};
     }
+    /** Creates the dataset required by JFreeChart for Email TSNEs */
     private XYDataset createEmailTsneDataset(ArrayList<DataValue> dataValues) {
-        // Creates the dataset required by JFreeChart for Email TSNEs
         XYSeriesCollection dataset = new XYSeriesCollection();
 
         ArrayList<Integer> seenDeptIds = new ArrayList<>();

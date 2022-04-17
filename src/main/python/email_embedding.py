@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 from sklearn.manifold import TSNE
 import plotly.express as px
+from tqdm import tqdm
 
 from email_grapher import get_all_users, process_to_col
 
@@ -22,23 +23,30 @@ def parse_args():
     return p.parse_args()
 
 
-def produce_one_hot(users: dict, emails: pd.DataFrame) -> pd.DataFrame:
+def produce_one_hot(users: dict, emails: pd.DataFrame,
+                    date_range: list) -> pd.DataFrame:
     """Produces one hot encoding for users based on email thread membership
 
     Args:
         users: Users at the company
         emails: All emails sent at the company.
+        date_range: Range of dates to include in the produced one hot encoding.
     Returns:
-        Emails as one-hot encoded features with the user as the key
+        Emails as one-hot encoded features with the user as the key within the
+        given date range.
     """
+    data = emails.copy()
     # First clean up emails by removing `RE: `/`re: `
-    emails['Subject'] = emails['Subject'].str.removeprefix('RE: ',)
+    data['Subject'] = data['Subject'].str.removeprefix('RE: ',)
 
     # List of all unique subject lines
-    subjects = emails['Subject'].unique().tolist()
+    subjects = data['Subject'].unique().tolist()
 
     # Turn recipients into a list
-    emails['To'] = emails['To'].apply(lambda x: process_to_col(x))
+    data['To'] = data['To'].apply(lambda x: process_to_col(x))
+
+    # Finally filter by date
+    filtered = data[data['Date'].dt.date.isin(date_range)]
 
     one_hot_dict = {}
 
@@ -54,7 +62,7 @@ def produce_one_hot(users: dict, emails: pd.DataFrame) -> pd.DataFrame:
         one_hot_dict[user] = d
 
     # Now iterate through every email
-    for row in emails.to_dict('index').values():
+    for row in filtered.to_dict('index').values():
         f = row['From']       # From
         r = row['To']         # Recipient
         sub = row['Subject']  # Subject
@@ -98,7 +106,6 @@ def output_tsne(embedded: np.ndarray, df: pd.DataFrame, out_path: Path):
     out['x'] = embedded[0].tolist()
     out['y'] = embedded[1].tolist()
     if out_path is not None:
-        print(f"Writing out TSNE coordinates to {out_path}...")
         out.to_csv(out_path)
     else:
         print(out.info())
@@ -107,18 +114,28 @@ def output_tsne(embedded: np.ndarray, df: pd.DataFrame, out_path: Path):
 def main():
     args = parse_args()
 
-    headers = pd.read_csv(args.PATH, usecols=['From', 'To', 'Subject'])
+    if not args.out.exists():
+        args.out.mkdir()
+
+    headers = pd.read_csv(args.PATH, usecols=['From', 'To', 'Subject', 'Date'],
+                          parse_dates=['Date'])
     users = get_all_users(headers, args.EXCEL)
+    unique_dates = headers['Date'].dt.date.unique().tolist()
 
-    one_hot = produce_one_hot(users, headers)
-    one_hot_np = one_hot_to_np(one_hot)
-
-    print("Running TSNE...")
-    users_embedded = TSNE(learning_rate='auto', random_state=0,
-                          verbose=0, n_jobs=-1).fit_transform(one_hot_np)
-    plot_tsne(users_embedded, one_hot)
-    output_tsne(users_embedded, one_hot, args.out)
-
+    pbar = tqdm(total=55)
+    for startIdx in range(len(unique_dates)):
+        for endIdx in range(startIdx, len(unique_dates)):
+            date_range = unique_dates[startIdx:endIdx + 1]
+            one_hot = produce_one_hot(users, headers, date_range)
+            one_hot_np = one_hot_to_np(one_hot)
+            users_embedded = TSNE(learning_rate='auto', random_state=0,
+                                  verbose=0, n_jobs=-1,
+                                  init="random").fit_transform(one_hot_np)
+            # plot_tsne(users_embedded, one_hot)
+            out = args.out / f"{startIdx}_{endIdx}.csv"
+            output_tsne(users_embedded, one_hot, out)
+            pbar.write(f"Wrote csv to {out}")
+            pbar.update(1)
 
 
 if __name__ == '__main__':
