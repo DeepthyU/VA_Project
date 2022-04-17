@@ -1,56 +1,56 @@
 ,Name,DeptId,Department,x,y
-Albina.Hafon@gastech.com.kronos,Albina Hafon,3,Facilities,-5.278244972229004,-9.392556190490723
-Mat.Bramar@gastech.com.kronos,Mat Bramar,0,Administration,-3.2444615364074707,-4.158854007720947
-Axel.Calzas@gastech.com.kronos,Axel Calzas,1,Engineering,-7.9862380027771,-5.852237701416016
-Sten.Sanjorge Jr.@gastech.com.kronos,Sten Sanjorge Jr.,2,Executive,-6.700666427612305,-4.883406639099121
-Marin.Onda@gastech.com.kronos,Marin Onda,1,Engineering,-8.715784072875977,-6.497206687927246
-Cecilia.Morluniau@gastech.com.kronos,Cecilia Morluniau,3,Facilities,-4.674435615539551,-8.699191093444824
-Vira.Frente@gastech.com.kronos,Vira Frente,1,Engineering,-9.282842636108398,-5.474172592163086
-Adra.Nubarron@gastech.com.kronos,Adra Nubarron,1,Engineering,-8.679693222045898,-6.300146102905273
-Ada.Campo-Corrente@gastech.com.kronos,Ada Campo-Corrente,2,Executive,-7.244187355041504,-3.995295524597168
-Varja.Lagos@gastech.com.kronos,Varja Lagos,5,Security,-5.441787242889404,-5.322210788726807
-Rachel.Pantanal@gastech.com.kronos,Rachel Pantanal,0,Administration,-3.2444610595703125,-4.158853054046631
-Brand.Tempestad@gastech.com.kronos,Brand Tempestad,1,Engineering,-8.209136009216309,-6.322179794311523
-Lars.Azada@gastech.com.kronos,Lars Azada,1,Engineering,-8.513895988464355,-5.180726528167725
-Isande.Borrasca@gastech.com.kronos,Isande Borrasca,1,Engineering,-8.209136009216309,-6.322179794311523
-Varro.Awelon@gastech.com.kronos,Varro Awelon,3,Facilities,-5.670143127441406,-8.370287895202637
-Hennie.Osvaldo@gastech.com.kronos,Hennie Osvaldo,5,Security,-5.260835647583008,-5.847860813140869
-Isia.Vann@gastech.com.kronos,Isia Vann,5,Security,-5.831724166870117,-5.923253059387207
-Nils.Calixto@gastech.com.kronos,Nils Calixto,4,Information Technology,-5.878231048583984,-3.187215566635132
-Isak.Baza@gastech.com.kronos,Isak Baza,4,Information Technology,-5.935028076171875,-3.0772438049316406
-Gustav.Cazar@gastech.com.kronos,Gustav Cazar,1,Engineering,-8.335724830627441,-5.094156265258789
-Bertrand.Ovan@gastech.com.kronos,Bertrand Ovan,3,Facilities,-5.4051513671875,-7.9525604248046875
-Ruscella.Mies.Haber@gastech.com.kronos,Ruscella Mies Haber,0,Administration,-3.2444615364074707,-4.158854007720947
-Irene.Nant@gastech.com.kronos,Irene Nant,3,Facilities,-5.099771499633789,-8.480769157409668
-Sten.Sanjorge Jr.@gastech.com.tethys,Sten.Sanjorge Jr.@gastech.com.tethys,6,Unknown,-7.699591159820557,-3.463789701461792
-Stenig.Fusil@gastech.com.kronos,Stenig Fusil,5,Security,-6.305739402770996,-5.078363418579102
-Anda.Ribera@gastech.com.kronos,Anda Ribera,0,Administration,-2.9579198360443115,-4.40010929107666
-Lidelse.Dedos@gastech.com.kronos,Lidelse Dedos,1,Engineering,-7.487737655639648,-6.0326642990112305
-Sven.Flecha@gastech.com.kronos,Sven Flecha,4,Information Technology,-5.905453205108643,-3.362459897994995
-Inga.Ferro@gastech.com.kronos,Inga Ferro,5,Security,-5.2853875160217285,-4.997556686401367
-Felix.Resumir@gastech.com.kronos,Felix Resumir,5,Security,-6.008761405944824,-5.6573004722595215
-Kanon.Herrero@gastech.com.kronos,Kanon Herrero,5,Security,-5.441786766052246,-5.322210311889648
-Lucas.Alcazar@gastech.com.kronos,Lucas Alcazar,4,Information Technology,-5.878231048583984,-3.187215566635132
-Carla.Forluniau@gastech.com.kronos,Carla Forluniau,0,Administration,-3.0790767669677734,-3.9075939655303955
-Willem.Vasco-Pais@gastech.com.kronos,Willem Vasco-Pais,2,Executive,-7.1297526359558105,-4.177541255950928
-Valeria.Morlun@gastech.com.kronos,Valeria Morlun,3,Facilities,-5.572619915008545,-9.37034797668457
-Emile.Arpa@gastech.com.kronos,Emile Arpa,3,Facilities,-5.101984977722168,-8.480672836303711
-Linda.Lagos@gastech.com.kronos,Linda Lagos,0,Administration,-3.2009341716766357,-3.8859899044036865
-Claudio.Hawelon@gastech.com.kronos,Claudio Hawelon,3,Facilities,-5.49672269821167,-8.357053756713867
-Henk.Mies@gastech.com.kronos,Henk Mies,3,Facilities,-5.522514820098877,-9.888548851013184
-Birgitta.Frente@gastech.com.kronos,Birgitta Frente,1,Engineering,-8.595382690429688,-5.4723429679870605
-Edvard.Vann@gastech.com.kronos,Edvard Vann,5,Security,-5.725625514984131,-6.15157413482666
-Ingrid.Barranco@gastech.com.kronos,Ingrid Barranco,2,Executive,-7.0830817222595215,-4.189594268798828
-Cornelia.Lais@gastech.com.kronos,Cornelia Lais,0,Administration,-2.9579195976257324,-4.400109767913818
-Felix.Balas@gastech.com.kronos,Felix Balas,1,Engineering,-8.206605911254883,-6.321019649505615
-Linnea.Bergen@gastech.com.kronos,Linnea Bergen,4,Information Technology,-6.687540054321289,-4.85805606842041
-Benito.Hawelon@gastech.com.kronos,Benito Hawelon,3,Facilities,-4.651109218597412,-9.465909004211426
-Hideki.Cocinaro@gastech.com.kronos,Hideki Cocinaro,5,Security,-5.441786766052246,-5.322210311889648
-Minke.Mies@gastech.com.kronos,Minke Mies,5,Security,-4.990650653839111,-5.545907497406006
-Dante.Coginian@gastech.com.kronos,Dante Coginian,3,Facilities,-5.099771499633789,-8.480769157409668
-Elsa.Orilla@gastech.com.kronos,Elsa Orilla,1,Engineering,-8.60207462310791,-6.026123523712158
-Dylan.Scozzese@gastech.com.kronos,Dylan Scozzese,3,Facilities,-5.07274055480957,-9.611311912536621
-Orhan.Strum@gastech.com.kronos,Orhan Strum,2,Executive,-6.892117500305176,-4.8177490234375
-Adan.Morlun@gastech.com.kronos,Adan Morlun,3,Facilities,-4.9282050132751465,-9.374565124511719
-Kare.Orilla@gastech.com.kronos,Kare Orilla,1,Engineering,-8.133670806884766,-6.880376815795898
-Loreto.Bodrogi@gastech.com.kronos,Loreto Bodrogi,5,Security,-5.441786766052246,-5.322210311889648
+Linda.Lagos@gastech.com.kronos,Linda Lagos,0,Administration,-0.42302682995796204,-1.5966054201126099
+Brand.Tempestad@gastech.com.kronos,Brand Tempestad,1,Engineering,0.9242483973503113,-5.330152988433838
+Claudio.Hawelon@gastech.com.kronos,Claudio Hawelon,3,Facilities,5.026891231536865,-2.6144027709960938
+Birgitta.Frente@gastech.com.kronos,Birgitta Frente,1,Engineering,1.6988178491592407,-5.665900230407715
+Vira.Frente@gastech.com.kronos,Vira Frente,1,Engineering,0.2639875113964081,-4.731961250305176
+Lidelse.Dedos@gastech.com.kronos,Lidelse Dedos,1,Engineering,1.2769473791122437,-4.651288032531738
+Elsa.Orilla@gastech.com.kronos,Elsa Orilla,1,Engineering,1.2221099138259888,-5.677131652832031
+Ada.Campo-Corrente@gastech.com.kronos,Ada Campo-Corrente,2,Executive,1.1021393537521362,-3.3829052448272705
+Sten.Sanjorge Jr.@gastech.com.tethys,Sten.Sanjorge Jr.@gastech.com.tethys,6,Unknown,0.5855247974395752,-3.3198623657226562
+Gustav.Cazar@gastech.com.kronos,Gustav Cazar,1,Engineering,1.9216291904449463,-5.209343910217285
+Felix.Balas@gastech.com.kronos,Felix Balas,1,Engineering,0.9206574559211731,-5.321780681610107
+Isande.Borrasca@gastech.com.kronos,Isande Borrasca,1,Engineering,0.9225017428398132,-5.328391075134277
+Willem.Vasco-Pais@gastech.com.kronos,Willem Vasco-Pais,2,Executive,1.288899302482605,-3.4516236782073975
+Kanon.Herrero@gastech.com.kronos,Kanon Herrero,5,Security,2.5133936405181885,-2.4361824989318848
+Edvard.Vann@gastech.com.kronos,Edvard Vann,5,Security,1.8884260654449463,-1.8774902820587158
+Isak.Baza@gastech.com.kronos,Isak Baza,4,Information Technology,3.3384220600128174,-4.434144496917725
+Sven.Flecha@gastech.com.kronos,Sven Flecha,4,Information Technology,3.2172627449035645,-4.325999736785889
+Varja.Lagos@gastech.com.kronos,Varja Lagos,5,Security,2.5133931636810303,-2.436182737350464
+Dante.Coginian@gastech.com.kronos,Dante Coginian,3,Facilities,5.208053112030029,-2.340514659881592
+Ruscella.Mies.Haber@gastech.com.kronos,Ruscella Mies Haber,0,Administration,-0.39634132385253906,-1.7479448318481445
+Anda.Ribera@gastech.com.kronos,Anda Ribera,0,Administration,-0.609072208404541,-1.8433688879013062
+Axel.Calzas@gastech.com.kronos,Axel Calzas,1,Engineering,1.2178070545196533,-4.994677543640137
+Rachel.Pantanal@gastech.com.kronos,Rachel Pantanal,0,Administration,-0.39634138345718384,-1.7479448318481445
+Varro.Awelon@gastech.com.kronos,Varro Awelon,3,Facilities,5.011288642883301,-2.7394983768463135
+Valeria.Morlun@gastech.com.kronos,Valeria Morlun,3,Facilities,5.957540035247803,-2.871159791946411
+Albina.Hafon@gastech.com.kronos,Albina Hafon,3,Facilities,6.016321182250977,-2.608048439025879
+Ingrid.Barranco@gastech.com.kronos,Ingrid Barranco,2,Executive,1.3059577941894531,-3.436652421951294
+Cornelia.Lais@gastech.com.kronos,Cornelia Lais,0,Administration,-0.6092936992645264,-1.8430997133255005
+Lars.Azada@gastech.com.kronos,Lars Azada,1,Engineering,1.907726764678955,-5.474140644073486
+Henk.Mies@gastech.com.kronos,Henk Mies,3,Facilities,6.388051986694336,-2.9197804927825928
+Sten.Sanjorge Jr.@gastech.com.kronos,Sten Sanjorge Jr.,2,Executive,2.1055312156677246,-3.692328691482544
+Hideki.Cocinaro@gastech.com.kronos,Hideki Cocinaro,5,Security,2.5133934020996094,-2.436182737350464
+Carla.Forluniau@gastech.com.kronos,Carla Forluniau,0,Administration,-0.3983853757381439,-1.570574402809143
+Emile.Arpa@gastech.com.kronos,Emile Arpa,3,Facilities,5.207181453704834,-2.339695930480957
+Adan.Morlun@gastech.com.kronos,Adan Morlun,3,Facilities,6.03836727142334,-2.353098154067993
+Lucas.Alcazar@gastech.com.kronos,Lucas Alcazar,4,Information Technology,3.3200292587280273,-4.401297092437744
+Dylan.Scozzese@gastech.com.kronos,Dylan Scozzese,3,Facilities,6.222180366516113,-2.4980955123901367
+Kare.Orilla@gastech.com.kronos,Kare Orilla,1,Engineering,0.533444881439209,-5.7243781089782715
+Linnea.Bergen@gastech.com.kronos,Linnea Bergen,4,Information Technology,2.0549814701080322,-3.6543943881988525
+Orhan.Strum@gastech.com.kronos,Orhan Strum,2,Executive,2.0092782974243164,-3.7654507160186768
+Marin.Onda@gastech.com.kronos,Marin Onda,1,Engineering,0.5776921510696411,-5.330049991607666
+Mat.Bramar@gastech.com.kronos,Mat Bramar,0,Administration,-0.3963927626609802,-1.7479592561721802
+Isia.Vann@gastech.com.kronos,Isia Vann,5,Security,1.9287079572677612,-2.1771962642669678
+Bertrand.Ovan@gastech.com.kronos,Bertrand Ovan,3,Facilities,4.714062690734863,-2.5063180923461914
+Adra.Nubarron@gastech.com.kronos,Adra Nubarron,1,Engineering,1.0878229141235352,-5.741858005523682
+Nils.Calixto@gastech.com.kronos,Nils Calixto,4,Information Technology,3.313964366912842,-4.4180684089660645
+Stenig.Fusil@gastech.com.kronos,Stenig Fusil,5,Security,2.194765090942383,-3.214186906814575
+Minke.Mies@gastech.com.kronos,Minke Mies,5,Security,2.66725492477417,-2.0208187103271484
+Loreto.Bodrogi@gastech.com.kronos,Loreto Bodrogi,5,Security,2.5103600025177,-2.4361581802368164
+Irene.Nant@gastech.com.kronos,Irene Nant,3,Facilities,5.204646110534668,-2.340195417404175
+Inga.Ferro@gastech.com.kronos,Inga Ferro,5,Security,2.7366220951080322,-2.3942484855651855
+Felix.Resumir@gastech.com.kronos,Felix Resumir,5,Security,2.020003080368042,-2.5470974445343018
+Hennie.Osvaldo@gastech.com.kronos,Hennie Osvaldo,5,Security,2.284151554107666,-1.924074649810791
+Benito.Hawelon@gastech.com.kronos,Benito Hawelon,3,Facilities,6.167370319366455,-2.1349427700042725
+Cecilia.Morluniau@gastech.com.kronos,Cecilia Morluniau,3,Facilities,5.477169513702393,-2.0425302982330322

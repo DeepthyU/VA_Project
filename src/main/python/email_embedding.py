@@ -111,6 +111,17 @@ def output_tsne(embedded: np.ndarray, df: pd.DataFrame, out_path: Path):
         print(out.info())
 
 
+def filter_zeros(one_hot: pd.DataFrame) -> pd.DataFrame:
+    """Removes lines which have no activity in the one-hot matrix."""
+    matrix = one_hot.drop(['Name', 'Department', 'DeptId'], axis=1)
+    emp_info = one_hot[['Name', 'Department', 'DeptId']]
+
+    # Remove all empty lines
+    matrix = matrix.loc[~(matrix == 0).all(axis=1)]
+
+    return emp_info.join(matrix, how='inner')
+
+
 def main():
     args = parse_args()
 
@@ -127,13 +138,14 @@ def main():
         for endIdx in range(startIdx, len(unique_dates)):
             date_range = unique_dates[startIdx:endIdx + 1]
             one_hot = produce_one_hot(users, headers, date_range)
-            one_hot_np = one_hot_to_np(one_hot)
+            filtered_one_hot = filter_zeros(one_hot)
+            one_hot_np = one_hot_to_np(filtered_one_hot)
             users_embedded = TSNE(learning_rate='auto', random_state=0,
                                   verbose=0, n_jobs=-1,
                                   init="random").fit_transform(one_hot_np)
             # plot_tsne(users_embedded, one_hot)
             out = args.out / f"{startIdx}_{endIdx}.csv"
-            output_tsne(users_embedded, one_hot, out)
+            output_tsne(users_embedded, filtered_one_hot, out)
             pbar.write(f"Wrote csv to {out}")
             pbar.update(1)
 
