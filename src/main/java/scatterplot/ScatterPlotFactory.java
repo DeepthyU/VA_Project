@@ -20,20 +20,19 @@ import java.awt.*;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ScatterPlotFactory {
-
     /** Produce a JPanel which shows the clustering of emailers in the company */
     public ChartPanel getEmailClusteringPlot(String csvPath) {
-        Object[] parsedCsv = parseEmailCsv(csvPath);
-        ArrayList<DataValue> dataValues = (ArrayList<DataValue>) parsedCsv[0];
-        Map<XYDataItem, DataValue> coordinateNameMap = (Map<XYDataItem, DataValue>) parsedCsv[1];
-
-        XYDataset dataset = createEmailTsneDataset(dataValues);
+        Object[] datasets = createEmailDatasetFromCsv(csvPath, 0, 9);
+        XYDataset dataset = (XYSeriesCollection) datasets[0];
+        Map<XYDataItem, DataValue> coordinateNameMap = (Map<XYDataItem, DataValue>) datasets[1];
 
         JFreeChart chart = ChartFactory.createScatterPlot(
                 "TSNE Clustering of Emailers based on Email Involvement",
@@ -50,17 +49,7 @@ public class ScatterPlotFactory {
 
         // The whole thing below this is to make a tooltip
         XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();
-        XYToolTipGenerator xyToolTipGenerator = new XYToolTipGenerator() {
-            @Override
-            public String generateToolTip(XYDataset dataset, int series, int item) {
-                XYDataItem dataItem = new XYDataItem(dataset.getX(series, item), dataset.getY(series, item));
-                String name = coordinateNameMap.get(dataItem).getHeader();
-                String department = (String) coordinateNameMap.get(dataItem).getInfo().get("Department");
-                return String.format("<html><p><b>%s</b></p>", name) +
-                        String.format("<p>%s</p>", department) +
-                        "</html>";
-            }
-        };
+        XYToolTipGenerator xyToolTipGenerator = generateEmailTooltip(coordinateNameMap);
         renderer.setDefaultToolTipGenerator(xyToolTipGenerator);
         for (int i = 0; i < plot.getSeriesCount(); i++) {
             renderer.setSeriesPaint(i, EmailColors.deptColors[i]);
@@ -96,8 +85,8 @@ public class ScatterPlotFactory {
         }
         return stringList;
     }
-    private Object[] parseEmailCsv(String csvPath) {
-        ArrayList<String[]> stringList = parseCsv(csvPath);
+    private Object[] parseEmailCsv(Path csvPath) {
+        ArrayList<String[]> stringList = parseCsv(csvPath.toString());
 
         // Transform CSV lines into DataValue objects
         ArrayList<DataValue> parsingList = new ArrayList<>();
@@ -116,6 +105,16 @@ public class ScatterPlotFactory {
         }
 
         return new Object[] {parsingList, coordinateNameMap};
+    }
+    public Object[] createEmailDatasetFromCsv(String csvPath, int startIdx, int endIdx) {
+        String fileName = startIdx + "_" + endIdx + ".csv";
+        Path path = FileSystems.getDefault().getPath(csvPath, fileName);
+        Object[] parsedCsv = parseEmailCsv(path);
+        ArrayList<DataValue> dataValues = (ArrayList<DataValue>) parsedCsv[0];
+        Map<XYDataItem, DataValue> coordinateNameMap = (Map<XYDataItem, DataValue>) parsedCsv[1];
+
+        XYDataset dataset = createEmailTsneDataset(dataValues);
+        return new Object[] {dataset, coordinateNameMap};
     }
     /** Creates the dataset required by JFreeChart for Email TSNEs */
     private XYDataset createEmailTsneDataset(ArrayList<DataValue> dataValues) {
@@ -136,6 +135,19 @@ public class ScatterPlotFactory {
             dataset.addSeries(xy);
         }
         return dataset;
+    }
+    public XYToolTipGenerator generateEmailTooltip(Map<XYDataItem, DataValue> coordinateNameMap) {
+        return new XYToolTipGenerator() {
+            @Override
+            public String generateToolTip(XYDataset dataset, int series, int item) {
+                XYDataItem dataItem = new XYDataItem(dataset.getX(series, item), dataset.getY(series, item));
+                String name = coordinateNameMap.get(dataItem).getHeader();
+                String department = (String) coordinateNameMap.get(dataItem).getInfo().get("Department");
+                return String.format("<html><p><b>%s</b></p>", name) +
+                        String.format("<p>%s</p>", department) +
+                        "</html>";
+            }
+        };
     }
 
     /** Produce a JPanel which shows the clustering of articles by words they contain */

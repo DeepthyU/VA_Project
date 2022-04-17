@@ -8,7 +8,7 @@ import java.awt.*;
 public class Main {
     public static void main(String[] args) {
         ChartPanel emailPlot = new ScatterPlotFactory().getEmailClusteringPlot(
-                "./src/main/data/gastech_data/data/email_tsne.csv"
+                "./src/main/data/gastech_data/data/email_tsne/0_9.csv"
         );
         emailPlot.setSize(400, 400);
 

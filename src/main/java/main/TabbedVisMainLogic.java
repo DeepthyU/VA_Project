@@ -206,6 +206,8 @@ public class TabbedVisMainLogic extends JPanel implements ActionListener, MouseW
                 // Set the HEB to use a filter
                 hebMainLogic.setStartFilter(startIndex);
                 hebMainLogic.setEndFilter(endIndex);
+                empTSNEMainLogic.setDateRange(startIndex, endIndex);
+
             }
         }
     }
