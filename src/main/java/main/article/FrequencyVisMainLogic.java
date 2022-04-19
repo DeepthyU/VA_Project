@@ -31,7 +31,7 @@ public class FrequencyVisMainLogic {
         lineChartPanel.setSize(width, height);
         lineChartPanel.setVisible(true);
         // Add in frame
-        mainFrequencyPanel.addTab("Ngram", lineChartPanel);
+        mainFrequencyPanel.addTab("Keyword Frequency", lineChartPanel);
         //tab2
         wordCloudPanel.setSize(width, height);
 
