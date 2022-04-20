@@ -18,7 +18,7 @@ public class HebMainLogic {
     }
 
     public JPanel simulate_graph() {
-        return hebPanel;
+        return panel;
     }
     public void setStartFilter(int i) {
         panel.setStartFilter(i);

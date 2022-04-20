@@ -23,13 +23,17 @@ public class KeywordFinder {
     private void findAndWriteKeywordsToFile(List<Article> articleList, String history) {
         if (ArrayUtils.isEmpty(keywordsArr)) {
             keywordsArr = getKeywords(articleList, 0, Long.MAX_VALUE, history);
-            try {
-                ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(KEYWORDS_FILE_PATH));
+            writeKeywordsToFile(keywordsArr);
+        }
+    }
 
-                outputStream.writeObject(keywordsArr);
-            } catch (IOException e) {
-                System.out.println("ERROR: write keyword to file failed");
-            }
+    public void writeKeywordsToFile(String[] keywordsArr) {
+        try {
+            ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(KEYWORDS_FILE_PATH));
+
+            outputStream.writeObject(keywordsArr);
+        } catch (IOException e) {
+            System.out.println("ERROR: write keyword to file failed");
         }
     }
 

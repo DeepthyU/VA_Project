@@ -71,7 +71,7 @@ public class Utils {
             byte[] encoded = Files.readAllBytes(Paths.get(path));
             return new String(encoded, encoding);
         } catch (IOException e) {
-            System.out.println("ERROR: File read failed for "+ path + " with error "+ e.getCause());
+            System.out.println("ERROR: File read failed for " + path + " with error " + e.getCause());
             return "";
         }
     }
@@ -84,12 +84,16 @@ public class Utils {
         } catch (IOException e) {
             System.out.println("ERROR: file read failed for " + path);
         }
+        deleteFile(path);
+        return new String(encoded, encoding);
+    }
+
+    public static void deleteFile(String path) {
         try {
             Files.delete(Paths.get(path));
         } catch (IOException e) {
             System.out.println("ERROR: delete operation failed for " + path);
         }
-        return new String(encoded, encoding);
     }
 
 
@@ -101,11 +105,7 @@ public class Utils {
         } catch (IOException e) {
             System.out.println("ERROR: image read failed for " + path);
         }
-        try {
-            Files.delete(Paths.get(path));
-        } catch (IOException e) {
-            System.out.println("ERROR: delete operation failed for " + path);
-        }
+        deleteFile(path);
         return image;
     }
 
@@ -140,7 +140,7 @@ public class Utils {
             myWriter.write(text);
             myWriter.close();
         } catch (IOException e) {
-            System.out.println("ERROR: An error occurred during file write to path "+ path);
+            System.out.println("ERROR: An error occurred during file write to path " + path);
         }
     }
 
@@ -148,7 +148,8 @@ public class Utils {
         try {
             BufferedWriter bWriter = new BufferedWriter(new FileWriter(fileName));
             Gson gson = new Gson();
-            Type type = new TypeToken<List<Article>>() {}.getType();
+            Type type = new TypeToken<List<Article>>() {
+            }.getType();
             String jsonStr = gson.toJson(articleList, type);
             bWriter.append(jsonStr);
             bWriter.newLine();
@@ -163,7 +164,8 @@ public class Utils {
         try {
             BufferedWriter bWriter = new BufferedWriter(new FileWriter(fileName, true));
             Gson gson = new Gson();
-            Type type = new TypeToken<Article>() {}.getType();
+            Type type = new TypeToken<Article>() {
+            }.getType();
             String jsonStr = gson.toJson(article, type);
             bWriter.append(jsonStr);
             bWriter.newLine();
@@ -186,9 +188,9 @@ public class Utils {
             }
             buffReader.close();
         } catch (IOException e) {
-            System.out.println("ERROR: File read failed in readArticleList()");
-        } catch (JsonSyntaxException e){
-            System.out.println("ERROR: Article deserialise read failed in readArticles() for line :");
+            System.out.println("ERROR: File read failed. " + e.getCause());
+        } catch (JsonSyntaxException e) {
+            System.out.println("ERROR: Article deserialise read failed:" + e.getCause());
         }
         return articleList;
     }
@@ -199,14 +201,15 @@ public class Utils {
         try {
             BufferedReader buffReader = new BufferedReader(new FileReader(fileName));
             Gson gson = new Gson();
-            Type type = new TypeToken<List<Article>>() {}.getType();
+            Type type = new TypeToken<List<Article>>() {
+            }.getType();
             while ((line = buffReader.readLine()) != null) {
                 articleList.addAll(gson.fromJson(line, type));
             }
             buffReader.close();
         } catch (IOException e) {
             System.out.println("ERROR: File read failed in readArticleList()");
-        } catch (JsonSyntaxException e){
+        } catch (JsonSyntaxException e) {
             System.out.println("ERROR: Article deserialise read failed in readArticleList() for line :");
         }
         return articleList;

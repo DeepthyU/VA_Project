@@ -1,14 +1,11 @@
 package vis;
 
 
-import preprocessing.Preprocessor;
-
 import javax.swing.*;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.PlainDocument;
-import java.awt.*;
 import java.awt.event.*;
 
 public class SearchableJComboBox extends PlainDocument {
@@ -17,9 +14,9 @@ public class SearchableJComboBox extends PlainDocument {
     JTextComponent editor;
     // flag to indicate if setSelectedItem has been called
     // subsequent calls to remove/insertString should be ignored
-    boolean selecting=false;
+    boolean selecting = false;
     boolean hidePopupOnFocusLoss;
-    boolean hitBackspace=false;
+    boolean hitBackspace = false;
     boolean hitBackspaceOnSelection;
 
     public SearchableJComboBox(final JComboBox comboBox) {
@@ -35,26 +32,29 @@ public class SearchableJComboBox extends PlainDocument {
         editor.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
                 if (comboBox.isDisplayable()) comboBox.setPopupVisible(true);
-                hitBackspace=false;
+                hitBackspace = false;
                 switch (e.getKeyCode()) {
                     // determine if the pressed key is backspace (needed by the remove method)
-                    case KeyEvent.VK_BACK_SPACE : hitBackspace=true;
-                        hitBackspaceOnSelection=editor.getSelectionStart()!=editor.getSelectionEnd();
+                    case KeyEvent.VK_BACK_SPACE:
+                        hitBackspace = true;
+                        hitBackspaceOnSelection = editor.getSelectionStart() != editor.getSelectionEnd();
                         break;
                     // ignore delete key
-                    case KeyEvent.VK_DELETE : e.consume();
+                    case KeyEvent.VK_DELETE:
+                        e.consume();
                         comboBox.getToolkit().beep();
                         break;
                 }
             }
         });
         // Bug 5100422 on Java 1.5: Editable JComboBox won't hide popup when tabbing out
-        hidePopupOnFocusLoss=System.getProperty("java.version").startsWith("1.5");
+        hidePopupOnFocusLoss = System.getProperty("java.version").startsWith("1.5");
         // Highlight whole text when gaining focus
         editor.addFocusListener(new FocusAdapter() {
             public void focusGained(FocusEvent e) {
                 highlightCompletedText(0);
             }
+
             public void focusLost(FocusEvent e) {
                 // Workaround for Bug 5100422 - Hide Popup on focus loss
                 if (hidePopupOnFocusLoss) comboBox.setPopupVisible(false);
@@ -62,7 +62,7 @@ public class SearchableJComboBox extends PlainDocument {
         });
         // Handle initially selected object
         Object selected = comboBox.getSelectedItem();
-        if (selected!=null) setText(selected.toString());
+        if (selected != null) setText(selected.toString());
         highlightCompletedText(0);
     }
 
@@ -72,7 +72,7 @@ public class SearchableJComboBox extends PlainDocument {
         if (hitBackspace) {
             // user hit backspace => move the selection backwards
             // old item keeps being selected
-            if (offs>0) {
+            if (offs > 0) {
                 if (hitBackspaceOnSelection) offs--;
             } else {
                 // User hit backspace with the cursor positioned on the start => beep
@@ -91,19 +91,15 @@ public class SearchableJComboBox extends PlainDocument {
         super.insertString(offs, str, a);
         // lookup and select a matching item
         Object item = lookupItem(getText(0, getLength()));
-        if (item != null) {
-            setSelectedItem(item);
-        } else {
-            // keep old item selected if there is no match
-            item = comboBox.getSelectedItem();
-            // imitate no insert (later on offs will be incremented by str.length(): selection won't move forward)
-            offs = offs-str.length();
-            // provide feedback to the user that his input has been received but can not be accepted
-            comboBox.getToolkit().beep(); // when available use: UIManager.getLookAndFeel().provideErrorFeedback(comboBox);
+        boolean listContainsSelectedItem = true;
+        if (item == null) {
+            // no item matches => use the current input as selected item
+            item = getText(0, getLength());
+            listContainsSelectedItem = false;
         }
         setText(item.toString());
-        // select the completed part
-        highlightCompletedText(offs+str.length());
+// select the completed part
+        if (listContainsSelectedItem) highlightCompletedText(offs + str.length());
     }
 
     private void setText(String text) {
@@ -134,7 +130,7 @@ public class SearchableJComboBox extends PlainDocument {
             return selectedItem;
         } else {
             // iterate over all items
-            for (int i=0, n=model.getSize(); i < n; i++) {
+            for (int i = 0, n = model.getSize(); i < n; i++) {
                 Object currentItem = model.getElementAt(i);
                 // current item starts with the pattern?
                 if (startsWithIgnoreCase(currentItem.toString(), pattern)) return currentItem;
@@ -149,36 +145,4 @@ public class SearchableJComboBox extends PlainDocument {
         return str1.toUpperCase().startsWith(str2.toUpperCase());
     }
 
-    private static void createAndShowGUI() {
-        // the combo box (add/modify items if you like to)
-        JComboBox comboBox = new JComboBox(new Preprocessor().getKeywordsArr());
-        // has to be editable
-        comboBox.setEditable(true);
-        // change the editor's document
-        new SearchableJComboBox(comboBox);
-
-        // create and show a window containing the combo box
-        JFrame frame = new JFrame();
-        frame.setLayout(new GridLayout());
-        frame.setDefaultCloseOperation(3);
-        frame.getContentPane().add(comboBox);
-        JButton button = new JButton("ADD");
-        frame.getContentPane().add(button);
-        button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println(comboBox.getSelectedItem());
-            }
-        });
-        frame.pack(); frame.setVisible(true);
-    }
-
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                createAndShowGUI();
-            }
-        });
-    }
 }

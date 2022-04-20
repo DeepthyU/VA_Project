@@ -5,7 +5,10 @@ import scatterplot.ArticleData;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 public class Article {
 
@@ -15,11 +18,8 @@ public class Article {
     private Timestamp date;
     private String place;
     private String content;
-    private String[] stems;
-    private List<String> keywordsList = new ArrayList<String>();
+    private List<String> keywordsList = new ArrayList<>();
     private String author;
-    private boolean hasDeletedImg;
-    private String time;
     private int xCoordinate;
     private int yCoordinate;
     private List<Edge> edges = new ArrayList<>();
@@ -42,27 +42,25 @@ public class Article {
         this.edges = edges;
     }
 
-    public Article(String publication, String title, String author, Timestamp date, String place, String content, boolean hasDeletedImg) {
+    public Article(String publication, String title, String author, Timestamp date, String place, String content) {
         this.publication = publication;
         this.title = title;
         this.author = author;
         this.date = date;
         this.place = place;
         this.content = content;
-        this.hasDeletedImg = hasDeletedImg;
     }
 
     public Article(ArticleData articleData) {
         this.title = articleData.getTitle();
         this.publication = articleData.getPublication();
         SimpleDateFormat sdf = new SimpleDateFormat("MMM d, y");
-        Date d = null;
+        Date d;
         try {
             d = sdf.parse(articleData.getDate());
-            Timestamp ts = new Timestamp(d.getTime());
-            this.date = ts;
+            this.date = new Timestamp(d.getTime());
         } catch (ParseException e) {
-            System.out.println("ERROR: Date parse error in Article constructor :"+ e.getCause());
+            System.out.println("ERROR: Date parse error in Article constructor :" + e.getCause());
         }
         this.fileName = articleData.getFilename();
     }
@@ -116,14 +114,6 @@ public class Article {
         this.content = content;
     }
 
-    public String[] getStems() {
-        return stems;
-    }
-
-    public void setStems(String[] stems) {
-        this.stems = stems;
-    }
-
     public String getAuthor() {
         return author;
     }
@@ -140,23 +130,6 @@ public class Article {
         this.author = author;
     }
 
-    public boolean isHasDeletedImg() {
-        return hasDeletedImg;
-    }
-
-    public void setHasDeletedImg(boolean hasDeletedImg) {
-        this.hasDeletedImg = hasDeletedImg;
-    }
-
-    public String getTime() {
-        return time;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
-    }
-
-
     public int getyCoordinate() {
         return yCoordinate;
     }
@@ -167,7 +140,7 @@ public class Article {
 
     public List<String> getKeywordsList() {
         List<String> list = new ArrayList<>();
-        for (String str : keywordsList){
+        for (String str : keywordsList) {
             list.add(str.toLowerCase(Locale.ROOT));
         }
         keywordsList = list;
@@ -187,11 +160,8 @@ public class Article {
                 ", date=" + date +
                 ", place='" + place + '\'' +
                 ", content='" + content + '\'' +
-                ", stems=" + Arrays.toString(stems) +
                 ", keywordsList=" + keywordsList +
                 ", author='" + author + '\'' +
-                ", hasDeletedImg=" + hasDeletedImg +
-                ", time='" + time + '\'' +
                 ", xCoordinate=" + xCoordinate +
                 ", yCoordinate=" + yCoordinate +
                 '}';

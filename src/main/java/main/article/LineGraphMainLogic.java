@@ -3,11 +3,9 @@ package main.article;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.*;
+import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.util.LogFormat;
-import org.jfree.data.Range;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import preprocessing.Article;
@@ -42,9 +40,9 @@ public class LineGraphMainLogic {
         dateAxis.setDateFormatOverride(new SimpleDateFormat("dd/MM/yy"));
         dateAxis.setVerticalTickLabels(true);
 
-        LogarithmicAxis logAxis = new LogarithmicAxis("log(Frequency)");
-        logAxis.setAllowNegativesFlag(false);
-        logAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+//        LogarithmicAxis logAxis = new LogarithmicAxis("log(Frequency)");
+//        logAxis.setAllowNegativesFlag(false);
+//        logAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
         chart = ChartFactory.createXYLineChart(null, "Date", "Frequency"
                 , dataset, PlotOrientation.VERTICAL, true, true, false);
         XYPlot plot = chart.getXYPlot();
@@ -54,7 +52,7 @@ public class LineGraphMainLogic {
         plot.getDomainAxis().setLabelFont(new Font("Tahoma", Font.BOLD, 12));
         plot.getDomainAxis().setTickLabelFont(new Font("Tahoma", Font.BOLD, 8));
         chart.getLegend().setItemFont(new Font("Tahoma", Font.BOLD, 9));
-        plot.setRangeAxis(logAxis);
+        //plot.setRangeAxis(logAxis);
         plot.setBackgroundPaint(new Color(229, 235, 247));
         plot.setDomainMinorGridlinePaint(Color.WHITE);
         plot.setDomainGridlinePaint(Color.DARK_GRAY);
@@ -95,11 +93,11 @@ public class LineGraphMainLogic {
         System.out.println("dataset update called");
         long startDate = computeKeywordFrequency(articleFilter);
         dataset.removeAllSeries();
-        String[] keywords = PREPROCESSOR.getKeywordsArr();
+        List<String> keywords = PREPROCESSOR.getKeywordsList();
         for (int i = 0; i < keywordCount.length; i++) {
-            XYSeries keywordSeries = new XYSeries(keywords[i]);
+            XYSeries keywordSeries = new XYSeries(keywords.get(i));
             for (int j = 0; j < keywordCount[i].length; j++) {
-                if (keywordCount[i][j] > 0) {
+                if (keywordCount[i][j] >= 0) {
                     keywordSeries.add(((long) j * (1000 * 60 * 60 * 24) + startDate), keywordCount[i][j]);
                 }
             }
@@ -110,7 +108,7 @@ public class LineGraphMainLogic {
     }
 
     private static long computeKeywordFrequency(List<ArticleFilter> filters) {
-        String[] keywords = PREPROCESSOR.getKeywordsArr();
+        List<String> keywords = PREPROCESSOR.getKeywordsList();
         List<Article> articleList = PREPROCESSOR.getArticleList();
         articleList.sort(Comparator.comparing(Article::getDate));
         long startDate = articleList.get(0).getDate().getTime();
@@ -128,18 +126,18 @@ public class LineGraphMainLogic {
             }
         }
 
-        keywordCount = new int[keywords.length][totalDays + 1];
-        //clearKeyCount();
-        for (int i = 0; i < keywords.length; i++) {
+        keywordCount = new int[keywords.size()][totalDays + 1];
+        clearKeyCount();
+        for (int i = 0; i < keywords.size(); i++) {
             for (Article article : articleList) {
                 if (!Utils.isRemoveItem(filters, article)) {
                     remainingArticlesCount++;
                     if (currKeywords != null) {
-                        if (!currKeywords.contains(keywords[i].toLowerCase(Locale.ROOT))) {
+                        if (!currKeywords.contains(keywords.get(i).toLowerCase(Locale.ROOT))) {
                             continue;
                         }
                     }
-                    if (article.getKeywordsList().contains(keywords[i].toLowerCase(Locale.ROOT))) {
+                    if (article.getKeywordsList().contains(keywords.get(i).toLowerCase(Locale.ROOT))) {
                         int dateIdx = (int) ((article.getDate().getTime() - startDate) / (1000 * 60 * 60 * 24));
 //                        if (keywordCount[i][dateIdx] == -1) {
 //                            keywordCount[i][dateIdx] = 0;
@@ -147,7 +145,7 @@ public class LineGraphMainLogic {
                         keywordCount[i][dateIdx]++;
                         if (maxKeyCount < keywordCount[i][dateIdx]) {
                             maxKeyCount = keywordCount[i][dateIdx];
-                            maxKeyword = keywords[i] + " " + i;
+                            maxKeyword = keywords.get(i) + " " + i;
                         }
                     }
                 }

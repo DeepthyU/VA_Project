@@ -29,17 +29,17 @@ public class FrequencyVisMainLogic {
 
     public JTabbedPane simulate_tab(int width, int height) {
         //tab1
+        wordCloudPanel.setSize(width, height);
+
+        // Add in frame
+        mainFrequencyPanel.addTab("WordCloud", wordCloudPanel);
+
+        //tab2
         lineChartPanel.setSize(width, height);
         lineChartPanel.setVisible(true);
         // Add in frame
         mainFrequencyPanel.setFont( new Font( "Tahoma", Font.BOLD, 10 ) );
         mainFrequencyPanel.addTab("Keyword Frequency", lineChartPanel);
-
-        //tab2
-        wordCloudPanel.setSize(width, height);
-
-        // Add in frame
-        mainFrequencyPanel.addTab("WordCloud", wordCloudPanel);
         return mainFrequencyPanel;
     }
 

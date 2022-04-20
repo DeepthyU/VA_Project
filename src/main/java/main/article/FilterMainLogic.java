@@ -4,6 +4,7 @@ import main.DateLabelFormatter;
 import net.sourceforge.jdatepicker.impl.JDatePanelImpl;
 import net.sourceforge.jdatepicker.impl.JDatePickerImpl;
 import net.sourceforge.jdatepicker.impl.UtilDateModel;
+import org.apache.commons.lang3.StringUtils;
 import preprocessing.Preprocessor;
 import vis.SearchableJComboBox;
 import vis.article.ArticleField;
@@ -13,7 +14,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -37,6 +37,7 @@ public class FilterMainLogic {
     private JButton addKeyword, addPlace, addAuthor, addPublication;
     private boolean movingComponents = false;
     private int visibleIndex = 4;
+    private JPanel keywordPanel;
 
     public FilterMainLogic() {
         UtilDateModel startDateModel = new UtilDateModel();
@@ -52,10 +53,11 @@ public class FilterMainLogic {
 
         ///////////////////////////////////////////////
         unselectAllKeywordCbs = new JButton("Unselect All Keywords");
-        keywordsCombo = new JComboBox(new Preprocessor().getKeywordsArr());
+        keywordsCombo = new JComboBox(new Preprocessor().getKeywordsList().toArray());
         // has to be editable
         keywordsCombo.setEditable(true);
         // change the editor's document
+
         new SearchableJComboBox(keywordsCombo);
         addKeyword = new JButton("ADD");
         //////////////////////////////////////////////////////////////
@@ -277,7 +279,7 @@ public class FilterMainLogic {
         includeEmptyPlaceFilter.addActionListener(new IncludeEmptyButtonActionListener(includeEmptyPlace));
         includeEmptyPublicationFilter.addActionListener(new IncludeEmptyButtonActionListener(includeEmptyPublication));
         includeEmptyAuthorFilter.addActionListener(new IncludeEmptyButtonActionListener(includeEmptyAuthor));
-        addKeyword.addActionListener(new AddButtonActionListener(keywordsCombo, keywordsCbList));
+        addKeyword.addActionListener(new AddKeywordButtonActionListener());
         addAuthor.addActionListener(new AddButtonActionListener(authorCombo, authorCbList));
         addPlace.addActionListener(new AddButtonActionListener(placeCombo, placeCbList));
         addPublication.addActionListener(new AddButtonActionListener(publicationCombo, publicationCbList));
@@ -305,6 +307,31 @@ public class FilterMainLogic {
         includeEmptyPublication.set(true);
         includeEmptyPublicationFilter.setSelected(true);
     }
+
+    class AddKeywordButtonActionListener implements ActionListener {
+
+        public void actionPerformed(ActionEvent e) {
+            int keywordIdx = keywordsCombo.getSelectedIndex();
+            if (keywordIdx > -1) {
+                keywordsCbList.get(keywordIdx).setSelected(true);
+            } else {
+                Object newObj = keywordsCombo.getSelectedItem();
+                if (null != newObj) {
+                    String newKeyword = newObj.toString();
+                    if (StringUtils.isNotBlank(newKeyword)) {
+                        PREPROCESSOR.updateKeywordsList(newKeyword);
+                        JCheckBox cb = new JCheckBox(newKeyword, true);
+                        cb.setPreferredSize(new Dimension(150, 20));
+                        keywordsCbList.add(cb);
+                        keywordPanel.add(cb);
+                        keywordPanel.repaint();
+                    }
+                }
+            }
+        }
+
+    }
+
 
     class AddButtonActionListener implements ActionListener {
         private JComboBox comboBox;
@@ -357,12 +384,16 @@ public class FilterMainLogic {
         public ChildPanel(String name, int id, MouseListener ml) {
             setLayout(new BorderLayout());
             add(new ControlPanel(name, id, ml), "First");
-            JScrollPane scrollPane = new JScrollPane(getContent(name));
+            JPanel child = getContent(name);
+            JScrollPane scrollPane = new JScrollPane(child);
             scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
             scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
             scrollPane.setVisible(true);
             scrollPane.repaint();
             add(scrollPane);
+            if ("Keyword".equals(name)) {
+                keywordPanel = child;
+            }
         }
 
         private JPanel getContent(String name) {
@@ -378,7 +409,7 @@ public class FilterMainLogic {
                     panel.add(addKeyword);
                     panel.add(unselectAllKeywordCbs);
                     panel.add(new JLabel());
-                    addOptions(Arrays.asList(PREPROCESSOR.getKeywordsArr()), panel, keywordsCbList);
+                    addOptions(PREPROCESSOR.getKeywordsList(), panel, keywordsCbList);
                     panel.setLayout(new GridLayout(44, 2));
                     break;
                 case "Author":
