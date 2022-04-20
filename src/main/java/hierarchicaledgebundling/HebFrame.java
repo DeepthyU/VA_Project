@@ -8,8 +8,9 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Rectangle2D;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class HebFrame extends JPanel{
     private int[][][] adjacencyMatrix;
@@ -28,8 +29,13 @@ public class HebFrame extends JPanel{
     private int maxValue = 0;
 
     public HebFrame(String jsonString) {
-        this.setLayout(null);
+
+        JLabel title = new JLabel("<html>Hierarchical Edge Bundling of <br/> Employee Email Communication</html>", SwingConstants.CENTER);
+        title.setFont(new Font("Tahoma", Font.BOLD, 20));
+        add(title);
         readDataFromJsonString(jsonString);
+        setPreferredSize(new Dimension(650,750));
+
     }
 
     @Override
@@ -129,7 +135,7 @@ public class HebFrame extends JPanel{
 
     private int[] polarToCartesian(float r, float theta) {
         // Converts polar coordinates to cartesian centered at the center of the panel
-        int[] origin = new int[]{this.getSize().width / 2, this.getSize().height / 2};
+        int[] origin = new int[]{this.getSize().width / 2, this.getSize().height / 2 - 20};
         int[] result = new int[2];
         result[0] = (int) (r * Math.cos(theta)) + origin[0];
         result[1] = (int) (r * Math.sin(theta)) + origin[1];
@@ -269,10 +275,17 @@ public class HebFrame extends JPanel{
 
         // Make things anti-aliased
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
         // Change font to be smaller
         Font currentFont = g2d.getFont();
         g2d.setFont(currentFont.deriveFont(9F));
+        g2d.setColor(Color.WHITE);
+        g2d.fillRect(0, 0, this.getSize().width, this.getSize().height);
+        g2d.setColor(new Color(229, 235, 247));
+        g2d.fillRect(10, 70, this.getSize().width - 20, this.getSize().height - 150);
+        Stroke stroke1 = new BasicStroke(0.5f);
+        g2d.setColor(Color.BLACK);
+        g2d.setStroke(stroke1);
+        g2d.drawRect(10, 70, this.getSize().width - 20, this.getSize().height - 150);
 
         // TODO Make start and end not hardcoded
         float[][] connections = sumConnections();

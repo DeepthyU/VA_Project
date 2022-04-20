@@ -5,6 +5,7 @@ import org.jfree.chart.ChartPanel;
 import preprocessing.Preprocessor;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.List;
 
 public class FrequencyVisMainLogic {
@@ -31,7 +32,9 @@ public class FrequencyVisMainLogic {
         lineChartPanel.setSize(width, height);
         lineChartPanel.setVisible(true);
         // Add in frame
+        mainFrequencyPanel.setFont( new Font( "Tahoma", Font.BOLD, 10 ) );
         mainFrequencyPanel.addTab("Keyword Frequency", lineChartPanel);
+
         //tab2
         wordCloudPanel.setSize(width, height);
 

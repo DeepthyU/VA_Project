@@ -18,12 +18,7 @@ public class HebMainLogic {
     }
 
     public JPanel simulate_graph() {
-        JScrollPane scrollPane = new JScrollPane(panel);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        scrollPane.setVisible(true);
-        scrollPane.repaint();
-        return panel;
+        return hebPanel;
     }
     public void setStartFilter(int i) {
         panel.setStartFilter(i);

@@ -6,12 +6,7 @@ import calendar
 import time
 import gensim
 
-#print("Hello Baeldung Readers!!")
-#print(f"Name of the script      : {sys.argv[0]=}")
-#print(f"Arguments of the script : {sys.argv[1:]=}")	
-
 arg = sys.argv[1]
-#print(f"Arguments:", arg)
 score = 0
 if len(sys.argv) > 2:
     score = sys.argv[2]
@@ -29,15 +24,6 @@ local_stopwords.update(custom_stopwords)
 # Generate word cloud
 wordcloud = WordCloud(width= 1000, height = 600, normalize_plurals=False, include_numbers=False, collocation_threshold=30, random_state=1, background_color='white', colormap='viridis', collocations=False, min_word_length = 3, stopwords = local_stopwords).generate(text)
     
-#wordcloud = WordCloud(width = 3000, height = 2000, random_state=1, background_color='black', colormap='Set2', collocations=False, stopwords = STOPWORDS).generate(text)
-# Plot
-# Set figure size
-#plt.figure(figsize=(40, 30))
-# Display image
-#plt.imshow(wordcloud) 
-# No axis details
-#plt.axis("off");
-
 
 gmt = time.gmtime()
 ts = calendar.timegm(gmt)

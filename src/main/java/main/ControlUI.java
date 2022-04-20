@@ -107,7 +107,7 @@ public class ControlUI extends JFrame implements ActionListener, MouseWheelListe
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("Article Tab", tabbedVisMainLogic.getArticlePanel());
         tabbedPane.addTab("Employee Tab", tabbedVisMainLogic.getEmployeePanel());
-
+        tabbedPane.setFont( new Font( "Tahoma", Font.BOLD, 10 ) );
         tabbedPane.setSize(frm_width, frm_height );
         tabbedPane.setLocation(gUIProp.posx, gUIProp.posy);
 

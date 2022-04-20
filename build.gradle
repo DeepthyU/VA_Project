@@ -1,6 +1,5 @@
 apply plugin: 'java'
 apply plugin: 'eclipse'
-//apply plugin: 'java-library'
 apply plugin: 'application'
 apply plugin: 'idea'
 buildscript {
@@ -29,24 +28,9 @@ repositories {
 
 }
 
-configurations {
-    // configuration that holds jars to include in the jar
-    extraLibs
+compileJava {
+    options.release = 15
 }
-
-
-//compileJava {
-//    options.release = 15
-//}
-
-//
-//java {
-//    toolchain {
-//        languageVersion.set(JavaLanguageVersion.of(15))
-//    }
-//}
-
-
 
 allprojects {
     repositories {
@@ -55,27 +39,15 @@ allprojects {
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
     implementation 'org.graphstream:gs-core:1.2'
     implementation 'org.graphstream:gs-algo:1.2'
     implementation 'org.graphstream:gs-ui:1.2'
-//    implementation 'com.github.graphstream:gs-core:2.0-alpha'
-//    implementation 'com.github.graphstream:gs-algo:2.0-alpha'
-//    implementation 'com.github.graphstream:gs-ui-swing:2.0-alpha'
-//    implementation 'org.graphstream:gs-ui:1.3'
-    implementation 'org.apache.lucene:lucene-core:3.6.2.redhat-8'
-    implementation 'org.apache.lucene:lucene-analyzers-common:4.0.0'
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     implementation 'org.apache.commons:commons-lang3:3.11'
-    // https://mvnrepository.com/artifact/org.python/jython
-    implementation group: 'org.python', name: 'jython', version: '2.7.0'
     // https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple
     implementation 'com.googlecode.json-simple:json-simple:1.1.1'
     // https://mvnrepository.com/artifact/org.apache.commons/commons-collections4
     implementation 'org.apache.commons:commons-collections4:4.4'
-    // https://mvnrepository.com/artifact/com.kennycason/kumo
-    implementation 'com.kennycason:kumo:1.5'
     // https://mvnrepository.com/artifact/edu.stanford.nlp/stanford-corenlp
     implementation 'edu.stanford.nlp:stanford-corenlp:4.4.0'
     implementation group: 'edu.stanford.nlp', name: 'stanford-corenlp', version: '4.4.0', classifier: 'models'
@@ -91,14 +63,11 @@ dependencies {
     implementation group: 'com.opencsv', name: 'opencsv', version: '5.6'
 }
 
-
-
-
-//java {
-//    toolchain {
-//        languageVersion = JavaLanguageVersion.of(15)
-//    }
-//}
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(15)
+    }
+}
 
 jar {
     manifest {

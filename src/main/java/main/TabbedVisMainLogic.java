@@ -61,6 +61,8 @@ public class TabbedVisMainLogic extends JPanel implements ActionListener, MouseW
         mainVisPanel = new JTabbedPane();
         mainVisPanel.addTab("Article Tab", articlePanel);
         mainVisPanel.addTab("Employee Tab", employeePanel);
+        mainVisPanel.setFont( new Font( "Tahoma", Font.BOLD, 10 ) );
+
     }
 
     private void makeEmployeeVis() {
@@ -85,7 +87,7 @@ public class TabbedVisMainLogic extends JPanel implements ActionListener, MouseW
         }
 
         hebPanel = hebMainLogic.simulate_graph();
-        hebPanel.setSize(frm_width / 2 - 100, frm_height - 100);
+        hebPanel.setSize(frm_width / 2, frm_height - 150);
         hebPanel.setLocation(gUIProp.posx, gUIProp.posy);
         empVisPanel.setLeftComponent(hebPanel);
     }

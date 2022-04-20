@@ -47,6 +47,7 @@ private Preprocessor preprocessor;
 
         // Add in frame
         mainAutoPanel.addTab("Clustering", articleTSNEChart);
+        mainAutoPanel.setFont( new Font( "Tahoma", Font.BOLD, 10 ) );
         return mainAutoPanel;
     }
 

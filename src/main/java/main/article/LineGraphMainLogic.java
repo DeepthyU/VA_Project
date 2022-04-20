@@ -48,21 +48,18 @@ public class LineGraphMainLogic {
         chart = ChartFactory.createXYLineChart(null, "Date", "Frequency"
                 , dataset, PlotOrientation.VERTICAL, true, true, false);
         XYPlot plot = chart.getXYPlot();
-        plot.getRangeAxis().setLabelFont(new Font("Tahoma", Font.PLAIN, 10));
-        plot.getRangeAxis().setTickLabelFont(new Font("Tahoma", Font.PLAIN, 8));
+        plot.getRangeAxis().setLabelFont(new Font("Tahoma", Font.BOLD, 10));
+        plot.getRangeAxis().setTickLabelFont(new Font("Tahoma", Font.BOLD, 8));
         plot.setDomainAxis(dateAxis);
-        plot.getDomainAxis().setLabelFont(new Font("Tahoma", Font.PLAIN, 12));
-        plot.getDomainAxis().setTickLabelFont(new Font("Tahoma", Font.PLAIN, 8));
-        chart.getLegend().setItemFont(new Font("Tahoma", Font.PLAIN, 9));
-
+        plot.getDomainAxis().setLabelFont(new Font("Tahoma", Font.BOLD, 12));
+        plot.getDomainAxis().setTickLabelFont(new Font("Tahoma", Font.BOLD, 8));
+        chart.getLegend().setItemFont(new Font("Tahoma", Font.BOLD, 9));
         plot.setRangeAxis(logAxis);
-        plot.setBackgroundAlpha(0.25f);
-        plot.setBackgroundPaint(Color.white);
+        plot.setBackgroundPaint(new Color(229, 235, 247));
         plot.setDomainMinorGridlinePaint(Color.WHITE);
         plot.setDomainGridlinePaint(Color.DARK_GRAY);
         plot.setRangeMinorGridlinePaint(Color.WHITE);
         plot.setRangeGridlinePaint(Color.DARK_GRAY);
-
 
         panel = new ChartPanel(chart, 300, 300, 0, 0, 2000, 2000, true, false, true, true, true, true);
         panel.setPreferredSize(new Dimension(500, 300));

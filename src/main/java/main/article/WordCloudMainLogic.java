@@ -22,7 +22,8 @@ public class WordCloudMainLogic {
     public WordCloudMainLogic(Preprocessor preprocessor) {
         PREPROCESSOR = preprocessor;
         panel = new ZoomablePicturePanel(makeWordCloud(null));
-        panel.setPreferredSize(new Dimension(500, 300));
+        panel.setBackground(new Color(229, 235, 247));
+        panel.setPreferredSize(new Dimension(1000, 600));
     }
 
 
