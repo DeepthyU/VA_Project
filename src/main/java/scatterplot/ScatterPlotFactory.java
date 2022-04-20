@@ -2,6 +2,7 @@ package scatterplot;
 
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
+import keywordsearch.PythonExecuter;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -23,7 +24,6 @@ import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -197,15 +197,41 @@ public class ScatterPlotFactory {
         return chartPanel;
     }
 
+    public ArrayList<String[]> calculateArticleTsneInPython(String startDate, String endDate) {
+        PythonExecuter executer = new PythonExecuter();
+        String[] commandParams = {
+                "./article_list.json",
+                "--start",
+                startDate,
+                "--end",
+                endDate
+        };
+        return executer.runArticleTsne("./src/main/python/article_embedding.py", commandParams);
+    }
+    public ArrayList<String[]> calculateArticleTsneInPython() {
+        PythonExecuter executer = new PythonExecuter();
+        String[] commandParams = {
+                "./article_list.json"
+        };
+        return executer.runArticleTsne("./src/main/python/article_embedding.py", commandParams);
+    }
+    /** Calculates Article TSNEs for a given date range by using a PythonExecutor */
+    public XYSeriesCollection calculateArticleTsne(String startDate, String endDate) {
+        ArrayList<String[]> strings = calculateArticleTsneInPython(startDate, endDate);
+        Map<XYDataItem, ArticleData> articleDataMap = createArticleDataMap(strings);
+        return createArticleTsneDataset(articleDataMap);
+    }
     /**
      * Parse the article_tsne.csv file.
      *
      * @return A {@code Map<XYDataItem, ArticleData>} object where the XYDataItem is the position
      * of the article on the TSNE plot.
      */
-    public Map<XYDataItem, ArticleData> parseArticleCsv(String csvPath) {
+    private Map<XYDataItem, ArticleData> parseArticleCsv(String csvPath) {
         ArrayList<String[]> stringList = parseCsv(csvPath);
-
+        return createArticleDataMap(stringList);
+    }
+    public Map<XYDataItem, ArticleData> createArticleDataMap(ArrayList<String[]> stringList) {
         Map<XYDataItem, ArticleData> dataMap = new HashMap<>();
         for (String[] line:stringList) {
             String filename = line[0];

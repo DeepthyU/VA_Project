@@ -1,5 +1,6 @@
 package main.article;
 
+import main.DateLabelFormatter;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -17,13 +18,14 @@ import preprocessing.Utils;
 import scatterplot.ArticleData;
 import scatterplot.ScatterPlotFactory;
 import style.GlasbeyColors;
+import vis.article.ArticleField;
 import vis.article.ArticleFilter;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.text.Format;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 public class ArticleTSNEMainLogic {
     private ChartPanel articleChart;
@@ -31,10 +33,10 @@ public class ArticleTSNEMainLogic {
     private Map<XYDataItem, ArticleData> parsedCsv;
     private static final String DATA_PATH = "./src/main/data/gastech_data/data/article_tsne.csv";
     private Map<String, Article> articleMap;
+    private final ScatterPlotFactory scFactory = new ScatterPlotFactory();
     public ArticleTSNEMainLogic(Preprocessor preprocessor) {
         makeArticleMap(preprocessor);
-        ScatterPlotFactory scFactory = new ScatterPlotFactory();
-        parsedCsv = scFactory.parseArticleCsv(DATA_PATH);
+        parsedCsv = scFactory.createArticleDataMap(scFactory.calculateArticleTsneInPython());
 
         dataset = scFactory.createArticleTsneDataset(parsedCsv);
 
@@ -54,7 +56,6 @@ public class ArticleTSNEMainLogic {
         addToolTip(parsedCsv, plot);
         articleChart = new ChartPanel(chart);
         articleChart.setInitialDelay(0);
-
     }
 
     private void makeArticleMap(Preprocessor preprocessor) {
@@ -81,6 +82,20 @@ public class ArticleTSNEMainLogic {
      */
     public void updateDataset(java.util.List<ArticleFilter> filters) {
         dataset.removeAllSeries();
+        String startDate = null;
+        String endDate = null;
+        if (filters != null) {
+            for (Object obj : filters) {
+                ArticleFilter filter = (ArticleFilter) obj;
+                if (filter.getField() == ArticleField.DATE) {
+                    Format format = new SimpleDateFormat("yyyy-MM-dd");
+                    startDate = format.format(new Date(filter.getStartDate()));
+                    endDate = format.format(new Date(filter.getEndDate()));
+                    parsedCsv = scFactory.createArticleDataMap(scFactory.calculateArticleTsneInPython(startDate, endDate));
+                }
+            }
+        }
+
         ArrayList<Integer> seenPubIds = new ArrayList<>();
         Map<Integer, XYSeries> xySeries = new HashMap<>();
         for (Map.Entry<XYDataItem, ArticleData> entry : parsedCsv.entrySet()) {
@@ -98,6 +113,18 @@ public class ArticleTSNEMainLogic {
         for (XYSeries xy : xySeries.values()) {
             dataset.addSeries(xy);
         }
+
+        JFreeChart chart = articleChart.getChart();
+        XYPlot plot = (XYPlot) chart.getPlot();
+        // Set background to lighter color
+        plot.setBackgroundPaint(new Color(229, 235, 247));
+        // Hide x and y axis
+        plot.getDomainAxis().setVisible(false);
+        plot.getRangeAxis().setVisible(false);
+
+        addToolTip(parsedCsv, plot);
+        articleChart = new ChartPanel(chart);
+        articleChart.setInitialDelay(0);
     }
 
 
