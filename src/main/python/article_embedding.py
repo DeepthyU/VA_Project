@@ -124,13 +124,13 @@ def main():
 
     vectorized = TfidfVectorizer().fit_transform(articles['content'].tolist())
     embedded = TSNE(learning_rate='auto', random_state=0,
-                    verbose=0, n_jobs=-1,
-                    perplexity=10.).fit_transform(vectorized)
+                    verbose=0, n_jobs=-1, perplexity=10.,
+                    init='random').fit_transform(vectorized)
     embedded = prepare_embeddings(embedded, articles)
 
     if args.out is not None:
         fig = px.scatter(embedded, x='x', y='y', color='publication',
-                         hover_name='title', hover_data=['date'])
+                         hover_name='title', hover_data=['date'],)
         fig.show()
         print(f"Writing out TSNE coordinates to {args.out}...")
         embedded.to_csv(args.out, index=False)
