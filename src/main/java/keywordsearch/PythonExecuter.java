@@ -52,7 +52,7 @@ public class PythonExecuter {
             command[2] = "python";
             command[3] = filename;
 
-            System.arraycopy(params, 0, command, 3, params.length);
+            System.arraycopy(params, 0, command, 4, params.length);
             // Only for Yvan's computer since he put his sklearn install inside a conda env
 //            String[] command = new String[params.length + 6];
 //            command[0] = "conda";
