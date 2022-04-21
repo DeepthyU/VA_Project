@@ -72,18 +72,11 @@ public class ArticleTSNEMainLogic {
     }
 
     public void applyFilters(List filters) {
-        updateDataset(filters);
-        articleChart.getChart().fireChartChanged();
-        articleChart.repaint();
-    }
-
-    /**
-     * Update dataset, grouped by publication, for visualization
-     */
-    public void updateDataset(java.util.List<ArticleFilter> filters) {
         dataset.removeAllSeries();
-        String startDate = null;
-        String endDate = null;
+        String startDate;
+        String endDate;
+
+        // First find the date filter and make a new TSNE based on that filter
         if (filters != null) {
             for (Object obj : filters) {
                 ArticleFilter filter = (ArticleFilter) obj;
@@ -125,8 +118,9 @@ public class ArticleTSNEMainLogic {
         addToolTip(parsedCsv, plot);
         articleChart = new ChartPanel(chart);
         articleChart.setInitialDelay(0);
+        articleChart.getChart().fireChartChanged();
+        articleChart.repaint();
     }
-
 
     private void addToolTip(Map<XYDataItem, ArticleData> parsedCsv, XYPlot plot) {
         // The whole thing below this is to make a tooltip
