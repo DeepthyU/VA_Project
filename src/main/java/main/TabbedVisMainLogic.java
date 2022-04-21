@@ -4,6 +4,7 @@ import main.article.*;
 import main.employee.EmployeeTSNEMainLogic;
 import main.employee.HebMainLogic;
 import org.jfree.chart.ChartPanel;
+import vis.SentimentVisualizer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,7 +14,6 @@ import java.util.Objects;
 public class TabbedVisMainLogic extends JPanel implements ActionListener, MouseWheelListener, MouseMotionListener {
 
     //article tab
-    private SentimentMainLogic sentimentMainLogic;
     private FrequencyVisMainLogic frequencyVisMainLogic;
     private FilterMainLogic filterMainLogic;
     private ArticleAutoVisMainLogic articleAutoVisMainLogic;
@@ -50,7 +50,6 @@ public class TabbedVisMainLogic extends JPanel implements ActionListener, MouseW
     public TabbedVisMainLogic() {
         mainVisPanel = new JTabbedPane();
         initGUI();
-        sentimentMainLogic = new SentimentMainLogic();
         filterMainLogic = new FilterMainLogic();
         frequencyVisMainLogic = new FrequencyVisMainLogic();
         articleAutoVisMainLogic = new ArticleAutoVisMainLogic();
