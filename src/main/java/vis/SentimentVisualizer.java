@@ -1,124 +1,174 @@
 package vis;
 
-import jdk.jshell.execution.Util;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.ListUtils;
-import org.graphstream.graph.Graph;
-import org.graphstream.graph.Node;
-import org.graphstream.ui.swingViewer.Viewer;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.labels.XYToolTipGenerator;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.data.xy.XYDataItem;
+import org.jfree.data.xy.XYDataset;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 import preprocessing.Article;
-import preprocessing.Utils;
+import preprocessing.Preprocessor;
 import vis.article.ArticleFilter;
-import vis.article.MainVisualizer;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.awt.*;
+import java.sql.Timestamp;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-public class SentimentVisualizer extends MainVisualizer {
+public class SentimentVisualizer {
 
-    protected static String styleSheet =
-            "graph {\n" +
-                    " fill-color: white;" +
-                    " fill-mode: plain;"+
-            "}"+
-            "node {	size: 2px, 2px; fill-color: black; } " +
-                    "node.marked { fill-color: red;}" +
-                    "node.positive { fill-color: blue;}" +
-                    "node.negative { fill-color: red;}" +
-                    "edge {\n" +
-                    "\tshape: line;\n" +
-                    "\tarrow-size: 3px, 2px;\n" +
-                    "}" +
-                    "edge.marked {\n" +
-                    "\tshape: line;\n" +
-                    "\tfill-color: red;\n" +
-                    "\tarrow-size: 3px, 2px;\n" +
-                    "}";
+    private XYSeriesCollection dataset;
+    private Map<XYDataItem, Article> tooltipLookup = new HashMap<>();
+    protected Preprocessor preprocessor;
+    private JFreeChart chart;
+    private ChartPanel panel;
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("MMM d, yyyy");
 
-    public void makeGraph(boolean showEdges, boolean doFilter) {
-        Graph graph = prepareGraph(doFilter);
+    public SentimentVisualizer(Preprocessor preprocessor) {
+        this.preprocessor = preprocessor;
+        dataset = new XYSeriesCollection();
 
-        Viewer viewer = graph.display();
-        viewer.disableAutoLayout();
-        if (showEdges) {
-            Node start = graph.getNode(1);
-            Iterator<? extends Node> k = start.getBreadthFirstIterator();
-            Node previous = null;
-            while (k.hasNext()) {
+        for (XYSeries series : createDataSeries(null)) {
+            dataset.addSeries(series);
+        }
 
-                Node next = k.next();
+        chart = ChartFactory.createScatterPlot(
+                "Article Sentiment",
+                "Articles",
+                "Sentiment",
+                dataset
+        );
+        setToolTip();
+        setSeriesPaint();
 
-                next.setAttribute("ui.class", "marked");
-                previous = next;
-                sleep();
+        panel = new ChartPanel(chart);
+        panel.setInitialDelay(0);
+    }
+
+    /**
+     * Creates initial "full" dataset without any filtering. Also, I don't really like methods with side effects
+     * so yeah I wrote it with a return.
+     * @return The negative, neutral, and positive XYSeries in that order
+     */
+    private List<XYSeries> createDataSeries(List<ArticleFilter> filters) {
+        XYSeries seriesNeutral = new XYSeries("neutral");
+        XYSeries seriesNegative = new XYSeries("negative");
+        XYSeries seriesPositive = new XYSeries("positive");
+        tooltipLookup = new HashMap<>();
+
+        for (Article article : preprocessor.getArticleList()) {
+            if (!decideIfArticleShouldBeAdded(article, filters)) continue;
+            double x = article.getxCoordinate();
+            int y = article.getSentimentScore();
+            // Add article to the appropriate series
+            if (y == 0){
+                seriesNeutral.add(x, y);
+            } else if (y < 0) {
+                seriesNegative.add(x, y);
+            } else {
+                seriesPositive.add(x, y);
+            }
+            // Now make the lookup
+            Map<String, Object> info = Map.of(
+                    "fileName", article
+            );
+            tooltipLookup.put(new XYDataItem(x, y), article);
+        }
+        return List.of(seriesNegative, seriesNeutral, seriesPositive);
+    }
+
+    /**
+     * Decides if an article should be added to the dataset based on the given filters
+     * @param article The article that is the object of the judgement
+     * @param filters The filters to be applied
+     * @return
+     */
+    private boolean decideIfArticleShouldBeAdded(Article article, List<ArticleFilter> filters) {
+        if (filters == null) return true;
+
+        for (ArticleFilter filter : filters) {
+            // Go through every filter and cheeck if the article fulfills the filter constraints
+            switch (filter.getField()) {
+                case DATE:
+                    Timestamp startDate = new Timestamp(filter.getStartDate());
+                    Timestamp endDate = new Timestamp(filter.getEndDate());
+                    Timestamp d = article.getDate();
+                    if (!(!d.before(startDate) && !d.after(endDate))) return false;
+                    break;
+                case PLACE:
+                    if (!filter.getSelectedValues().contains(article.getPlace())) return false;
+                    break;
+                case AUTHOR:
+                    if (!filter.getSelectedValues().contains(article.getAuthor())) return false;
+                    break;
+                case KEYWORD:
+                    Set<String> result = article.getKeywordsList().stream()
+                            .distinct()
+                            .filter(filter.getSelectedValues()::contains)
+                            .collect(Collectors.toSet());
+                    if (result.isEmpty()) return false;
+                    break;
+                case PUBLICATION:
+                    if (!filter.getSelectedValues().contains(article.getPublication())) return false;
+                    break;
             }
         }
-        System.out.println("DONE");
+        return true;
     }
 
-    public Graph prepareGraph(boolean doFilter) {
-        Graph graph = initGraph(styleSheet);
-        drawGraph(doFilter, graph);
-        return graph;
-    }
-
-    public void drawGraph(boolean doFilter, Graph graph) {
-        List<ArticleFilter> filters = new ArrayList<>();
-        if (doFilter) {
-            filters = getFilters();
+    /**
+     * Method to apply filters to the currently loaded dataset.
+     * @param filters New set of filters to filter the full dataset on
+     */
+    public void applyFilters(List<ArticleFilter> filters) {
+        System.out.println("DEBUG: Dataset update called");
+        dataset.removeAllSeries();
+        for (XYSeries series : createDataSeries(filters)) {
+            dataset.addSeries(series);
         }
-        System.out.println("article list size is " + PREPROCESSOR.getArticleList().size());
-        List<Article> currList = new ArrayList<>();
-        for (Article article : PREPROCESSOR.getArticleList()) {
-            if (Utils.isRemoveItem(filters, article)) {
-                continue;
+        setToolTip();
+        setSeriesPaint();
+    }
+    private XYToolTipGenerator createToolTipGenerator() {
+        return new XYToolTipGenerator() {
+            @Override
+            public String generateToolTip(XYDataset dataset, int series, int item) {
+                XYDataItem dataItem = new XYDataItem(dataset.getX(series, item), dataset.getY(series, item));
+                Article article = tooltipLookup.get(dataItem);
+                String title = article.getTitle();
+                String publication = article.getPublication();
+                String date = article.getDate().toLocalDateTime().format(FORMATTER);
+                String filename = article.getFileName();
+                return String.format("<html><p><b>%s</b></p>", title) +
+                        String.format("<p>%s</p>", publication) +
+                        String.format("<p>%s</p>", date) +
+                        String.format("<p>filename: %s</p>", filename) +
+                        "</html>";
             }
-            currList.add(article);
-            Node node = graph.addNode(article.getFileName());
-
-            node.setAttribute("xy", article.getxCoordinate(), article.getSentimentScore() * 100);
-            node.setAttribute("title", article.getTitle());
-            node.setAttribute("sentiment", article.getSentimentScore());
-            node.setAttribute("publication", article.getPublication());
-            if (article.getSentimentScore() < 0) {
-                node.setAttribute("ui.class", "negative");
-            } else if (article.getSentimentScore() > 0) {
-                node.setAttribute("ui.class", "positive");
-            }
-        }
-        System.out.println("Remaining articles after filtering:" + currList.size());
+        };
+    }
+    private void setToolTip() {
+        XYPlot plot = (XYPlot) chart.getPlot();
+        XYItemRenderer renderer = plot.getRenderer();
+        renderer.setDefaultToolTipGenerator(createToolTipGenerator());
+    }
+    private void setSeriesPaint() {
+        XYPlot plot = (XYPlot) chart.getPlot();
+        XYItemRenderer renderer = plot.getRenderer();
+        renderer.setSeriesPaint(0, new Color(255, 193, 7));
+        renderer.setSeriesPaint(1, new Color(50, 50, 50));
+        renderer.setSeriesPaint(2, new Color(30, 136, 229));
     }
 
-
-
-    public void drawGraph(List<ArticleFilter> filters, Graph graph) {
-        System.out.println("article list size is " + PREPROCESSOR.getArticleList().size());
-        List<Article> currList = new ArrayList<>();
-        for (Article article : PREPROCESSOR.getArticleList()) {
-            if (Utils.isRemoveItem(filters, article)) {
-                continue;
-            }
-            currList.add(article);
-            Node node = graph.addNode(article.getFileName());
-
-            node.setAttribute("xy", article.getxCoordinate(), article.getSentimentScore() * 100);
-            node.setAttribute("title", article.getTitle());
-            node.setAttribute("sentiment", article.getSentimentScore());
-            node.setAttribute("publication", article.getPublication());
-            if (article.getSentimentScore() < 0) {
-                node.setAttribute("ui.class", "negative");
-            } else if (article.getSentimentScore() > 0) {
-                node.setAttribute("ui.class", "positive");
-            }
-        }
-        System.out.println("Remaining articles after filtering:" + currList.size());
+    public ChartPanel getPanel() {
+        return panel;
     }
-
-    //TODO: zoom https://stackoverflow.com/questions/44675827/how-to-zoom-into-a-graphstream-view
-    public static void main(String args[]) {
-        SentimentVisualizer sv = new SentimentVisualizer();
-        sv.makeGraph(false, true);
-    }
-
 }
