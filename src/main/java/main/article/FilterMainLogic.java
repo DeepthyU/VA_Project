@@ -22,7 +22,7 @@ public class FilterMainLogic {
 
     private static Preprocessor PREPROCESSOR = new Preprocessor();
     private JButton unselectAllKeywordCbs, unselectAllPlaceCbs, unselectAllAuthorCbs, unselectAllPublicationCbs;
-    private JToggleButton includeEmptyAuthorFilter, includeEmptyPlaceFilter, includeEmptyPublicationFilter;
+    private JRadioButton includeEmptyAuthorFilter, includeEmptyPlaceFilter, includeEmptyPublicationFilter;
 
     private List<JCheckBox> keywordsCbList = new ArrayList<>();
     private List<JCheckBox> placeCbList = new ArrayList<>();
@@ -62,7 +62,7 @@ public class FilterMainLogic {
         addKeyword = new JButton("ADD");
         //////////////////////////////////////////////////////////////
         unselectAllPlaceCbs = new JButton("Unselect All Place");
-        includeEmptyPlaceFilter = new JToggleButton("Include emtpy values");
+        includeEmptyPlaceFilter = new JRadioButton("Include emtpy values");
         includeEmptyPlaceFilter.setSelected(true);
         placeCombo = new JComboBox(new Preprocessor().getPlaces().toArray());
         // has to be editable
@@ -72,7 +72,7 @@ public class FilterMainLogic {
         addPlace = new JButton("ADD");
         ////////////////////////////////////////////////////////////////////////
         unselectAllAuthorCbs = new JButton("Unselect All Author");
-        includeEmptyAuthorFilter = new JToggleButton("Include emtpy values");
+        includeEmptyAuthorFilter = new JRadioButton("Include emtpy values");
         includeEmptyAuthorFilter.setSelected(true);
         authorCombo = new JComboBox(new Preprocessor().getAuthors().toArray());
         // has to be editable
@@ -82,7 +82,7 @@ public class FilterMainLogic {
         addAuthor = new JButton("ADD");
         /////////////////////////////////////////////////////////////
         unselectAllPublicationCbs = new JButton("Unselect All Publication");
-        includeEmptyPublicationFilter = new JToggleButton("Include emtpy values");
+        includeEmptyPublicationFilter = new JRadioButton("Include emtpy values");
         includeEmptyPublicationFilter.setSelected(true);
         publicationCombo = new JComboBox(new Preprocessor().getPublications().toArray());
         // has to be editable
@@ -276,9 +276,9 @@ public class FilterMainLogic {
         unselectAllPublicationCbs.addActionListener(new UnselectAllActionListener(publicationCbList));
         unselectAllAuthorCbs.addActionListener(new UnselectAllActionListener(authorCbList));
         unselectAllPlaceCbs.addActionListener(new UnselectAllActionListener(placeCbList));
-        includeEmptyPlaceFilter.addActionListener(new IncludeEmptyButtonActionListener(includeEmptyPlace));
-        includeEmptyPublicationFilter.addActionListener(new IncludeEmptyButtonActionListener(includeEmptyPublication));
-        includeEmptyAuthorFilter.addActionListener(new IncludeEmptyButtonActionListener(includeEmptyAuthor));
+        includeEmptyPlaceFilter.addActionListener(new IncludeEmptyButtonActionListener(includeEmptyPlaceFilter, includeEmptyPlace));
+        includeEmptyPublicationFilter.addActionListener(new IncludeEmptyButtonActionListener(includeEmptyPublicationFilter, includeEmptyPublication));
+        includeEmptyAuthorFilter.addActionListener(new IncludeEmptyButtonActionListener(includeEmptyAuthorFilter, includeEmptyAuthor));
         addKeyword.addActionListener(new AddKeywordButtonActionListener());
         addAuthor.addActionListener(new AddButtonActionListener(authorCombo, authorCbList));
         addPlace.addActionListener(new AddButtonActionListener(placeCombo, placeCbList));
@@ -352,15 +352,19 @@ public class FilterMainLogic {
     }
 
     class IncludeEmptyButtonActionListener implements ActionListener {
+        private JRadioButton radioButton;
         private AtomicBoolean include;
 
-        public IncludeEmptyButtonActionListener(AtomicBoolean include) {
+        public IncludeEmptyButtonActionListener(JRadioButton radioButton, AtomicBoolean include) {
+            this.radioButton = radioButton;
             this.include = include;
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             include.set(!include.get());
+            this.radioButton.setSelected(include.get());
+
         }
 
     }
