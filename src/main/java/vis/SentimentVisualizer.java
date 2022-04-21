@@ -1,5 +1,6 @@
 package vis;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -17,14 +18,11 @@ import vis.article.ArticleFilter;
 import java.awt.*;
 import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class SentimentVisualizer {
-
     private XYSeriesCollection dataset;
     private Map<XYDataItem, Article> tooltipLookup = new HashMap<>();
     protected Preprocessor preprocessor;
@@ -48,6 +46,12 @@ public class SentimentVisualizer {
         );
         setToolTip();
         setSeriesPaint();
+
+        XYPlot plot = (XYPlot) chart.getPlot();
+        plot.setBackgroundPaint(new Color(229, 235, 247));
+        // Hide x and y axis
+        plot.getDomainAxis().setVisible(false);
+        plot.getRangeAxis().setVisible(false);
 
         panel = new ChartPanel(chart);
         panel.setInitialDelay(0);
@@ -89,25 +93,37 @@ public class SentimentVisualizer {
      * Decides if an article should be added to the dataset based on the given filters
      * @param article The article that is the object of the judgement
      * @param filters The filters to be applied
-     * @return
+     * @return True if the article fulfills the constraints of the given filters
      */
     private boolean decideIfArticleShouldBeAdded(Article article, List<ArticleFilter> filters) {
+
         if (filters == null) return true;
 
         for (ArticleFilter filter : filters) {
             // Go through every filter and cheeck if the article fulfills the filter constraints
             switch (filter.getField()) {
                 case DATE:
-                    Timestamp startDate = new Timestamp(filter.getStartDate());
-                    Timestamp endDate = new Timestamp(filter.getEndDate());
+                    // Why does java have so many date classes I swear to god and with so many object conversions it's
+                    // horrible but whatever
+                    Timestamp startDate = new Timestamp(DateUtils.truncate(new Timestamp(filter.getStartDate()), Calendar.DATE).getTime());
+                    Timestamp endDate = new Timestamp(DateUtils.ceiling(new Timestamp(filter.getEndDate()), Calendar.DATE).getTime());
                     Timestamp d = article.getDate();
                     if (!(!d.before(startDate) && !d.after(endDate))) return false;
                     break;
                 case PLACE:
-                    if (!filter.getSelectedValues().contains(article.getPlace())) return false;
+                    if (notInFilter(filter.getSelectedValues(), article.getPlace(), filter.isKeepEmptyValue())) {
+                        return false;
+                    }
                     break;
                 case AUTHOR:
-                    if (!filter.getSelectedValues().contains(article.getAuthor())) return false;
+                    if (notInFilter(filter.getSelectedValues(), article.getAuthor(), filter.isKeepEmptyValue())) {
+                        return false;
+                    }
+                    break;
+                case PUBLICATION:
+                    if (notInFilter(filter.getSelectedValues(), article.getPublication(), filter.isKeepEmptyValue())) {
+                        return false;
+                    }
                     break;
                 case KEYWORD:
                     Set<String> result = article.getKeywordsList().stream()
@@ -116,12 +132,32 @@ public class SentimentVisualizer {
                             .collect(Collectors.toSet());
                     if (result.isEmpty()) return false;
                     break;
-                case PUBLICATION:
-                    if (!filter.getSelectedValues().contains(article.getPublication())) return false;
-                    break;
             }
         }
         return true;
+    }
+
+    /**
+     * For filtering, we sometimes need to check against null, blank, or empty values. All of these basically have
+     * the same checks in place so we refactor those lines out to a single method.
+     * @param selectedValues List of values that we want to check against
+     * @param other The value with want to check
+     * @param keepEmptyValue Whether or not to return true if other was null, blank, or empty
+     * @return Whether or not other was in the filter, keeping in mind the keepEmptyValue argument
+     */
+    private boolean notInFilter(List<String> selectedValues, String other, boolean keepEmptyValue) {
+        String otherLower;
+        try {
+            otherLower = other.toLowerCase();
+            if (selectedValues.contains(otherLower)) {
+                return false;
+            } else {
+                return !otherLower.isBlank() || !keepEmptyValue;
+            }
+        } catch (NullPointerException e) {
+            // Then the value was null. We then return keepEmptyValue
+            return !keepEmptyValue;
+        }
     }
 
     /**
