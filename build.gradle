@@ -28,10 +28,6 @@ repositories {
 
 }
 
-compileJava {
-    options.release = 15
-}
-
 allprojects {
     repositories {
         maven { url 'https://jitpack.io' }
