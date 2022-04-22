@@ -15,7 +15,7 @@ import java.util.List;
 
 public class WordCloudMainLogic {
 
-    public static final String DEFAULT_ARTICLE_WORD_CLOUD = VisualizerPrefs.getInstance().getRootPath().resolve("articleWordCloud.png").toString();
+    public static final String DEFAULT_ARTICLE_WORD_CLOUD = VisualizerPrefs.getInstance().getDataDirPath().resolve("articleWordCloud.png").toString();
     private ZoomablePicturePanel panel;
     private static Preprocessor PREPROCESSOR;
 
@@ -51,7 +51,7 @@ public class WordCloudMainLogic {
         String outFileName = Utils.readAndDeleteFile("wcpythonOut.txt", Charset.defaultCharset());
         BufferedImage data = Utils.readAndDeleteImageFile(outFileName + ".png");
         if (null == data){
-            data = Utils.readAndDeleteImageFile(DEFAULT_ARTICLE_WORD_CLOUD);
+            data = Utils.readImageFile(DEFAULT_ARTICLE_WORD_CLOUD);
         }
         Utils.deleteFile("search_text_for_wc.txt");
         return data;
