@@ -7,8 +7,8 @@ import java.nio.file.Paths;
 public class VisualizerPrefs {
     private static final VisualizerPrefs instance = new VisualizerPrefs();
     private String[] pythonExecutable = {"conda", "run", "python3"};
-    private Path rootPath = Paths.get(".");
-    private Path dataDirPath = Paths.get("src", "data", "gastech_data", "data");
+    private Path rootPath = Paths.get("").toAbsolutePath();
+    private Path dataDirPath = Paths.get("src", "main", "data", "gastech_data", "data");
 
     /**
      * Singleton class holding all preferences that might be needed by the visualizer.
@@ -31,7 +31,16 @@ public class VisualizerPrefs {
      * @param pythonExecutable Array of strings representing the command to be run.
      */
     public void setPythonExecutable(String[] pythonExecutable) {
-        this.pythonExecutable = pythonExecutable;
+        if (pythonExecutable.length == 1) {
+            String[] command = pythonExecutable[0].split("\\s+");
+            if (command.length > 1) {
+                this.pythonExecutable = command;
+            } else {
+                this.pythonExecutable = pythonExecutable;
+            }
+        } else {
+            this.pythonExecutable = pythonExecutable;
+        }
     }
     /**
      * Accesses the set data directory path.
@@ -68,6 +77,6 @@ public class VisualizerPrefs {
      * @param rootPath Path to the project root.
      */
     public void setRootPath(Path rootPath) {
-        this.rootPath = rootPath;
+        this.rootPath = rootPath.toAbsolutePath();
     }
 }

@@ -9,7 +9,7 @@ import java.nio.charset.Charset;
 
 public class HebMainLogic {
 
-    private static final String DATA_PATH= VisualizerPrefs.getInstance().getFullDataDirPath().resolve("/adjacency.json").toString();
+    private static final String DATA_PATH= VisualizerPrefs.getInstance().getFullDataDirPath().resolve("adjacency.json").toString();
     private HebFrame panel;
     public HebMainLogic()
     {
