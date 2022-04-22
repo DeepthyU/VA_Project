@@ -1,8 +1,10 @@
-# VA_Project
-VA project to analyse GasTech missing employee data
+# Visual Analytics Project
 
+Our Visual Analytics tool to help in the case of missing employees from GAStech.
+This is the product of Group 15 consiting of Oana Radu, Deepthy Unnikrishnan, Yvan Putra Satyawan.
 
-To build:
+## Building
+
 1. Install wordcloud and related package in conda:
     `conda install -c conda-forge wordcloud scikit-learn pandas numpy plotly gensim matplotlib`
 2. Install scikit-learn package in conda:
@@ -10,6 +12,8 @@ To build:
    `conda install -c plotly plotly`
 3. set `conda path` in environment variables.
 4. run `gradlew clean build` from project root path.
+
+## Running
 
 Use the command `java -jar build/libs/shadow.jar` to open the visualization tool.
 
