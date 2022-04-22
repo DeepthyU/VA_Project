@@ -1,5 +1,6 @@
 package vis;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -147,7 +148,7 @@ public class SentimentVisualizer {
      */
     private boolean notInFilter(List<String> selectedValues, String other, boolean keepEmptyValue) {
         String otherLower;
-        otherLower = other.isBlank() ? "" : other.toLowerCase();
+        otherLower = StringUtils.isBlank(other) ? "" : other.toLowerCase();
         if (selectedValues.contains(otherLower)) {
             return false;
         } else {
