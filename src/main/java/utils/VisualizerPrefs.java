@@ -6,7 +6,7 @@ import java.nio.file.Paths;
 
 public class VisualizerPrefs {
     private static final VisualizerPrefs instance = new VisualizerPrefs();
-    private String[] pythonExecutable = {"conda", "run", "python3"};
+    private String[] pythonExecutable = {"conda", "run", "python"};
     private Path rootPath = Paths.get("").toAbsolutePath();
     private Path dataDirPath = Paths.get("src", "main", "data", "gastech_data", "data");
 
