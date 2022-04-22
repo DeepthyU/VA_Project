@@ -147,16 +147,11 @@ public class SentimentVisualizer {
      */
     private boolean notInFilter(List<String> selectedValues, String other, boolean keepEmptyValue) {
         String otherLower;
-        try {
-            otherLower = other.toLowerCase();
-            if (selectedValues.contains(otherLower)) {
-                return false;
-            } else {
-                return !otherLower.isBlank() || !keepEmptyValue;
-            }
-        } catch (NullPointerException e) {
-            // Then the value was null. We then return keepEmptyValue
-            return !keepEmptyValue;
+        otherLower = other.isBlank() ? "" : other.toLowerCase();
+        if (selectedValues.contains(otherLower)) {
+            return false;
+        } else {
+            return !otherLower.isBlank() || !keepEmptyValue;
         }
     }
 
