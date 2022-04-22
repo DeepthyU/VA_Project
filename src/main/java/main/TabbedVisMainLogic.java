@@ -274,7 +274,7 @@ public class TabbedVisMainLogic extends JPanel implements ActionListener, MouseW
         datePanel = new JPanel();
         String[] dateStrings = {
                 "January 6, 2014", "January 7, 2014", "January 8, 2014", "January 9, 2014",
-                "January 10, 2014", "January 13, 2014", "January 14, 2014", "January 15, 2015",
+                "January 10, 2014", "January 13, 2014", "January 14, 2014", "January 15, 2014",
                 "January 16, 2014", "January 17, 2014"
         };
         // Start Date Filter Picker
