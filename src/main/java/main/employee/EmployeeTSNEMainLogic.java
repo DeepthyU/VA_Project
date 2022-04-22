@@ -10,13 +10,14 @@ import org.jfree.data.xy.XYSeriesCollection;
 import scatterplot.DataValue;
 import scatterplot.ScatterPlotFactory;
 import style.EmailColors;
+import utils.VisualizerPrefs;
 
 import java.util.Map;
 
 public class EmployeeTSNEMainLogic {
     ChartPanel emailPlot;
     ScatterPlotFactory scFactory = new ScatterPlotFactory();
-    private static final String DATA_PATH= "./src/main/data/gastech_data/data/email_tsne";
+    private static final String DATA_PATH = VisualizerPrefs.getInstance().getFullDataDirPath().resolve("email_tsne").toString();
     public EmployeeTSNEMainLogic()
     {
         emailPlot = scFactory.getEmailClusteringPlot(DATA_PATH);

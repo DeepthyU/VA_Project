@@ -156,8 +156,6 @@ public class LineGraphMainLogic {
         System.out.println("Remaining articles = " + remainingArticlesCount);
         return startDate;
     }
-
-
     private static void clearKeyCount() {
         for (int[] ints : keywordCount) {
             Arrays.fill(ints, -1);

@@ -2,13 +2,14 @@ package main.employee;
 
 import hierarchicaledgebundling.HebFrame;
 import preprocessing.Utils;
+import utils.VisualizerPrefs;
 
 import javax.swing.*;
 import java.nio.charset.Charset;
 
 public class HebMainLogic {
 
-    private static final String DATA_PATH= "./src/main/data/gastech_data/data/adjacency.json";
+    private static final String DATA_PATH= VisualizerPrefs.getInstance().getFullDataDirPath().resolve("adjacency.json").toString();
     private HebFrame panel;
     public HebMainLogic()
     {

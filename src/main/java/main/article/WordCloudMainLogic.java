@@ -4,6 +4,7 @@ import keywordsearch.PythonExecuter;
 import preprocessing.Article;
 import preprocessing.Preprocessor;
 import preprocessing.Utils;
+import utils.VisualizerPrefs;
 import vis.ZoomablePicturePanel;
 import vis.article.ArticleFilter;
 
@@ -15,7 +16,7 @@ import java.util.List;
 
 public class WordCloudMainLogic {
 
-    public static final String DEFAULT_ARTICLE_WORD_CLOUD = "articleWordCloud.png";
+    public static final String DEFAULT_ARTICLE_WORD_CLOUD = VisualizerPrefs.getInstance().getRootPath().resolve("articleWordCloud.png").toString();
     private ZoomablePicturePanel panel;
     private static Preprocessor PREPROCESSOR;
 

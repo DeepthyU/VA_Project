@@ -1,5 +1,7 @@
 package hierarchicaledgebundling;
 
+import utils.VisualizerPrefs;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
@@ -12,7 +14,7 @@ public class Main {
 
         String data = null;
         try {
-            File file = new File("./src/main/data/gastech_data/data/adjacency.json");
+            File file = VisualizerPrefs.getInstance().getFullDataDirPath().resolve("adjacency.json").toFile();
             Scanner reader = new Scanner(file);
             while (reader.hasNextLine()) {
                 data = reader.nextLine();
