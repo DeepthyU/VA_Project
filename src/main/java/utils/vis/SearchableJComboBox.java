@@ -1,5 +1,5 @@
 /**
- * Code taken from http://www.orbital-computer.de/JComboBox/
+ * Taken from <a href="http://www.orbital-computer.de/JComboBox/">label</a>
  */
 package utils.vis;
 

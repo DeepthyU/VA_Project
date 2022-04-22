@@ -1,6 +1,7 @@
 /**
- * Taken from https://github.com/Thanasis1101/Zoomable-Java-Panel
+ * Taken from <a href="https://github.com/Thanasis1101/Zoomable-Java-Panel">label</a>
  */
+
 package utils.vis;
 
 import javax.swing.*;
