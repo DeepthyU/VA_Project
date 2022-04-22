@@ -31,7 +31,6 @@ public class ArticleTSNEMainLogic {
     private ChartPanel articleChart;
     private XYSeriesCollection dataset;
     private Map<XYDataItem, ArticleData> parsedCsv;
-    private static final String DATA_PATH = "./src/main/data/gastech_data/data/article_tsne.csv";
     private Map<String, Article> articleMap;
     private final ScatterPlotFactory scFactory = new ScatterPlotFactory();
     public ArticleTSNEMainLogic(Preprocessor preprocessor) {

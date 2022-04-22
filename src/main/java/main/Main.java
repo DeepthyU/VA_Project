@@ -5,8 +5,8 @@ import javax.swing.*;
 public class Main {
 
 	public static void main(String[] args) {
-		//This is what is run when the program
-		//All of the code for the GUI is in ControlUI
+		// This is what is run when the program is launched
+		// All of the code for the GUI is in ControlUI
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {

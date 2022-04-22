@@ -4,19 +4,21 @@ import keywordsearch.KeywordFinder;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import sentimentAnalysis.SentimentAnalysis;
+import utils.VisualizerPrefs;
 
 import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class Preprocessor {
-    public static final String ARTICLE_LIST_FILE_PATH = "article_list.json";
-    private static final String ARTICLES_PATH = "./src/main/data/gastech_data/data/articles/";
-    private static final String HISTORIC_DOCS_PATH = "./src/main/data/gastech_data/data/HistoricalDocuments/txt versions";
+    public static final String ARTICLE_LIST_FILE_PATH = VisualizerPrefs.getInstance().getRootPath().resolve("article_list.json").toString();
+    private static final String ARTICLES_PATH = VisualizerPrefs.getInstance().getFullDataDirPath().toString();
+    private static final String HISTORIC_DOCS_PATH = VisualizerPrefs.getInstance().getFullDataDirPath().resolve("HistoricalDocuments/txt versions").toString();
     private List<Article> articleList;
     private static final String HISTORY = Utils.getText(HISTORIC_DOCS_PATH);
     private List<String> keywordsList;
