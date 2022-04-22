@@ -5,8 +5,8 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import vis.article.ArticleField;
-import vis.article.ArticleFilter;
+import main.article.ArticleField;
+import main.article.ArticleFilter;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

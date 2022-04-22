@@ -1,5 +1,6 @@
-package vis;
+package main.article;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -13,7 +14,6 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import preprocessing.Article;
 import preprocessing.Preprocessor;
-import vis.article.ArticleFilter;
 
 import java.awt.*;
 import java.sql.Timestamp;
@@ -22,7 +22,7 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SentimentVisualizer {
+public class SentimentMainLogic {
     private XYSeriesCollection dataset;
     private Map<XYDataItem, Article> tooltipLookup = new HashMap<>();
     protected Preprocessor preprocessor;
@@ -30,7 +30,7 @@ public class SentimentVisualizer {
     private ChartPanel panel;
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("MMM d, yyyy");
 
-    public SentimentVisualizer(Preprocessor preprocessor) {
+    public SentimentMainLogic(Preprocessor preprocessor) {
         this.preprocessor = preprocessor;
         dataset = new XYSeriesCollection();
 
@@ -67,7 +67,7 @@ public class SentimentVisualizer {
         XYSeries seriesNegative = new XYSeries("negative");
         XYSeries seriesPositive = new XYSeries("positive");
         tooltipLookup = new HashMap<>();
-
+        int counter =0;
         for (Article article : preprocessor.getArticleList()) {
             if (!decideIfArticleShouldBeAdded(article, filters)) continue;
             double x = article.getxCoordinate();
@@ -85,7 +85,9 @@ public class SentimentVisualizer {
                     "fileName", article
             );
             tooltipLookup.put(new XYDataItem(x, y), article);
+            counter++;
         }
+        System.out.println("DEBUG: Sentiment filter count:"+counter);
         return List.of(seriesNegative, seriesNeutral, seriesPositive);
     }
 
@@ -147,7 +149,7 @@ public class SentimentVisualizer {
      */
     private boolean notInFilter(List<String> selectedValues, String other, boolean keepEmptyValue) {
         String otherLower;
-        otherLower = other.isBlank() ? "" : other.toLowerCase();
+        otherLower = StringUtils.isBlank(other) ? "" : other.toLowerCase();
         if (selectedValues.contains(otherLower)) {
             return false;
         } else {

@@ -1,12 +1,11 @@
 package main.article;
 
-import keywordsearch.PythonExecuter;
+import utils.PythonExecuter;
 import preprocessing.Article;
 import preprocessing.Preprocessor;
 import preprocessing.Utils;
 import utils.VisualizerPrefs;
-import vis.ZoomablePicturePanel;
-import vis.article.ArticleFilter;
+import utils.vis.ZoomablePicturePanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -48,12 +47,13 @@ public class WordCloudMainLogic {
         String searchText = getSearchText(filters);
         Utils.writeFile("search_text_for_wc.txt", searchText);
         PythonExecuter executer = new PythonExecuter();
-        executer.runWordCloudScript("word_cloud.py", new String[]{"search_text_for_wc.txt", "0.05"}, "wc");
+        executer.runWordCloudScript("./src/main/python/word_cloud.py", new String[]{"search_text_for_wc.txt", "0.05"}, "wc");
         String outFileName = Utils.readAndDeleteFile("wcpythonOut.txt", Charset.defaultCharset());
         BufferedImage data = Utils.readAndDeleteImageFile(outFileName + ".png");
         if (null == data){
             data = Utils.readAndDeleteImageFile(DEFAULT_ARTICLE_WORD_CLOUD);
         }
+        Utils.deleteFile("search_text_for_wc.txt");
         return data;
     }
 

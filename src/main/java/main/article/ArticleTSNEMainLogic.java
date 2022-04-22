@@ -1,6 +1,5 @@
 package main.article;
 
-import main.DateLabelFormatter;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -18,8 +17,6 @@ import preprocessing.Utils;
 import scatterplot.ArticleData;
 import scatterplot.ScatterPlotFactory;
 import style.GlasbeyColors;
-import vis.article.ArticleField;
-import vis.article.ArticleFilter;
 
 import java.awt.*;
 import java.text.Format;

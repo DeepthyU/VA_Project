@@ -16,7 +16,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class Preprocessor {
-    public static final String ARTICLE_LIST_FILE_PATH = VisualizerPrefs.getInstance().getRootPath().resolve("article_list.json").toString();
+    public static final String ARTICLE_LIST_FILE_PATH = VisualizerPrefs.getInstance().getFullDataDirPath().resolve("article_list.json").toString();
     private static final String ARTICLES_PATH = VisualizerPrefs.getInstance().getFullDataDirPath().resolve("articles").toString();
     private static final String HISTORIC_DOCS_PATH = VisualizerPrefs.getInstance().getFullDataDirPath().resolve("HistoricalDocuments/txt versions").toString();
     private List<Article> articleList;
@@ -40,7 +40,6 @@ public class Preprocessor {
         } else {
             kf = new KeywordFinder(articleList, HISTORY);
             keywordsList = new ArrayList<>(Arrays.asList(kf.getKeywordsArr()));
-            System.out.println("Keywords:" + StringUtils.join(keywordsList, ", "));
         }
         places = articleList.stream().map(Article::getPlace).distinct().filter(Objects::nonNull)
                 .filter(Predicate.not(String::isBlank)).collect(Collectors.toList());

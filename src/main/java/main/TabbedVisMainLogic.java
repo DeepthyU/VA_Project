@@ -4,7 +4,6 @@ import main.article.*;
 import main.employee.EmployeeTSNEMainLogic;
 import main.employee.HebMainLogic;
 import org.jfree.chart.ChartPanel;
-import vis.SentimentVisualizer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -41,7 +40,7 @@ public class TabbedVisMainLogic extends JPanel implements ActionListener, MouseW
     private JPanel hebPanel;
     private ChartPanel empTSNEChart;
     private JSplitPane empVisPanel;
-    private GraphUIProperty gUIProp;
+    private GUIProperty gUIProp;
 
     private int frm_width, frm_height;
     private int ctrl_width, ctrl_height;
@@ -128,7 +127,7 @@ public class TabbedVisMainLogic extends JPanel implements ActionListener, MouseW
         ctrl_height = (int) (0.2 * (double) screen_dim.height);
 
         // Initialize graph UI property object to pass to sim
-        gUIProp = new GraphUIProperty();
+        gUIProp = new GUIProperty();
         gUIProp.height = screen_dim.height - 100;
         gUIProp.width = screen_dim.width - ctrl_width;
         gUIProp.posx = 0;
@@ -216,15 +215,7 @@ public class TabbedVisMainLogic extends JPanel implements ActionListener, MouseW
     /**
      * Function to load graph and create graph listener
      */
-    NodeClickListener clisten = null;
-
     public void loadGraph(java.util.List articleFilterList) {
-
-        // close event listener for mouse first before removing view
-        // in next step
-        if (clisten != null) {
-            clisten.viewClosed(null);
-        }
         // Remove view if exists
         if (autoPanel != null) {
             articleVisPanel.remove(autoPanel);

@@ -2,7 +2,7 @@ package scatterplot;
 
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
-import keywordsearch.PythonExecuter;
+import utils.PythonExecuter;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -16,6 +16,7 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import style.EmailColors;
 import style.GlasbeyColors;
+import utils.VisualizerPrefs;
 
 import java.awt.*;
 import java.io.FileNotFoundException;
@@ -199,8 +200,9 @@ public class ScatterPlotFactory {
 
     public ArrayList<String[]> calculateArticleTsneInPython(String startDate, String endDate) {
         PythonExecuter executer = new PythonExecuter();
+
         String[] commandParams = {
-                "./article_list.json",
+                VisualizerPrefs.getInstance().getFullDataDirPath().resolve("article_list.json").toString(),
                 "--start",
                 startDate,
                 "--end",
@@ -211,7 +213,7 @@ public class ScatterPlotFactory {
     public ArrayList<String[]> calculateArticleTsneInPython() {
         PythonExecuter executer = new PythonExecuter();
         String[] commandParams = {
-                "./article_list.json"
+                VisualizerPrefs.getInstance().getFullDataDirPath().resolve("article_list.json").toString()
         };
         return executer.runArticleTsne("./src/main/python/article_embedding.py", commandParams);
     }

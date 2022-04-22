@@ -5,8 +5,8 @@ package main;
  * @author brandon
  *
  */
-public class GraphUIProperty {
-	public GraphUIProperty(){} 
+public class GUIProperty {
+	public GUIProperty(){}
 
 	public int width;
 	public int height;

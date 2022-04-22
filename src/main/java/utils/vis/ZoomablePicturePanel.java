@@ -1,19 +1,19 @@
-package vis;
+/**
+ * Taken from https://github.com/Thanasis1101/Zoomable-Java-Panel
+ */
+package utils.vis;
 
-import preprocessing.Utils;
-
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.MouseInfo;
-import java.awt.Point;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import javax.swing.*;
+
+/**
+ *
+ * @author Thanasis1101
+ * @version 1.0
+ */
 
 public class ZoomablePicturePanel extends JPanel implements MouseWheelListener, MouseListener, MouseMotionListener {
 
@@ -149,11 +149,4 @@ public class ZoomablePicturePanel extends JPanel implements MouseWheelListener, 
 
     }
 
-    public static void main(String[] args) {
-        JFrame jFrame = new JFrame();
-        BufferedImage image  = Utils.readImageFile("historic.png");
-        ZoomablePicturePanel panel = new ZoomablePicturePanel(image);
-        jFrame.add(panel);
-        jFrame.setVisible(true);
-    }
 }

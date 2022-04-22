@@ -6,9 +6,7 @@ import net.sourceforge.jdatepicker.impl.JDatePickerImpl;
 import net.sourceforge.jdatepicker.impl.UtilDateModel;
 import org.apache.commons.lang3.StringUtils;
 import preprocessing.Preprocessor;
-import vis.SearchableJComboBox;
-import vis.article.ArticleField;
-import vis.article.ArticleFilter;
+import utils.vis.SearchableJComboBox;
 
 import javax.swing.*;
 import java.awt.*;

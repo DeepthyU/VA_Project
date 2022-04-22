@@ -1,4 +1,4 @@
-package keywordsearch;
+package utils;
 
 import com.opencsv.CSVReader;
 import utils.VisualizerPrefs;
@@ -11,7 +11,7 @@ public class PythonExecuter {
     public void runWordCloudScript(String filename, String[] params, String identifier) {
         try {
             Runtime RT = Runtime.getRuntime();
-            System.out.println("INFO: run python script");
+            System.out.println("INFO: run python script for WordCloudScript");
 
             // Create command array by concatenating pythonCommand + filename + params
             String[] command = concatCommandArray(filename, params);
@@ -46,7 +46,7 @@ public class PythonExecuter {
         try {
             // Setup executor and commands
             Runtime RT = Runtime.getRuntime();
-            System.out.println("INFO: run python script");
+            System.out.println("INFO: run python script for ArticleTsne");
             String[] command = concatCommandArray(filename, params);
 
             // Actually execute

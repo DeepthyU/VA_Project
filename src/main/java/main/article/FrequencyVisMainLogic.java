@@ -44,8 +44,10 @@ public class FrequencyVisMainLogic {
     }
 
     public void applyFilters(List filters){
+        if (null != filters) {
             lineGraphMainLogic.applyFilters(filters);
             wordCloudMainLogic.applyFilters(filters);
+        }
     }
     public JTabbedPane getPane() {
         return mainFrequencyPanel;

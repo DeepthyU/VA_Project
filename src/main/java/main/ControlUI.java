@@ -17,7 +17,7 @@ public class ControlUI extends JFrame implements ActionListener, MouseWheelListe
 
     // Logic Variables
     private TabbedVisMainLogic tabbedVisMainLogic;
-    private GraphUIProperty gUIProp;
+    private GUIProperty gUIProp;
 
     // UI Components
 
@@ -56,12 +56,11 @@ public class ControlUI extends JFrame implements ActionListener, MouseWheelListe
         frm_height = screen_dim.height;
 
         ctrl_width = (int) (0.2 * (double) screen_dim.width);
-        //ctrl_height = screen_dim.height;
+        
         ctrl_height = (int) (0.2 * (double) screen_dim.height);
-        //System.out.println(screen_dim.height);
-
-        // Initialize graph UI property object to pass to sim
-        gUIProp = new GraphUIProperty();
+        
+        // Initialize GUI property object to pass to sim
+        gUIProp = new GUIProperty();
         gUIProp.height = screen_dim.height - 100;
         gUIProp.width = screen_dim.width - ctrl_width;
         gUIProp.posx = 0;
@@ -80,17 +79,14 @@ public class ControlUI extends JFrame implements ActionListener, MouseWheelListe
         jfrm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         jfrm.getContentPane().setLayout(null);
 
-        //This is the code that places the the new pannel
-        //This may be where I need to shift everything to make it straight
+        
         ctrl_panel = new JPanel();
         ctrl_panel.setBounds(frm_width - ctrl_width, 0, ctrl_width, ctrl_height);
-        //ctrl_panel.setBounds(0, 0, ctrl_width, frm_height);
-        //jfrm.getContentPane().add(ctrl_panel);
+        
         ctrl_panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
         try {
-            ControlUI.class.getResourceAsStream("./src/main/java/main/images/graph.png");
-            BufferedImage myPicture = ImageIO.read(new File("./src/main/java/main/images/graph.png"));
+            BufferedImage myPicture = ImageIO.read(new File("./src/main/java/main/images/search.png"));
             JLabel picLabel = new JLabel(new ImageIcon(myPicture));
             picLabel.setPreferredSize(new Dimension(100, 100));
             ctrl_panel.add(picLabel);
@@ -98,7 +94,8 @@ public class ControlUI extends JFrame implements ActionListener, MouseWheelListe
         } catch (Exception e) {
             System.out.println("ERROR: Icon load failed with error "+ e.getCause());
         }
-        jfrm.setTitle("Kronos Visualisation Tool");
+        jfrm.setTitle("Accio Visualization Tool");
+
 
         lbl_name = new JLabel("Kronos Visualisation Tool");
         lbl_name.setFont(new Font("Century", Font.BOLD, 16));

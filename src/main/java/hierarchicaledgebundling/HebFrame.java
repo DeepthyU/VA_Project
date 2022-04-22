@@ -129,8 +129,7 @@ public class HebFrame extends JPanel{
             }
         }
         long elapsedTime = System.nanoTime();
-        System.out.println("Time taken to read JSON (ms):");
-        System.out.println((elapsedTime - startTime) / 1000000);
+        System.out.println("DEBUG: Time taken to read JSON (ms):" + ((elapsedTime - startTime) / 1000000));
     }
 
     private int[] polarToCartesian(float r, float theta) {

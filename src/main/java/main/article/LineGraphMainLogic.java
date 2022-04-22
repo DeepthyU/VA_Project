@@ -11,8 +11,6 @@ import org.jfree.data.xy.XYSeriesCollection;
 import preprocessing.Article;
 import preprocessing.Preprocessor;
 import preprocessing.Utils;
-import vis.article.ArticleField;
-import vis.article.ArticleFilter;
 
 import javax.swing.*;
 import java.awt.*;
@@ -90,7 +88,7 @@ public class LineGraphMainLogic {
     }
 
     public void updateDataset(XYSeriesCollection dataset, List<ArticleFilter> articleFilter) {
-        System.out.println("dataset update called");
+        System.out.println("DEBUG: dataset update called");
         long startDate = computeKeywordFrequency(articleFilter);
         dataset.removeAllSeries();
         List<String> keywords = PREPROCESSOR.getKeywordsList();
@@ -128,10 +126,10 @@ public class LineGraphMainLogic {
 
         keywordCount = new int[keywords.size()][totalDays + 1];
         clearKeyCount();
-        for (int i = 0; i < keywords.size(); i++) {
-            for (Article article : articleList) {
-                if (!Utils.isRemoveItem(filters, article)) {
-                    remainingArticlesCount++;
+        for (Article article : articleList) {
+            if (!Utils.isRemoveItem(filters, article)) {
+                remainingArticlesCount++;
+                for (int i = 0; i < keywords.size(); i++) {
                     if (currKeywords != null) {
                         if (!currKeywords.contains(keywords.get(i).toLowerCase(Locale.ROOT))) {
                             continue;
@@ -139,9 +137,6 @@ public class LineGraphMainLogic {
                     }
                     if (article.getKeywordsList().contains(keywords.get(i).toLowerCase(Locale.ROOT))) {
                         int dateIdx = (int) ((article.getDate().getTime() - startDate) / (1000 * 60 * 60 * 24));
-//                        if (keywordCount[i][dateIdx] == -1) {
-//                            keywordCount[i][dateIdx] = 0;
-//                        }
                         keywordCount[i][dateIdx]++;
                         if (maxKeyCount < keywordCount[i][dateIdx]) {
                             maxKeyCount = keywordCount[i][dateIdx];
@@ -151,11 +146,13 @@ public class LineGraphMainLogic {
                 }
             }
         }
-        System.out.println("Max key count = " + maxKeyCount);
-        System.out.println("Max keyword = " + maxKeyword);
-        System.out.println("Remaining articles = " + remainingArticlesCount);
+        System.out.println("DEBUG: Max key count = " + maxKeyCount);
+        System.out.println("DEBUG: Max keyword = " + maxKeyword);
+        System.out.println("DEBUG: Remaining articles = " + remainingArticlesCount);
         return startDate;
     }
+
+
     private static void clearKeyCount() {
         for (int[] ints : keywordCount) {
             Arrays.fill(ints, -1);

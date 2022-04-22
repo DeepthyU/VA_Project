@@ -12,7 +12,7 @@ import java.util.List;
 public class SentimentAnalysis {
 
 
-    private static final String ARTICLE_LIST_FILE_PATH = VisualizerPrefs.getInstance().getRootPath().resolve("article_list.json").toString();
+    private static final String ARTICLE_LIST_FILE_PATH = VisualizerPrefs.getInstance().getFullDataDirPath().resolve("article_list.json").toString();
 
     public static void setSentiments(List<Article> articleList) {
         for (Article article:articleList) {

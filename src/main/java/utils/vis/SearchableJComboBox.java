@@ -1,4 +1,7 @@
-package vis;
+/**
+ * Code taken from http://www.orbital-computer.de/JComboBox/
+ */
+package utils.vis;
 
 
 import javax.swing.*;

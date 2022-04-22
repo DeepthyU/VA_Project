@@ -2,16 +2,14 @@ package main.article;
 
 import org.jfree.chart.ChartPanel;
 import preprocessing.Preprocessor;
-import vis.SentimentVisualizer;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseWheelEvent;
 import java.util.List;
 
 public class ArticleAutoVisMainLogic {
 
-    private SentimentVisualizer sentimentVisualizer;
+    private SentimentMainLogic sentimentVisualizer;
     private ArticleTSNEMainLogic articleTSNEMainLogic;
     private JTabbedPane mainAutoPanel;
     private ChartPanel articleTSNEChart;
@@ -21,7 +19,7 @@ private Preprocessor preprocessor;
         preprocessor = new Preprocessor();
         mainAutoPanel = new JTabbedPane();
 
-        sentimentVisualizer = new SentimentVisualizer(preprocessor);
+        sentimentVisualizer = new SentimentMainLogic(preprocessor);
 
         articleTSNEMainLogic = new ArticleTSNEMainLogic(preprocessor);
         articleTSNEChart = articleTSNEMainLogic.simulate_graph();
@@ -42,8 +40,10 @@ private Preprocessor preprocessor;
     }
 
     public void applyFilters(List filters){
+        if (null != filters) {
             sentimentVisualizer.applyFilters(filters);
             articleTSNEMainLogic.applyFilters(filters);
+        }
     }
     public JTabbedPane getPane() {
         return mainAutoPanel;

@@ -1,4 +1,4 @@
-package vis.article;
+package main.article;
 
 import java.util.ArrayList;
 import java.util.List;

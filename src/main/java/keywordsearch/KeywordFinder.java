@@ -3,6 +3,8 @@ package keywordsearch;
 import org.apache.commons.lang3.ArrayUtils;
 import preprocessing.Article;
 import preprocessing.Utils;
+import utils.PythonExecuter;
+import utils.VisualizerPrefs;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -13,7 +15,7 @@ import java.util.List;
 public class KeywordFinder {
 
     public static String[] keywordsArr;
-    public static final String KEYWORDS_FILE_PATH = "keywords_list.txt";
+    public static final String KEYWORDS_FILE_PATH = VisualizerPrefs.getInstance().getFullDataDirPath().resolve("keywords_list.txt").toString();
 
     public KeywordFinder(List<Article> articleList, String history) {
         getKeywordsFromFile();
@@ -61,9 +63,10 @@ public class KeywordFinder {
         //https://github.com/kennycason/kumo
         Utils.writeFile("search_text.txt", searchText);
         PythonExecuter executer = new PythonExecuter();
-        executer.runWordCloudScript("freq_count.py", new String[]{"search_text.txt", "0.05"}, "kf");
+        executer.runWordCloudScript("./src/main/python/freq_count.py", new String[]{"search_text.txt", "0.05"}, "kf");
         String outFileName = Utils.readAndDeleteFile("kfpythonOut.txt", Charset.defaultCharset());
         String data = Utils.readAndDeleteFile(outFileName + ".txt", Charset.defaultCharset());
+        Utils.deleteFile("search_text.txt");
         String[] keywords = data.split("##");
         System.out.println("keywords: " + keywords.length + " :: " + Arrays.toString(keywords));
         return keywords;//Arrays.copyOfRange(keywords, 0, 10);
